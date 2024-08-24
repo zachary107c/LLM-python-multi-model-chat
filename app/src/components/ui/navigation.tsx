@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { Button, Box, Card, Heading } from "@radix-ui/themes";
-import { ArrowRightIcon, ArrowLeftIcon, GearIcon, SunIcon } from "@radix-ui/react-icons";
+import { Button, Heading } from "@radix-ui/themes";
+import { GearIcon, SunIcon, HomeIcon } from "@radix-ui/react-icons";
 
 
 export default function Navigation() {
@@ -18,6 +17,11 @@ export default function Navigation() {
         <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r w-15">
             <div className="mt-1 p-2">
                 <Heading size='6'>bs.</Heading>
+            </div>
+            <div className="mt-1 p-2">
+                <Button variant="surface" highContrast>
+                    <HomeIcon />
+                </Button>
             </div>
             <div className="mt-1 p-2">
                 <Button variant="surface" highContrast>

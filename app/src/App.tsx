@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import Navigation from "./components/ui/navigation";
 
 function App() {
     useEffect(() => {
@@ -9,7 +10,8 @@ function App() {
         }
     }, []);
     return (
-        <div className="grid w-full pl-[55px]">
+        <div className="h-screen max-h-[100dvh] overflow-auto flex flex-row">
+            <Navigation />
             <Outlet />
         </div>
     )
