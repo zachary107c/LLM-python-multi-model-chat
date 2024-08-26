@@ -554,16 +554,18 @@ video {
   --tw-contain-style:  ;
 }
 
-.fixed {
-  position: fixed;
-}
-
-.left-0 {
-  left: 0px;
-}
-
 .z-20 {
   z-index: 20;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mx-20 {
+  margin-left: 5rem;
+  margin-right: 5rem;
 }
 
 .mb-2 {
@@ -580,6 +582,10 @@ video {
 
 .mt-1 {
   margin-top: 0.25rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
 }
 
 .flex {
@@ -600,6 +606,10 @@ video {
 
 .max-h-\[100dvh\] {
   max-height: 100dvh;
+}
+
+.w-14 {
+  width: 3.5rem;
 }
 
 .w-full {
@@ -652,6 +662,20 @@ video {
 
 .p-2 {
   padding: 0.5rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.px-16 {
+  padding-left: 4rem;
+  padding-right: 4rem;
 }
 
 .align-middle {

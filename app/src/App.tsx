@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Navigation from "./components/ui/navigation";
+import Navigation from "./components/ui/navigation/navigation";
 
 function App() {
     useEffect(() => {

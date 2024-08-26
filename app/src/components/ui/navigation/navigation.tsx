@@ -14,7 +14,7 @@ export default function Navigation() {
     }
 
     return (
-        <aside className="inset-y fixed left-0 z-20 flex h-full flex-col border-r w-15">
+        <aside className="z-20 flex h-full flex-col border-r w-14">
             <div className="mt-1 p-2">
                 <Heading size='6'>bs.</Heading>
             </div>
