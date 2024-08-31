@@ -29,7 +29,7 @@ const ChatComponent = () => {
         <div className='flex-col justify-between'>
             <div className='h-full mb-2 w-[50%]'>
                 {
-                    responseData?.loading ? <FingerprintSpinner color="#8457AA" size={75}/> : <Panel className="overflow-y-scroll h-[50%]">{responseData.data}</Panel>
+                    responseData?.loading ? <FingerprintSpinner color="#8457AA" size={75}/> : <Panel className="W">{responseData.data}</Panel>
                 }
             </div>
             <div className="flex justify-between">
