@@ -14,8 +14,10 @@ export default function Panel({ title, centered, children }: any) {
                         {children}
                     </div>
                     :
-                    <div className="overflow-y-auto h-full">
-                        {children}
+                    <div className="max-h-screen">
+                        <div className="overflow-y-scroll h-[50%]">
+                            {children}
+                        </div>
                     </div>
             }
 

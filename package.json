@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "@heroicons/react": "^2.1.5",
-    "autoprefixer": "^10.4.20",
-    "framer-motion": "^11.3.24",
-    "postcss": "^8.4.41"
-  }
-}
