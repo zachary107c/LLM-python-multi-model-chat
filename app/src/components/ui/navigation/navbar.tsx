@@ -1,7 +1,8 @@
-import { Button, Heading, Separator } from "@radix-ui/themes";
-import { GitHubLogoIcon, SunIcon } from "@radix-ui/react-icons";
+import { Button } from "@radix-ui/themes";
+import { HomeIcon, GearIcon, SunIcon } from "@radix-ui/react-icons";
 
-export default function NavBar() {
+
+export default function Navbar() {
     function onChangeMode() {
         if (localStorage.theme === 'dark') {
             document.getElementById('body')!.classList.remove('dark')
@@ -13,9 +14,24 @@ export default function NavBar() {
     }
 
     return (
-        <nav className="border-b">
-            <div className='h-14 flex justify-between items-center align-middle ml-15'>
+        <aside className='border-r border-white'>
+            <div className="flex flex-col my-4 mx-2">
+                <div className="mb-2">
+                    <Button variant='surface'>
+                        <HomeIcon />
+                    </Button>
+                </div>
+                <div className="mb-2">
+                    <Button variant='surface'>
+                        <GearIcon />
+                    </Button>
+                </div>
+                <div className="mb-2">
+                    <Button onClick={onChangeMode} variant='surface'>
+                        <SunIcon />
+                    </Button>
+                </div>
             </div>
-        </nav>
+        </aside>
     )
 }

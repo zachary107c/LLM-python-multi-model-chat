@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Navigation from "./components/ui/navigation/navigation";
+import Navbar from "./components/ui/navigation/navbar";
 
 function App() {
     useEffect(() => {
@@ -11,7 +11,7 @@ function App() {
     }, []);
     return (
         <div className="h-screen max-h-[100dvh] overflow-auto flex flex-row">
-            <Navigation />
+            <Navbar />
             <Outlet />
         </div>
     )
