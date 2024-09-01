@@ -1,27 +1,25 @@
-import { Card, Text } from "@radix-ui/themes";
+import { Card, Text, Heading, Inset, Button, Badge } from "@radix-ui/themes";
+import MarkdownRenderer from "../utils/markdown";
 
-export default function Panel({ title, centered, children }: any) {
+
+export default function Panel({ title, role, text, children }: any) {
     return (
-        <Card variant='surface' className='mb-2'>
+        <Card className='mb-2' variant='surface'>
             {(title) && (
-            <div className='mb-2'>
-                <Text as="div" size="4" weight="bold">
-                    {title}
-                </Text>
-            </div>)}
-            {
-                centered ?
-                    <div className="flex ml-auto mr-auto align-middle justify-center items-center content-center h-full">
-                        {children}
-                    </div>
-                    :
-                    <div className="max-h-screen">
-                        <div className="overflow-y-scroll h-[50%] no-scrollbar">
-                            {children}
-                        </div>
-                    </div>
-            }
-
+                <div className={`mb-2 flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <Badge variant='surface' color={role === 'user' ? 'jade' : 'gray'}>{title}</Badge>
+                </div>)}
+            <div>
+                <div className="font-work-sans overflow-y-scroll no-scrollbar">
+                    {(text) && (
+                        <Text size='1'>
+                            <MarkdownRenderer markdown={text} />
+                        </Text>
+                    )
+                    }
+                    {children}
+                </div>
+            </div>
         </Card>
     );
 }

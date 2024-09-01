@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "./components/ui/navigation/navbar";
+import Navbar from "@/components/navigation/navbar";
 
 function App() {
     useEffect(() => {
@@ -10,7 +10,7 @@ function App() {
         }
     }, []);
     return (
-        <div className="h-screen max-h-[100dvh] overflow-auto flex flex-row">
+        <div className="chat-page h-screen max-h-[100dvh] overflow-auto flex flex-row">
             <Navbar />
             <Outlet />
         </div>

@@ -5,10 +5,14 @@ export default {
       "./pages/**/*.{ts,tsx}",
       "./components/**/*.{ts,tsx}",
       "./app/**/*.{ts,tsx}",
-      "./src/**/*.{ts,tsx}"]
+      "./src/**/*.{ts,tsx,html}"]
   },
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        "work-sans": ["Work Sans"]
+      }
+    },
   },
   plugins: [],
 }

@@ -1,4 +1,4 @@
-import ChatBot from "../components/ui/chat/message"
+import { ChatBot } from "@/features/chat/components/message"
 
 export default function HomePage() {
     return (
