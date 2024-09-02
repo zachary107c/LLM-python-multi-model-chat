@@ -1,58 +1,37 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { TextArea, Button, IconButton, Card, Separator, Badge, Switch, Text, Flex } from '@radix-ui/themes';
-import { PaperPlaneIcon } from '@radix-ui/react-icons';
 import useScrollToEnd from '@/features/chat/hooks/use-scroll-to-end';
-import { BarLoader } from 'react-spinners';
+import { ChatLoader } from '@/features/chatLoader/components/chat-loader';
 import Panel from '@/components/ui/panel';
+import { ChatInput } from '@/features/chatInput/components/chat-input';
+import { ChatMessage } from '@/features/chatMessage/components/chat-message';
 
 export interface Message {
     text: string;
     type: 'user' | 'llm';
 }
 
+
 export function ChatBot() {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [context, setContext] = useState([]);
-    const [contextEnabled, setContextEnabled] = useState(false);
-    const [newMessage, setNewMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
 
-    async function handleSendMessage(event: any) {
-        event.preventDefault();
-        if (newMessage.trim().length > 0) {
-            setMessages([...messages, { text: newMessage, type: 'user' }]);
-            setNewMessage('');
+    async function handleSendMessage(message: string) {
+        if (message.trim().length > 0) {
+            setMessages([...messages, { text: message, type: 'user' }]);
             setIsLoading(true);
             var payload = {
-                model: "Jade",
-                // messages: [{ role: "user", content: newMessage }],
-                prompt: newMessage,
+                model: "llama3",
+                messages: [{ role: "user", content: message }],
                 stream: false,
-                context: null
             }
-            if (contextEnabled) {
-                if (context && context.length > 0) {
-                    payload.context = context;
-                }
-            }
-            const response = await axios.post('http://192.168.1.11:11434/api/generate', payload);
 
-            if (contextEnabled) {
-                setContext(response.data.context)
-            } else {
-                console.log(contextEnabled)
-            }
+            const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
 
             setIsLoading(false);
-            setMessages([...messages, { text: newMessage, type: 'user' }, { text: response.data.response, type: 'llm' }]);
+            setMessages([...messages, { text: message, type: 'user' }, { text: response.data.message.content, type: 'llm' }]);
         }
-    }
-
-    function handleContextToggle(event: any) {
-        console.log((event.target.value === 'on'))
-        setContextEnabled((event.target.value === 'on'))
     }
 
     return (
@@ -60,55 +39,20 @@ export function ChatBot() {
             <div className='flex flex-col justify-between h-screen w-[65%]'>
                 <div className='pt-4 overflow-x-hidden overflow-y-scroll no-scrollbar'>
                     {messages.map((message, index) => (
-                        message.type === 'user' ? (
-                            <div className='flex justify-end'>
-                                <div>
-                                    <Panel title='You' text={message.text} role={message.type} />
-                                </div>
-                            </div>
-                        ) : (
-                            <div className='flex justify-start'>
-                                <div>
-                                    <Panel title='LLM' text={message.text} role={message.type} />
-                                </div>
-                            </div>
-                        )
+                        <ChatMessage messageText={message.text} messageType={message.type} />
                     ))}
                     {
                         (isLoading) && (
                             <div className='flex justify-start'>
-                                <div>
-                                    <Panel title='LLM' justify='justify-start'>
-                                        <BarLoader color='#197CAE' />
-                                    </Panel>
-                                </div>
-                                <div className='ml-96'></div>
+                                <Panel title='LLM' justify='justify-start'>
+                                    <ChatLoader />
+                                </Panel>
                             </div>
                         )
                     }
                     <div ref={ref} />
                 </div>
-                <div className='my-4'>
-                    <form onSubmit={handleSendMessage} className='flex justify-between'>
-                        <div className='mr-2'>
-                            <div className='flex flex-col'>
-                                <div className='mb-1'>
-                                    <Switch size="1" onClick={(event) => { handleContextToggle(event) }} />
-                                </div>
-                                Context
-                            </div>
-                        </div>
-                        <TextArea
-                            size='1'
-                            variant='surface'
-                            value={newMessage}
-                            onChange={(event) => setNewMessage(event?.target.value)}
-                            placeholder='Type a message to the bot'
-                            className='w-full mr-2'
-                        />
-                        <IconButton type='submit' size='4' variant='surface'><PaperPlaneIcon /></IconButton>
-                    </form>
-                </div>
+                <ChatInput onSendMessage={handleSendMessage} />
             </div>
         </div>
     );

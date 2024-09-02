@@ -4,15 +4,15 @@ import MarkdownRenderer from "../utils/markdown";
 
 export default function Panel({ title, role, text, children }: any) {
     return (
-        <Card className='mb-2' variant='surface'>
+        <Card className='mb-2 ' variant='surface'>
             {(title) && (
                 <div className={`mb-2 flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <Badge variant='surface' color={role === 'user' ? 'jade' : 'gray'}>{title}</Badge>
                 </div>)}
             <div>
-                <div className="font-work-sans overflow-y-scroll no-scrollbar">
+                <div className="font-work-sans overflow-y-scroll overflow-x-scroll no-scrollbar">
                     {(text) && (
-                        <Text size='1'>
+                        <Text size='2'>
                             <MarkdownRenderer markdown={text} />
                         </Text>
                     )
