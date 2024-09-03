@@ -10,7 +10,7 @@ function App() {
         }
     }, []);
     return (
-        <div className="chat-page h-screen max-h-[100dvh] overflow-auto flex flex-row">
+        <div className="main-page h-screen max-h-[100dvh] overflow-auto flex flex-row">
             <Navbar />
             <Outlet />
         </div>

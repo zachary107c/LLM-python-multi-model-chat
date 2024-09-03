@@ -597,14 +597,13 @@ video {
   --tw-contain-style:  ;
 }
 
+.m-4 {
+  margin: 1rem;
+}
+
 .mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
-}
-
-.my-2 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .my-4 {
@@ -618,10 +617,6 @@ video {
 
 .mr-2 {
   margin-right: 0.5rem;
-}
-
-.mt-2 {
-  margin-top: 0.5rem;
 }
 
 .flex {
@@ -676,6 +671,10 @@ video {
   overflow: auto;
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
 .overflow-x-hidden {
   overflow-x: hidden;
 }
@@ -692,74 +691,17 @@ video {
   border-right-width: 1px;
 }
 
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .pt-4 {
   padding-top: 1rem;
 }
 
-.pb-2 {
-  padding-bottom: 0.5rem;
-}
-
 .font-work-sans {
   font-family: Work Sans;
-}
-
-.scrollbar::-webkit-scrollbar-track {
-  background-color: var(--scrollbar-track);
-  border-radius: var(--scrollbar-track-radius);
-}
-
-.scrollbar::-webkit-scrollbar-track:hover {
-  background-color: var(--scrollbar-track-hover, var(--scrollbar-track));
-}
-
-.scrollbar::-webkit-scrollbar-track:active {
-  background-color: var(--scrollbar-track-active, var(--scrollbar-track-hover, var(--scrollbar-track)));
-}
-
-.scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: var(--scrollbar-thumb-radius);
-}
-
-.scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--scrollbar-thumb-hover, var(--scrollbar-thumb));
-}
-
-.scrollbar::-webkit-scrollbar-thumb:active {
-  background-color: var(--scrollbar-thumb-active, var(--scrollbar-thumb-hover, var(--scrollbar-thumb)));
-}
-
-.scrollbar::-webkit-scrollbar-corner {
-  background-color: var(--scrollbar-corner);
-  border-radius: var(--scrollbar-corner-radius);
-}
-
-.scrollbar::-webkit-scrollbar-corner:hover {
-  background-color: var(--scrollbar-corner-hover, var(--scrollbar-corner));
-}
-
-.scrollbar::-webkit-scrollbar-corner:active {
-  background-color: var(--scrollbar-corner-active, var(--scrollbar-corner-hover, var(--scrollbar-corner)));
-}
-
-.scrollbar {
-  scrollbar-width: auto;
-  scrollbar-color: var(--scrollbar-thumb, initial) var(--scrollbar-track, initial);
-}
-
-.scrollbar::-webkit-scrollbar {
-  display: block;
-  width: var(--scrollbar-width, 16px);
-  height: var(--scrollbar-height, 16px);
-}
-
-.scrollbar-track-slate-300 {
-  --scrollbar-track: #cbd5e1 !important;
-}
-
-.scrollbar-thumb-slate-700 {
-  --scrollbar-thumb: #334155 !important;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -777,48 +719,30 @@ video {
   /* Firefox */
 }
 
-.scrollbar::-webkit-scrollbar {
-  width: 20px;
-  height: 20px;
-}
-
-.scrollbar::-webkit-scrollbar-track {
-  border-radius: 100vh;
-  background: #ffffff00;
-}
-
-.scrollbar::-webkit-scrollbar-thumb {
-  background: #ffffff00;
-  border-radius: 100vh;
-  border: 3px solid #ffffff00;
-}
-
-.scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #ffffff00;
-}
-
 .hljs {
   border-radius: 10px;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  background: #FFFFFF09 !important;
+  background: #b8b8b833 !important;
   /* background: #3c0878 !important; 
     background-image: radial-gradient(at 23.0% 58.0%, #000000 0px, transparent 50%),radial-gradient(at 92.0% 46.0%, #030203 0px, transparent 50%),radial-gradient(at 23.0% 14.0%, #000000 0px, transparent 50%),radial-gradient(at 47.0% 80.0%, #0d0d0d 0px, transparent 50%),radial-gradient(at 9.8% 44.9%, #000000 0px, transparent 50%) !important; */
 }
 
-.chat-page {
-  background: #199e9a;
-  background-image: radial-gradient(at 13.0% 49.0%, hsl(313, 72%, 29%) 0px, transparent 50%),radial-gradient(at 95.0% 67.0%, hsl(212, 45%, 82%) 0px, transparent 50%),radial-gradient(at 80.0% 73.0%, hsl(254, 71%, 36%) 0px, transparent 50%),radial-gradient(at 62.0% 89.0%, hsl(307, 34%, 52%) 0px, transparent 50%),radial-gradient(at 93.0% 10.0%, hsl(299, 92%, 60%) 0px, transparent 50%);
-  background: #4ae8eb;
-  background-image: radial-gradient(at 91.0% 98.0%, hsl(196, 29%, 33%) 0px, transparent 50%),radial-gradient(at 91.0% 81.0%, hsl(140, 66%, 66%) 0px, transparent 50%),radial-gradient(at 33.0% 40.0%, hsl(165, 69%, 25%) 0px, transparent 50%),radial-gradient(at 44.0% 86.0%, hsl(354, 100%, 36%) 0px, transparent 50%),radial-gradient(at 96.0% 33.0%, hsl(51, 66%, 70%) 0px, transparent 50%);
-  background: #572a51;
-  background-image: radial-gradient(at 70.0% 15.0%, hsl(279, 96%, 40%) 0px, transparent 50%),radial-gradient(at 31.0% 63.0%, hsl(281, 61%, 36%) 0px, transparent 50%),radial-gradient(at 15.0% 20.0%, hsl(287, 48%, 60%) 0px, transparent 50%),radial-gradient(at 59.0% 16.0%, hsl(25, 11%, 62%) 0px, transparent 50%),radial-gradient(at 63.0% 49.0%, hsl(169, 52%, 54%) 0px, transparent 50%);
-  background: #fe87fc;
-  background-image: radial-gradient(at 28.0% 54.0%, hsl(270, 64%, 21%) 0px, transparent 50%),radial-gradient(at 56.0% 49.0%, hsl(255, 96%, 62%) 0px, transparent 50%),radial-gradient(at 58.0% 60.0%, hsl(22, 70%, 54%) 0px, transparent 50%),radial-gradient(at 48.0% 58.0%, hsl(152, 79%, 36%) 0px, transparent 50%),radial-gradient(at 31.0% 87.0%, hsl(298, 89%, 50%) 0px, transparent 50%);
-  background: #12e4ec;
-  background-image: radial-gradient(at 14.0% 97.0%, hsl(181, 88%, 36%) 0px, transparent 50%),radial-gradient(at 38.0% 64.0%, hsl(196, 60%, 52%) 0px, transparent 50%),radial-gradient(at 85.0% 22.0%, hsl(181, 94%, 60%) 0px, transparent 50%),radial-gradient(at 49.0% 63.0%, hsl(239, 61%, 55%) 0px, transparent 50%),radial-gradient(at 2.0% 64.0%, hsl(238, 97%, 47%) 0px, transparent 50%);
-  background: #7e1d93;
-  background-image: radial-gradient(at 49.0% 89.0%, hsl(358, 97%, 22%) 0px, transparent 50%),radial-gradient(at 67.0% 14.0%, hsl(5, 88%, 43%) 0px, transparent 50%),radial-gradient(at 61.0% 61.0%, hsl(124, 38%, 75%) 0px, transparent 50%),radial-gradient(at 60.0% 89.0%, hsl(254, 71%, 37%) 0px, transparent 50%),radial-gradient(at 15.0% 8.0%, hsl(169, 95%, 92%) 0px, transparent 50%);
-  background: #3c0878;
-  background-image: radial-gradient(at 23.0% 58.0%, #000000 0px, transparent 50%),radial-gradient(at 92.0% 46.0%, #030203 0px, transparent 50%),radial-gradient(at 23.0% 14.0%, #000000 0px, transparent 50%),radial-gradient(at 47.0% 80.0%, #0d0d0d 0px, transparent 50%),radial-gradient(at 9.8% 44.9%, #000000 0px, transparent 50%);
+/* .main-page {
+    background: radial-gradient(at 100% 0%, hsla(237, 95%, 63%, 0) 0px, transparent 50%), radial-gradient(at 93% 98%, rgb(114, 0, 245) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(128, 137, 239, 0.506) 0px, transparent 50%);
+} */
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #f2c464;
+  /* Your preferred color */
+  transform: scale(0);
+  transition: transform 0.5s ease-out;
+}
+
+.confetti-piece:hover {
+  transform: scale(1.2);
 }

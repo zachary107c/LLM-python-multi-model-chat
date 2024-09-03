@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from "@radix-ui/themes";
+import { Button, Avatar } from "@radix-ui/themes";
 import { HomeIcon, GearIcon, SunIcon } from "@radix-ui/react-icons";
 import { Link } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ export default function Navbar() {
 
     return (
         <aside className="border-r background-none">
-            <div className="flex flex-col my-4 mx-2">
+            <div className="flex flex-col my-4 mx-2 items-center">
                 <div className="mb-2">
                     <Link to="/">
                         <Button variant='surface'>

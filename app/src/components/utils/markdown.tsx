@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from "react";
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
-// import "highlight.js/styles/atom-one-dark.css";
-import "highlight.js/styles/vs2015.css";
+import "highlight.js/styles/vs.css";
+
 
 interface MarkdownRendererProps {
   markdown: string;
