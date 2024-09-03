@@ -1,5 +1,4 @@
 .dark {
-
     .hljs {
         border-radius: 10px;
         margin-top: 1rem;
@@ -123,5 +122,9 @@
         background-color: #600;
         display: inline-block;
         width: 100%
+    }
+
+    .react-spinners-BarLoader-short {
+        background-color: white !important;
     }
 }

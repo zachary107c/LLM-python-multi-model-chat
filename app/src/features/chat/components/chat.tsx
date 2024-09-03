@@ -12,7 +12,7 @@ export interface Message {
 }
 
 
-export function ChatBot() {
+export function Chat() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
@@ -36,7 +36,7 @@ export function ChatBot() {
 
     return (
         <div className='flex flex-col items-center'>
-            <div className='flex flex-col justify-between h-screen w-[65%]'>
+            <div className='flex flex-col justify-between h-screen w-[60%]'>
                 <div className='pt-4 overflow-x-hidden overflow-y-scroll no-scrollbar'>
                     {messages.map((message, index) => (
                         <ChatMessage messageText={message.text} messageType={message.type} />

@@ -56,15 +56,15 @@
         --destructive-foreground: 0 0% 98%;
         --border: 0 0% 14.9%;
     }
-}
 
-.hljs {
-    border-radius: 10px;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    background: #b8b8b833 !important;
-    /* background: #3c0878 !important; 
-    background-image: radial-gradient(at 23.0% 58.0%, #000000 0px, transparent 50%),radial-gradient(at 92.0% 46.0%, #030203 0px, transparent 50%),radial-gradient(at 23.0% 14.0%, #000000 0px, transparent 50%),radial-gradient(at 47.0% 80.0%, #0d0d0d 0px, transparent 50%),radial-gradient(at 9.8% 44.9%, #000000 0px, transparent 50%) !important; */
+    .hljs {
+        border-radius: 10px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        background: #b8b8b833 !important;
+        /* background: #3c0878 !important; 
+        background-image: radial-gradient(at 23.0% 58.0%, #000000 0px, transparent 50%),radial-gradient(at 92.0% 46.0%, #030203 0px, transparent 50%),radial-gradient(at 23.0% 14.0%, #000000 0px, transparent 50%),radial-gradient(at 47.0% 80.0%, #0d0d0d 0px, transparent 50%),radial-gradient(at 9.8% 44.9%, #000000 0px, transparent 50%) !important; */
+    }
 }
 
 @layer utilities {
@@ -90,22 +90,8 @@
 }
 
 
-/* .main-page {
-    background: radial-gradient(at 100% 0%, hsla(237, 95%, 63%, 0) 0px, transparent 50%), radial-gradient(at 93% 98%, rgb(114, 0, 245) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(128, 137, 239, 0.506) 0px, transparent 50%);
-} */
-
-
-.confetti-piece {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #f2c464;
-    /* Your preferred color */
-    transform: scale(0);
-    transition: transform 0.5s ease-out;
+.main-page {
+    background: radial-gradient(at 100% 0%, hsla(237, 95%, 63%, 0) 0px, transparent 50%), radial-gradient(at 93% 98%, rgb(114, 0, 245) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(136, 0, 255, 0.095) 0px, transparent 50%);
 }
 
-.confetti-piece:hover {
-    transform: scale(1.2);
-}
+
