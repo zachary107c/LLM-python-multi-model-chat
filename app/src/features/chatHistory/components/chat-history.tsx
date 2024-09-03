@@ -9,7 +9,7 @@ export function ChatHistory() {
     const [messages, setMessages] = useState([
         'Hello World Python 🐍',
         'Is Klim F awesome? 🌈',
-        'Did Bush do the 9/11 attack??!!',
+        'Who was the 100th president of the unite d States of America?',
         'What is the meaning of life? And the universe? And everything?? 🤔',
     ]);
 
@@ -26,13 +26,13 @@ export function ChatHistory() {
                         <div className="w-full flex justify-start overflow-hidden">
                             {
                                 index === selected ?
-                                <Button size='sm' variant={'ghost'} className="mb-1 w-full justify-between bg-accent text-accent-foreground" onClick={() => handleSetSelected(index)}>
-                                    {message}
-                                </Button>
-                                :
-                                <Button size='sm' variant={'ghost'} className="mb-1 w-full justify-between " onClick={() => handleSetSelected(index)}>
-                                    {message}
-                                </Button>
+                                    <Button size='sm' variant={'ghost'} className="mb-1 w-full justify-between bg-accent text-accent-foreground" onClick={() => handleSetSelected(index)}>
+                                        {message}
+                                    </Button>
+                                    :
+                                    <Button size='sm' variant={'ghost'} className="mb-1 w-full justify-between " onClick={() => handleSetSelected(index)}>
+                                        {message}
+                                    </Button>
                             }
                         </div>
                     ))

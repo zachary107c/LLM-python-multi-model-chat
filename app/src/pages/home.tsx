@@ -7,15 +7,15 @@ import { Button } from "@/components/ui/button"
 export default function HomePage() {
     const [expanded, setExpanded] = useState(false)
 
-    function handleSetExpanded(e) {
+    function handleSetExpanded(e: any) {
         setExpanded(e)
     }
 
     return (
         <div className="w-full h-full flex overflow-hidden">
-            <div className={`${expanded ? 'w-[15%]' : 'w-[2%]'} border-r border-[#7d7d7d68] bg-[#7d7d7d14]`}>
+            <div className={`${expanded ? 'w-[15%]' : 'w-[2%]'} border-r border-[#7d7d7d68] bg-[#7d7d7d14] transition-all ease-in-out duration-300`}>
                 <div className="flex justify-start">
-                    <Button variant={'ghost'} className="m-1 p-1">
+                    <Button variant={'ghost'} className="ml-1 p-1">
                         {expanded ? <PinLeftIcon onClick={() => handleSetExpanded(false)} /> : <PinRightIcon onClick={() => handleSetExpanded(true)} />}
                     </Button>
                 </div>
