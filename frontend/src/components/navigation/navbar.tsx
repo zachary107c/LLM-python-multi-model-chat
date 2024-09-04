@@ -22,7 +22,7 @@ export default function Navbar() {
 
 
     return (
-        <aside className="border-r border-[#7d7d7db3] bg-[#22222279]">
+        <aside className="border-r border-[#7d7d7db3] bg-[#2222222f]">
             <div className="flex flex-col my-2 mx-2 items-center">
                 <div className="mb-2">
                     <Link to="/">

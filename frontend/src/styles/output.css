@@ -614,10 +614,6 @@ video {
   margin: 0.25rem;
 }
 
-.m-0 {
-  margin: 0px;
-}
-
 .mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
@@ -641,16 +637,16 @@ video {
   margin-bottom: 0.5rem;
 }
 
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
 .mr-2 {
   margin-right: 0.5rem;
 }
 
 .mt-2 {
   margin-top: 0.5rem;
-}
-
-.ml-1 {
-  margin-left: 0.25rem;
 }
 
 .flex {
@@ -693,28 +689,20 @@ video {
   width: 2.25rem;
 }
 
-.w-\[60\%\] {
-  width: 60%;
-}
-
-.w-full {
-  width: 100%;
-}
-
 .w-\[15\%\] {
   width: 15%;
-}
-
-.w-\[5\%\] {
-  width: 5%;
 }
 
 .w-\[2\%\] {
   width: 2%;
 }
 
-.w-\[3\%\] {
-  width: 3%;
+.w-\[60\%\] {
+  width: 60%;
+}
+
+.w-full {
+  width: 100%;
 }
 
 .resize {
@@ -833,12 +821,12 @@ video {
   background-color: transparent;
 }
 
-.p-1 {
-  padding: 0.25rem;
+.bg-\[\#2222222f\] {
+  background-color: #2222222f;
 }
 
-.p-2 {
-  padding: 0.5rem;
+.p-1 {
+  padding: 0.25rem;
 }
 
 .px-3 {
@@ -932,34 +920,16 @@ video {
   outline-style: solid;
 }
 
-.transition-colors {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
 
-.transition-transform {
-  transition-property: transform;
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-}
-
-.transition {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.delay-300 {
-  transition-delay: 300ms;
 }
 
 .duration-300 {

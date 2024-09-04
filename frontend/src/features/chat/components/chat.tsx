@@ -22,7 +22,7 @@ export function Chat() {
             setMessages([...messages, { text: message, type: 'user' }]);
             setIsLoading(true);
             var payload = {
-                model: "llama3",
+                model: "llama3.1",
                 messages: [{ role: "user", content: message }],
                 stream: false,
             }
