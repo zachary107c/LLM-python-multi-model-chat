@@ -30,7 +30,7 @@ export function Chat() {
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
 
             setIsLoading(false);
-            setMessages([...messages, { text: message, type: 'user' }, { text: response.data.message.content, type: 'llm' }]);
+            setMessages([...messages, { text: message, type: 'user' }, { text: response.data.message.content.replace("\n", "<br/>"), type: 'llm' }]);
         }
     }
 

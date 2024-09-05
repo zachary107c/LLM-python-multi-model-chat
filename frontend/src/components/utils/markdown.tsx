@@ -21,10 +21,14 @@ const markedInstance = new Marked(
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ markdown }) => {
   const containerRef = useRef(null);
+
   useEffect(() => {
     hljs.highlightAll();
   }, [markdown]);
+
+  // Parsing markdown and sanitizing the resulting HTML
   const html = markedInstance.parse(markdown);
+
   return (
     <div
       ref={containerRef}

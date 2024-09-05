@@ -10,38 +10,71 @@ interface Props {
 export function ChatInput({ onSendMessage }: Props) {
     const [newMessage, setNewMessage] = useState('');
     const [newContext, setNewContext] = useState('');
+    const [textAreaHeight, setTextAreaHeight] = useState(48);
+    const [lastMessage, setLastMessage] = useState('');
 
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         onSendMessage(newMessage + '\n\n' + newContext);
+        setLastMessage(newMessage);
         setNewMessage('');
         setNewContext('');
+        setTextAreaHeight(48);
+    };
+
+    const handleKeyDown = (event: any) => {
+        if (event.shiftKey && event.key === 'Enter') {
+            setTextAreaHeight(Math.min(textAreaHeight + 24, 240)); // Limit expansion to 240px
+        }    
+        else if (event.key === 'Enter') {
+            event.preventDefault();
+            onSendMessage(newMessage);
+            setLastMessage(newMessage);
+            setNewMessage('');
+            setNewContext('');
+            setTextAreaHeight(48);
+        } else if (event.key === 'Backspace' && textAreaHeight > 48) {
+            if (newMessage.endsWith('\n')) {
+                setTextAreaHeight(Math.max(textAreaHeight - 24, 48));
+            }
+        } else if (event.key === 'ArrowUp') {
+            if (lastMessage) {
+                setNewMessage(lastMessage);
+            }
+        }
     };
 
     return (
-        <div className='chat-input py-4'>
-            <Card>
-                <form onSubmit={handleSendMessage} className='flex justify-between items-center'>
-                    <TextArea
-                        size='1'
-                        variant='surface'
-                        value={newMessage}
-                        onChange={(event) => setNewMessage(event.target.value)}
-                        placeholder='Type a message to the bot'
-                        className='w-full mr-2'
-                        rows={1}
-                        resize="vertical"
-                        radius="full"
-                    />
-                    <Button type='submit' size='4' variant='surface' color='jade'>
-                        <Text size='2'>
-                            Submit
-                        </Text>
-                        <RocketIcon />
-                    </Button>
-                </form>
-            </Card>
-
+        <div className='chat-input my-4'>
+            <form onSubmit={handleSendMessage} className='flex justify-between'>
+                <Card
+                    className='w-full'
+                    style={{
+                        '--base-card-padding-top': 'var(--space-1)',
+                        '--base-card-padding-bottom': 'var(--space-1)',
+                        '--base-card-padding-left': 'var(--space-2)',
+                        '--base-card-padding-right': 'var(--space-2)',
+                    } as any} size="1" variant='surface'>
+                    <div className='flex justify-between items-center h-full'>
+                        <Textarea
+                            className='mr-2 outline-none border-none w-full py-3 px-1 rounded-l resize-none h-[48px] no-scrollbar'
+                            onChange={(event) => setNewMessage(event.target.value)}
+                            value={newMessage}
+                            placeholder='Type your message here'
+                            onKeyDown={handleKeyDown}
+                            style={{ height: `${textAreaHeight}px` }}
+                        />
+                        <div className='flex items-end'>
+                            <Button type='submit' size='2' variant='surface' color='green'>
+                                <Text size='2'>
+                                    Submit
+                                </Text>
+                                <RocketIcon />
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
+            </form>
         </div>
     );
 };
