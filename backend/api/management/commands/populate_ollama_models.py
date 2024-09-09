@@ -32,10 +32,6 @@ class Command(BaseCommand):
                 if created:
                     self.stdout.write(self.style.SUCCESS(f"Model '{name}' created."))
                 else:
-                    self.stdout.write(
-                        self.style.SUCCESS(
-                            f"Model '{name}' already exists and updated."
-                        )
-                    )
+                    self.stdout.write(self.style.MIGRATE_HEADING(f"Model '{name}' already exists and updated."))
             else:
                 self.stdout.write(self.style.ERROR(f"Invalid model data: {model_data}"))
