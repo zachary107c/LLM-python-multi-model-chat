@@ -14,7 +14,7 @@ export default function HomePage() {
     return (
         <div className="w-full h-full flex overflow-hidden">
             <div className={`${expanded ? 'w-[15%]' : 'w-[2%]'} border-r border-[#7d7d7d68] ease-in-out duration-300`}>
-                <div className="flex justify-end">
+                <div className="flex justify-end mr-2">
                     {/* <Button variant={'ghost'} className="m-1 p-1">
                         {expanded ? <PinLeftIcon onClick={() => handleSetExpanded(false)} /> : <PinRightIcon onClick={() => handleSetExpanded(true)} />}
                     </Button> */}

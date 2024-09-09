@@ -11,7 +11,15 @@ django = "^5.1.1"
 requests = "^2.32.3"
 ollama = "^0.3.2"
 pillow = "^10.4.0"
+djangorestframework = "^3.15.2"
+django-allauth = "^64.2.1"
+django-rest-auth = "^0.9.5"
+djangorestframework-simplejwt = "^5.3.1"
+django-cors-headers = "^4.4.0"
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
 
 [build-system]
 requires = ["poetry-core"]
