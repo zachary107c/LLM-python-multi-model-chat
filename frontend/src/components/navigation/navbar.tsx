@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Button, Avatar, Text } from "@radix-ui/themes";
-import { HomeIcon, GearIcon, SunIcon, MoonIcon } from "@radix-ui/react-icons";
+import { HomeIcon, GearIcon, SunIcon, MoonIcon, ExitIcon } from "@radix-ui/react-icons";
 import { Link } from 'react-router-dom';
-import { Sun } from 'lucide-react';
+import { handleLogout } from '@/components/utils/handle-logout.ts';
 
 
 export default function Navbar() {
@@ -41,6 +41,11 @@ export default function Navbar() {
                 <div className="mb-2">
                     <Button onClick={onChangeMode} variant='soft' size='1'>
                         {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+                    </Button>
+                </div>
+                <div className="mb-2">
+                    <Button variant='soft' size='1' color='red' onClick={handleLogout}>
+                        <ExitIcon />
                     </Button>
                 </div>
             </div>
