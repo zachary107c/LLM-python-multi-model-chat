@@ -3,12 +3,18 @@ import { Chat } from "@/features/chat/components/chat"
 import { ChatHistory } from "@/features/chatHistory/components/chat-history"
 import { PinLeftIcon, PinRightIcon, Pencil2Icon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
+import Cookies from "js-cookie"
 
 export default function HomePage() {
     const [expanded, setExpanded] = useState(true)
+    const [selectedChatId, setSelectedChatId] = useState(null);
 
     function handleSetExpanded(e: any) {
         setExpanded(e)
+    }
+    
+    function handleSelectedChatId(id: any) {
+        setSelectedChatId(id);
     }
 
     return (
@@ -22,10 +28,10 @@ export default function HomePage() {
                         <Pencil2Icon />
                     </Button>
                 </div>
-                <ChatHistory />
+                <ChatHistory token={Cookies.get('token')} onSelectedIdChange={handleSelectedChatId}/>
             </div>
             <div className="w-full">
-                <Chat />
+                <Chat token={Cookies.get('token')} chatId={selectedChatId}/>
             </div>
         </div>
     )

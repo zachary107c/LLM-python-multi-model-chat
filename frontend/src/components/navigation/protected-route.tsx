@@ -6,14 +6,13 @@ interface ProtectedRouteProps {
 }
 
 // Function to check if a CSRF token exists in the cookies
-const hasCSRFToken = (): boolean => {
-  const csrfToken = Cookies.get('access_token'); // Retrieve the csrf token from cookies
-  console.log(csrfToken);
-  return !!csrfToken; // Return true if the csrf token exists
+const hasToken = (): boolean => {
+  const token = Cookies.get('token'); // Retrieve the csrf token from cookies
+  return !!token; // Return true if the csrf token exists
 };
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  if (!hasCSRFToken()) {
+  if (!hasToken()) {
     // If there is no CSRF token, redirect to the login page
     return <Navigate to="/login" />;
   }

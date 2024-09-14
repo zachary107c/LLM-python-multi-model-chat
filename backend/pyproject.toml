@@ -16,6 +16,7 @@ django-allauth = "^64.2.1"
 django-rest-auth = "^0.9.5"
 djangorestframework-simplejwt = "^5.3.1"
 django-cors-headers = "^4.4.0"
+django-rest-knox = "^5.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

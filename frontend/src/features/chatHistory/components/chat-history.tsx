@@ -1,37 +1,53 @@
-import { useState } from "react";
-import { PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons"
-import { Separator, Heading, Text, Card } from "@radix-ui/themes"
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { set } from "js-cookie";
 
-export function ChatHistory() {
 
-    const [selected, setSelected] = useState(0);
-    const [messages, setMessages] = useState([
-        'Hello World Python 🐍',
-        'Is Klim F awesome? 🌈',
-        'Who was the 100th president of the unite d States of America?',
-        'What is the meaning of life? And the universe? And everything?? 🤔',
-    ]);
+export function ChatHistory({token, onSelectedIdChange}: any) {
+
+    const [selected, setSelected] = useState(-1);
+    const [selectedId, setSelectedId] = useState(null);
+    const [chats, setHistory] = useState([]);
 
     function handleSetSelected(index: number) {
         setSelected(index);
+        setSelectedId(chats[index]?.id);
+        onSelectedIdChange(chats[index]?.id);
     }
+
+    useEffect(() => {
+        const fetchChatHistory = async () => {
+            const response = await axios.get('http://127.0.0.1:8000/api/v1/conversations/', {
+                headers: {
+                    Authorization: `Token ${token}`,
+                },
+            });
+            const data = await response.data;
+            setHistory(data);
+            setSelectedId(data[0].id);
+        };
+
+        if (token) {
+            fetchChatHistory();
+        }
+    }, [token]);
 
 
     return (
         <div className="mx-4">
             <div className="flex flex-col justify-center align-top mt-2">
                 <div className="flex flex-col w-full">
-                    {messages.map((message, index) => (
+                    {chats.map((chat, index) => (
                         <div className="w-full flex justify-start overflow-hidden">
                             {
                                 index === selected ?
                                     <Button size='sm' variant={'ghost'} className="mb-1 w-full justify-between bg-accent text-accent-foreground" onClick={() => handleSetSelected(index)}>
-                                        {message}
+                                        {chat.title}
                                     </Button>
                                     :
                                     <Button size='sm' variant={'ghost'} className="mb-1 w-full justify-between " onClick={() => handleSetSelected(index)}>
-                                        {message}
+                                        {chat.title}
                                     </Button>
                             }
                         </div>

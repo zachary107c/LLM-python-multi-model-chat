@@ -606,6 +606,10 @@ video {
   --tw-contain-style:  ;
 }
 
+.relative {
+  position: relative;
+}
+
 .m-1 {
   margin: 0.25rem;
 }
@@ -648,6 +652,10 @@ video {
 
 .mt-2 {
   margin-top: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
 }
 
 .flex {
@@ -708,6 +716,10 @@ video {
 
 .w-full {
   width: 100%;
+}
+
+.w-screen {
+  width: 100vw;
 }
 
 .resize-none {
@@ -881,6 +893,10 @@ video {
   vertical-align: top;
 }
 
+.align-middle {
+  vertical-align: middle;
+}
+
 .font-work-sans {
   font-family: Work Sans;
 }
@@ -967,9 +983,9 @@ video {
   /* Firefox */
 }
 
-/* .main-page {
-    background: radial-gradient(at 100% 0%, rgb(114, 0, 245) 0px, transparent 50%), radial-gradient(at 93% 98%, hsla(237, 95%, 63%, 0) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(136, 0, 255, 0.095) 0px, transparent 50%);
-} */
+.main-page {
+  background: radial-gradient(at 100% 0%, rgba(114, 0, 245, 0.106) 0px, transparent 50%), radial-gradient(at 93% 98%, hsla(237, 95%, 63%, 0) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(136, 0, 255, 0.095) 0px, transparent 50%);
+}
 
 .placeholder\:text-muted-foreground::-moz-placeholder {
   color: hsl(var(--muted-foreground));

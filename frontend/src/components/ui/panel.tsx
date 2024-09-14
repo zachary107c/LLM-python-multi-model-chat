@@ -9,7 +9,7 @@ export default function Panel({ title, role, text, children }: any) {
             <div className={`mb-1 flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <Badge variant='surface' color={role === 'user' ? 'green' : 'gray'}>{title}</Badge>
             </div>)}
-            <Card className='mb-2'>
+            <Card>
                 <div>
                     <div className="font-work-sans overflow-y-scroll overflow-x-scroll no-scrollbar">
                         {(text) && (
