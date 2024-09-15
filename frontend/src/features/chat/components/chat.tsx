@@ -5,29 +5,22 @@ import { ChatLoader } from '@/features/chatLoader/components/chat-loader';
 import Panel from '@/components/ui/panel';
 import { ChatInput } from '@/features/chatInput/components/chat-input';
 import { ChatMessage } from '@/features/chatMessage/components/chat-message';
-
-export interface Message {
-    text: string;
-    type: 'user' | 'assistant';
-    id: number;
-}
+import { createUserMessage } from '@/features/chatMessage/api/create-user-message';
+import { createAssistantMessage } from '@/features/chatMessage/api/create-assistant-message';
+import { getConversation } from '@/features/chatHistory/api/get-conversation';
+import { ConverstaionDetailMessage } from '@/types/api';
 
 
-export function Chat({ token, chatId }: any) {
-    const [messages, setMessages] = useState<Message[]>([]);
+export function Chat({ chatId }: any) {
+    const [messages, setMessages] = useState<ConverstaionDetailMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
 
 
     useEffect(() => {
         const fetchChatMessages = async () => {
-            const response = await axios.get(`http://127.0.0.1:8000/api/v1/conversations/${chatId}`, {
-                headers: {
-                    Authorization: `Token ${token}`,
-                },
-            });
-            const data = await response.data;
-            setMessages(data.messages.map((message) => ({ type: message.type, text: message.content, id: message.id })));
+            const response = await getConversation({ conversationId: chatId });
+            setMessages(response.messages.map((message) => ({ type: message.type, content: message.content, id: message.id, createdAt: message.createdAt })));
         };
 
         if (chatId) {
@@ -37,12 +30,8 @@ export function Chat({ token, chatId }: any) {
 
     async function handleSendMessage(message: string) {
         if (message.trim().length > 0) {
-            const userPost = await axios.post('http://127.0.0.1:8000/api/v1/messages/user/', { conversation: chatId, content: message }, {
-                headers: {
-                    Authorization: `Token ${token}`
-                },
-            });
-            setMessages([...messages, { text: message, type: 'user', id: userPost.data.id }]);
+            const userPostData = await createUserMessage({ data: { conversation: chatId, content: message }});
+            setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt }]);
             setIsLoading(true);
             var payload = {
                 model: "llama3.1",
@@ -51,12 +40,8 @@ export function Chat({ token, chatId }: any) {
             }
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
             setIsLoading(false);
-            const assistantPost = await axios.post('http://127.0.0.1:8000/api/v1/messages/assistant/', { conversation: chatId, content: response.data.message.content, model: "llama3.1", provider: "ollama" }, {
-                headers: {
-                    Authorization: `Token ${token}`
-                },
-            });
-            setMessages([...messages, { text: response.data.message.content, type: 'assistant', id: assistantPost.data.id }]);
+            const assistantPostData = await createAssistantMessage({ data : { conversation: chatId, content: response.data.message.content, model: "llama3.1", provider: "ollama" } });
+            setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt }]);
         }
     }
 
@@ -65,7 +50,7 @@ export function Chat({ token, chatId }: any) {
             <div className='flex flex-col justify-between h-screen w-[60%]'>
                 <div className='pt-4 overflow-x-hidden overflow-y-scroll no-scrollbar'>
                     {messages.map((message, index) => (
-                        <ChatMessage messageText={message.text} messageType={message.type} messageId={message.id} token={token} />
+                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} />
                     ))}
                     {
                         (isLoading) && (

@@ -1,13 +1,19 @@
 import Panel from "@/components/ui/panel"
-import { TrashIcon } from "@radix-ui/react-icons";
+import { TrashIcon, HeartIcon, MagicWandIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import { deleteAssistantMessage } from "../api/delete-assistant-message";
+import { deleteUserMessage } from "../api/delete-user-message";
+import { Flex } from "@radix-ui/themes";
 
 
-export function ChatMessage({ messageText, messageType, messageId, token,  }: any) {
+export function ChatMessage({ messageText, messageType, messageId }: any) {
 
-    async function handleDelete(id) {
-        const response = await axios.delete(`http://127.0.0.1:8000/api/v1/messages/${messageType}/${id}/`, {headers: {Authorization: `Token ${token}`}})
+    async function handleDelete(id: string) {
+        if (messageType === 'user') {
+            await deleteUserMessage({ messageId: id });
+        } else {
+            await deleteAssistantMessage({ messageId: id });
+        }
         window.document.location.reload();
     }
 
@@ -18,11 +24,19 @@ export function ChatMessage({ messageText, messageType, messageId, token,  }: an
             <div>
                 <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} />
             </div>
-            <div className={messageType === 'user' ? 'flex justify-end' : 'flex justify-start'}>
-                <Button variant='ghost' size={'icon'} onClick={() => handleDelete(messageId)}>
-                    <TrashIcon />
-                </Button>
-            </div>
+            { messageType === 'assistant' ? <div className={messageType === 'user' ? 'flex justify-end' : 'flex justify-start'}>
+                <Flex gap="0" align="center">
+                    <Button variant='ghost' size={'icon'} onClick={() => handleDelete(messageId)}>
+                        <TrashIcon />
+                    </Button>
+                    <Button variant='ghost' size={'icon'}>
+                        <HeartIcon />
+                    </Button>
+                    <Button variant='ghost' size={'icon'}>
+                        <MagicWandIcon />
+                    </Button>
+                </Flex>
+            </div> : ''}
         </>
     );
 }

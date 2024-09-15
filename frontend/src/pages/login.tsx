@@ -37,7 +37,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="main-page w-screen h-screen flex overflow-hidden">
+        <div className="main-page font-work-sans w-screen h-screen flex overflow-hidden">
             <div className="w-full h-full flex justify-center items-center align-middle">
                 <Card size="4" style={{ width: 400 }}>
                     <Heading as="h3" size="6" trim="start" mb="5">
