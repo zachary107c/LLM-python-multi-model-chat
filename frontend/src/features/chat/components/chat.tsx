@@ -7,32 +7,22 @@ import { ChatInput } from '@/features/chatInput/components/chat-input';
 import { ChatMessage } from '@/features/chatMessage/components/chat-message';
 import { createUserMessage } from '@/features/chatMessage/api/create-user-message';
 import { createAssistantMessage } from '@/features/chatMessage/api/create-assistant-message';
-import { getConversation } from '@/features/chatHistory/api/get-conversation';
 import { ConverstaionDetailMessage } from '@/types/api';
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateConversation } from '@/features/chatHistory/api/update-conversation';
+import { updateConversationMutation } from '@/features/chatHistory/api/update-conversation';
+import { useGetConversationQuery } from '@/features/chatHistory/api/get-conversation';
 
 
 export function Chat({ chatId }: any) {
-    const queryClient = useQueryClient();
     const [messages, setMessages] = useState<ConverstaionDetailMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
-
-
-    // Create a new conversation
-    const { mutateAsync: updateConversationMutation } = useMutation({
-        mutationFn: updateConversation,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["conversations"] });
-        }
-    });
-
+    const updateMutation = updateConversationMutation();
+    const getConversation = useGetConversationQuery;
 
     useEffect(() => {
         const fetchChatMessages = async () => {
-            const response = await getConversation({ conversationId: chatId });
-            setMessages(response.messages.map((message) => ({ type: message.type, content: message.content, id: message.id, createdAt: message.createdAt })));
+            const { data, error, isLoading } = getConversation({ conversationId: chatId });
+            setMessages(data.messages.map((message) => ({ type: message.type, content: message.content, id: message.id, createdAt: message.createdAt })));
         };
 
         if (chatId) {
@@ -44,7 +34,7 @@ export function Chat({ chatId }: any) {
         if (message.trim().length > 0) {
             const userPostData = await createUserMessage({ data: { conversation: chatId, content: message } });
             if (messages.length == 0) {
-                await updateConversationMutation({ conversationId: chatId, data: { title: message } });
+                await updateMutation.mutateAsync({ conversationId: chatId, data: { title: message } });
             }
             setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt }]);
             setIsLoading(true);

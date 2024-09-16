@@ -1,42 +1,21 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getConversations } from "@/features/chatHistory/api/get-conversations";
-import { createConversation } from "@/features/chatHistory/api/create-conversation";
-import { deleteConversation } from "../api/delete-conversation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { PlusIcon, PinLeftIcon, PinRightIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useSearchParams } from 'react-router-dom';
+import { createConversationMutation } from "@/features/chatHistory/api/create-conversation";
+import { deleteConversationMutation } from "@/features/chatHistory/api/delete-conversation";
+import { getConversationsMutation } from "@/features/chatHistory/api/get-conversations";
+import { get } from "js-cookie";
 
 
 export function ChatHistory({ onSelectedIdChange }: any) {
-    const queryClient = useQueryClient();
     const [searchParams, setSearchParams] = useSearchParams();
     const [expanded, setExpanded] = useState(true);
     const currentConversationId = searchParams.get('c');
-
-    // Get the conversations
-    const { data: chats, isLoading } = useQuery(
-        {
-            queryFn: () => getConversations(),
-            queryKey: ["conversations"],
-        }
-    );
-
-    // Create a new conversation
-    const { mutateAsync: createConversationMutation } = useMutation({
-        mutationFn: createConversation,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["conversations"] });
-        }
-    });
-
-    // Delete a conversation
-    const { mutateAsync: deleteConversationMutation } = useMutation({
-        mutationFn: deleteConversation,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["conversations"] });
-        }
-    });
+    const { data: chats, isLoading } = getConversationsMutation();
+    const createMutation = createConversationMutation();
+    const deleteMutation = deleteConversationMutation();
 
 
     function handleSetExpanded(e: any) {
@@ -53,7 +32,7 @@ export function ChatHistory({ onSelectedIdChange }: any) {
 
     async function handleNewConversation() {
         try {
-            var response = await createConversationMutation({ data: { title: "New Conversation" } });
+            var response = await createMutation.mutateAsync({ data: { title: "New Conversation" } });
             setSearchParams({ c: response.id });
             handleSetSelected(response.id);
         } catch (e) {
@@ -104,7 +83,7 @@ export function ChatHistory({ onSelectedIdChange }: any) {
                                     </div>
                                     <Button variant={"ghost-no-hover"} className="mx-1 px-1 py-0 my-0" onClick={async () => {
                                         try {
-                                            await deleteConversationMutation({ conversationId: chat.id })
+                                            await deleteMutation.mutateAsync({ data: { conversationId: chat.id } })
                                         } catch (e) {
                                             console.log(e)
                                         }
