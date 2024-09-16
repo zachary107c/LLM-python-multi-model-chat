@@ -38,9 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    'knox',
-    "rest_auth.registration",
-    "rest_framework_simplejwt.token_blacklist",
+    "knox",
     "api",
     "users",
     "corsheaders",
@@ -143,8 +141,8 @@ import os
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-CSRF_COOKIE_SAMESITE = 'Strict'
-SESSION_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_SAMESITE = "Strict"
+SESSION_COOKIE_SAMESITE = "Strict"
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5173", "http://localhost:5173"]

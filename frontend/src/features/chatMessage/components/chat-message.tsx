@@ -20,7 +20,7 @@ export function ChatMessage({ messageText, messageType, messageId }: any) {
 
 
     return (
-        <>
+        <div className="mb-2">
             <div>
                 <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} />
             </div>
@@ -37,6 +37,6 @@ export function ChatMessage({ messageText, messageType, messageId }: any) {
                     </Button>
                 </Flex>
             </div> : ''}
-        </>
+        </div>
     );
 }

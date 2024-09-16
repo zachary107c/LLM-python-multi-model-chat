@@ -606,10 +606,6 @@ video {
   --tw-contain-style:  ;
 }
 
-.absolute {
-  position: absolute;
-}
-
 .relative {
   position: relative;
 }
@@ -622,14 +618,19 @@ video {
   margin: 1rem;
 }
 
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
 .mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
 }
 
-.mx-4 {
-  margin-left: 1rem;
-  margin-right: 1rem;
+.my-0 {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .my-2 {
@@ -710,8 +711,8 @@ video {
   width: 2.25rem;
 }
 
-.w-\[15\%\] {
-  width: 15%;
+.w-\[250px\] {
+  width: 250px;
 }
 
 .w-\[60\%\] {
@@ -729,6 +730,10 @@ video {
 
 .w-screen {
   width: 100vw;
+}
+
+.max-w-\[250px\] {
+  max-width: 250px;
 }
 
 .transform {
@@ -869,9 +874,9 @@ video {
   padding-right: 0.25rem;
 }
 
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .px-4 {
@@ -882,6 +887,11 @@ video {
 .px-8 {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+
+.py-0 {
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
 .py-2 {
@@ -984,9 +994,9 @@ video {
   /* Firefox */
 }
 
-/* .main-page {
-    background: radial-gradient(at 100% 0%, rgba(0, 45, 245, 0.106) 0px, transparent 50%), radial-gradient(at 93% 98%, hsla(237, 98%, 52%, 0) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(0, 17, 255, 0.095) 0px, transparent 50%);
-} */
+.main-page {
+  background: radial-gradient(at 100% 0%, rgba(0, 45, 245, 0.106) 0px, transparent 50%), radial-gradient(at 93% 98%, hsla(237, 98%, 52%, 0) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(0, 17, 255, 0.095) 0px, transparent 50%);
+}
 
 .placeholder\:text-muted-foreground::-moz-placeholder {
   color: hsl(var(--muted-foreground));

@@ -9,6 +9,7 @@ export const createConversationInputSchema = z.object({
 
 export type CreateConversationInput = z.infer<typeof createConversationInputSchema>;
 
-export const createAssistantMessage = ({ data }: { data: CreateConversationInput }): Promise<Conversation> => {
-  return api.post(`/conversations/`, data, { headers: { Authorization: `Token ${Cookies.get('token')}` } });
+export const createConversation = async ({ data }: { data: CreateConversationInput }): Promise<Conversation> => {
+  console.log("createconversation called!")
+  return await api.post(`/conversations/`, data, { headers: { Authorization: `Token ${Cookies.get('token')}` } });
 };

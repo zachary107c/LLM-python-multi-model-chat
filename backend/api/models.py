@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -12,7 +13,7 @@ class OllamaModel(models.Model):
 
 
 class Conversation(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     title = models.CharField(max_length=255)
     user = models.ForeignKey(User, related_name="conversations", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

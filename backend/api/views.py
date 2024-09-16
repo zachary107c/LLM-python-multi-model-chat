@@ -54,6 +54,9 @@ class ConversationDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         return conversation
 
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = None
