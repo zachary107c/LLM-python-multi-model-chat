@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from 'zod';
 import { api } from '@/lib/api-client';
 import { Conversation } from '@/types/api';
@@ -18,6 +18,6 @@ export const createConversationMutation = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["conversations"] });
-        }
+        },
     });
 }

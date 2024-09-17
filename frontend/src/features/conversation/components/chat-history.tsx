@@ -1,19 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
-import { PlusIcon, PinLeftIcon, PinRightIcon, TrashIcon } from "@radix-ui/react-icons";
+import { PlusIcon, PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons";
+import { DeleteConversationModal } from "./delete-conversation-modal";
 import { useSearchParams } from 'react-router-dom';
-import { createConversationMutation } from "@/features/chatHistory/api/create-conversation";
-import { deleteConversationMutation } from "@/features/chatHistory/api/delete-conversation";
-import { getConversationsMutation } from "@/features/chatHistory/api/get-conversations";
-import { get } from "js-cookie";
+import { createConversationMutation } from "@/features/conversation/api/create-conversation";
+import { deleteConversationMutation } from "@/features/conversation/api/delete-conversation";
+import { useGetConversationQuery } from "@/features/conversation/api/get-conversations";
 
 
 export function ChatHistory({ onSelectedIdChange }: any) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [expanded, setExpanded] = useState(true);
     const currentConversationId = searchParams.get('c');
-    const { data: chats, isLoading } = getConversationsMutation();
+    const { data: chats, isLoading } = useGetConversationQuery();
     const createMutation = createConversationMutation();
     const deleteMutation = deleteConversationMutation();
 
@@ -81,15 +80,7 @@ export function ChatHistory({ onSelectedIdChange }: any) {
                                                 </Button>
                                         }
                                     </div>
-                                    <Button variant={"ghost-no-hover"} className="mx-1 px-1 py-0 my-0" onClick={async () => {
-                                        try {
-                                            await deleteMutation.mutateAsync({ data: { conversationId: chat.id } })
-                                        } catch (e) {
-                                            console.log(e)
-                                        }
-                                    }}>
-                                        <TrashIcon />
-                                    </Button>
+                                    <DeleteConversationModal conversationId={chat.id} deleteMutation={deleteMutation} />
                                 </div>
                             ))
                             }

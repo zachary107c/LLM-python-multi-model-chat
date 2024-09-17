@@ -31,7 +31,7 @@ export type Conversation = Entity<{
     updatedAt: number;
 }>;
 
-export type ConverstaionDetailMessage = Entity<{
+export type ConversationDetailMessage = Entity<{
     content: string;
     type: string;
     model?: string;
@@ -42,7 +42,7 @@ export type ConversationDetail = {
     title: string;
     user: string;
     updatedAt: number;
-    messages: ConverstaionDetailMessage[];
+    messages: ConversationDetailMessage[];
 };
 
 

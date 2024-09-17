@@ -25,26 +25,26 @@ export default function Navbar() {
             <div className="flex flex-col my-2 mx-2 items-center">
                 <div className="mb-2">
                     <Link to="/">
-                        <Button variant='surface' size='1'>
+                        <Button variant='soft' size='1'>
                             <HomeIcon />
                         </Button>
                     </Link>
                 </div>
                 <div className="mb-2">
                     <Link to="/settings">
-                        <Button variant='surface' size='1'>
+                        <Button variant='soft' size='1'>
                             <GearIcon />
                         </Button>
                     </Link>
                 </div>
                 <div className="mb-2">
-                    <Button onClick={onChangeMode} variant='surface' size='1'>
-                        {theme === 'light' ? <MoonIcon color='black' /> : <SunIcon color='yellow'/>}
+                    <Button onClick={onChangeMode} variant='soft' size='1'>
+                        {theme === 'light' ? <MoonIcon /> : <SunIcon />}
                     </Button>
                 </div>
                 <div className="mb-2">
-                    <Button variant='surface' size='1' onClick={handleLogout}>
-                        <ExitIcon  color='red'/>
+                    <Button variant='soft' size='1' onClick={handleLogout}>
+                        <ExitIcon />
                     </Button>
                 </div>
             </div>

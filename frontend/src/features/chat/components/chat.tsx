@@ -7,28 +7,32 @@ import { ChatInput } from '@/features/chatInput/components/chat-input';
 import { ChatMessage } from '@/features/chatMessage/components/chat-message';
 import { createUserMessage } from '@/features/chatMessage/api/create-user-message';
 import { createAssistantMessage } from '@/features/chatMessage/api/create-assistant-message';
-import { ConverstaionDetailMessage } from '@/types/api';
-import { updateConversationMutation } from '@/features/chatHistory/api/update-conversation';
-import { useGetConversationQuery } from '@/features/chatHistory/api/get-conversation';
+import { ConversationDetailMessage } from '@/types/api';
+import { updateConversationMutation } from '@/features/conversation/api/update-conversation';
+import { useGetConversationQuery } from '@/features/conversation/api/get-conversation';
+import { Callout } from '@radix-ui/themes';
+import { InfoCircledIcon } from '@radix-ui/react-icons';
+import { HashLoader } from 'react-spinners';
 
 
 export function Chat({ chatId }: any) {
-    const [messages, setMessages] = useState<ConverstaionDetailMessage[]>([]);
+    const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
     const updateMutation = updateConversationMutation();
-    const getConversation = useGetConversationQuery;
+    const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId: chatId });
 
     useEffect(() => {
-        const fetchChatMessages = async () => {
-            const { data, error, isLoading } = getConversation({ conversationId: chatId });
-            setMessages(data.messages.map((message) => ({ type: message.type, content: message.content, id: message.id, createdAt: message.createdAt })));
-        };
-
-        if (chatId) {
-            fetchChatMessages();
+        if (data) {
+            const newMessages = data.messages.map((message: any) => ({
+                type: message.type,
+                content: message.content,
+                id: message.id,
+                createdAt: message.createdAt,
+            }));
+            setMessages(newMessages);
         }
-    }, [chatId]);
+    }, [data]);
 
     async function handleSendMessage(message: string) {
         if (message.trim().length > 0) {
@@ -53,9 +57,26 @@ export function Chat({ chatId }: any) {
     return (
         <div className='flex flex-col items-center'>
             <div className='flex flex-col justify-between align-middle h-screen w-[60%]'>
+                {
+                    conversationLoading && (
+                        <div className='w-full h-full flex flex-col items-center justify-center'>
+                            <HashLoader color='#484848' size={100}/>
+                        </div>
+                    )
+                }
                 <div className='pt-4 overflow-x-hidden overflow-y-scroll no-scrollbar'>
+                    {
+                        error && (<Callout.Root color='red' variant='surface'>
+                            <Callout.Icon>
+                                <InfoCircledIcon />
+                            </Callout.Icon>
+                            <Callout.Text>
+                                Failed to get conversation {chatId}: {error.message}
+                            </Callout.Text>
+                        </Callout.Root>)
+                    }
                     {messages.map((message, index) => (
-                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} />
+                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} conversationId={chatId} />
                     ))}
                     {
                         (isLoading) && (

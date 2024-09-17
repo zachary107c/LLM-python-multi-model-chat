@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Chat } from "@/features/chat/components/chat";
-import { ChatHistory } from "@/features/chatHistory/components/chat-history";
+import { ChatHistory } from "@/features/conversation/components/chat-history";
 import Cookies from "js-cookie";
 import { useSearchParams } from 'react-router-dom';
 
