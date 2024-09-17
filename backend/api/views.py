@@ -8,7 +8,7 @@ from .serializers import (
     UserMessageSerializer,
     AsistantMessageSerializer,
     ConversationDetailSerializer,
-    OllamaModelSerializer
+    OllamaModelSerializer,
 )
 
 
@@ -31,7 +31,7 @@ class ConversationListCreateView(generics.ListCreateAPIView):
         conversations = self.get_queryset()
         serializer = self.get_serializer(conversations, many=True)
         return Response(serializer.data)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -48,9 +48,14 @@ class ConversationDetailView(generics.RetrieveUpdateDestroyAPIView):
         conversation = super().get_object()
 
         if conversation.user != self.request.user:
-            raise PermissionDenied("You do not have permission to access this conversation.")
-        
+            raise PermissionDenied(
+                "You do not have permission to access this conversation."
+            )
+
         return conversation
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class UserListCreateView(generics.ListCreateAPIView):
@@ -80,9 +85,9 @@ class UserMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         if message.conversation.user != self.request.user:
             raise PermissionDenied("You do not have permission to access this message.")
-        
+
         return message
-    
+
 
 class AssistantListCreateView(generics.ListCreateAPIView):
     queryset = None
@@ -96,7 +101,7 @@ class AssistantListCreateView(generics.ListCreateAPIView):
         messages = self.get_queryset()
         serializer = self.get_serializer(messages, many=True)
         return Response(serializer.data)
-    
+
 
 class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = None
@@ -111,7 +116,7 @@ class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         if message.conversation.user != self.request.user:
             raise PermissionDenied("You do not have permission to access this message.")
-        
+
         return message
 
 
@@ -125,4 +130,3 @@ class OllamaModelDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = OllamaModel.objects.all()
     serializer_class = OllamaModelSerializer
     permission_classes = [IsAuthenticated]
-

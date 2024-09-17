@@ -37,10 +37,6 @@ export function ChatInput({ onSendMessage }: Props) {
             if (newMessage.endsWith('\n')) {
                 setTextAreaHeight(Math.max(textAreaHeight - 24, 48));
             }
-        } else if (event.key === 'ArrowUp') {
-            if (lastMessage) {
-                setNewMessage(lastMessage);
-            }
         }
     };
 

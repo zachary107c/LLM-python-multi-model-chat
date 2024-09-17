@@ -4,8 +4,14 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .serializers import RegisterSerializer, UserSerializer
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from .serializers import RegisterSerializer, UserSerializer, AuthSerializer
 from django.contrib.auth.models import User
+from knox.views import (
+    LoginView as KnoxLoginView,
+    LogoutView as KnoxLogoutView,
+    LogoutAllView as KnoxLogoutAllView,
+)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -29,23 +35,16 @@ class RegisterView(generics.CreateAPIView):
         return serializer.save()
 
 
-class LoginView(APIView):
+class LoginView(KnoxLoginView):
+    serializer_class = AuthSerializer
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            return Response(
-                {"message": "Logged in successfully"}, status=status.HTTP_200_OK
-            )
-        else:
-            return Response(
-                {"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer = AuthTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+        login(request, user)
+        return super(LoginView, self).post(request, format=None)
 
 
 class LogoutView(APIView):
@@ -65,4 +64,3 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
- 

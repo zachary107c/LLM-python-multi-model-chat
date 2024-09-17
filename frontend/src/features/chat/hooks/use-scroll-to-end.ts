@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { Message } from "@/features/chat/components/message";
+import { ConverstaionDetailMessage } from '@/types/api';
 
-const useScrollToEnd = (messages: Message[]) => {
+const useScrollToEnd = (messages: ConverstaionDetailMessage[]) => {
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        ref.current?.scrollIntoView({ behavior: 'smooth' });
+        ref.current?.scrollIntoView({ behavior: 'smooth'});
     }, [messages]);
 
     return ref;
