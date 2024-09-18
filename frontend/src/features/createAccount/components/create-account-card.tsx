@@ -34,7 +34,11 @@ export function CreateAccountCard() {
 
         } catch (error: any) {
             if (error.response) {
-                setError(error.response.data.error || 'Something went wrong!');
+                var data = ''
+                for (let key in error.response.data) {
+                    data += key + ': ' + error.response.data[key] + '\n';
+                }
+                setError(data || 'Something went wrong!');
             } else {
                 console.log(error);
                 setError(error.message);
@@ -158,7 +162,7 @@ export function CreateAccountCard() {
                                 <InfoCircledIcon />
                             </Callout.Icon>
                             <Callout.Text>
-                                Login failed, please try again.
+                                {error}
                             </Callout.Text>
                         </Callout.Root>
                     }
