@@ -29,8 +29,12 @@ export function Chat({ chatId }: any) {
                 content: message.content,
                 id: message.id,
                 createdAt: message.createdAt,
+                liked: message.liked,
             }));
             setMessages(newMessages);
+        }
+        if (!chatId) {
+            setMessages([]);
         }
     }, [data]);
 
@@ -60,7 +64,7 @@ export function Chat({ chatId }: any) {
                 {
                     conversationLoading && (
                         <div className='w-full h-full flex flex-col items-center justify-center'>
-                            <HashLoader color='#484848' size={100}/>
+                            <HashLoader color='#484848' size={100} />
                         </div>
                     )
                 }
@@ -76,7 +80,7 @@ export function Chat({ chatId }: any) {
                         </Callout.Root>)
                     }
                     {messages.map((message, index) => (
-                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} conversationId={chatId} />
+                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} liked={message.liked} conversationId={chatId} />
                     ))}
                     {
                         (isLoading) && (

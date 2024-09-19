@@ -8,7 +8,7 @@ import { deleteConversationMutation } from "@/features/conversation/api/delete-c
 import { useGetConversationQuery } from "@/features/conversation/api/get-conversations";
 
 
-export function ChatHistory({ onSelectedIdChange }: any) {
+export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [expanded, setExpanded] = useState(true);
     const currentConversationId = searchParams.get('c');

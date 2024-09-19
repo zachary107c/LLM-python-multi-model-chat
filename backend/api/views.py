@@ -6,7 +6,7 @@ from .models import Conversation, UserMessage, AssistantMessage, OllamaModel
 from .serializers import (
     ConversationSerializer,
     UserMessageSerializer,
-    AsistantMessageSerializer,
+    AssistantMessageSerializer,
     ConversationDetailSerializer,
     OllamaModelSerializer,
 )
@@ -91,7 +91,7 @@ class UserMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class AssistantListCreateView(generics.ListCreateAPIView):
     queryset = None
-    serializer_class = AsistantMessageSerializer
+    serializer_class = AssistantMessageSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -105,7 +105,7 @@ class AssistantListCreateView(generics.ListCreateAPIView):
 
 class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = None
-    serializer_class = AsistantMessageSerializer
+    serializer_class = AssistantMessageSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -113,11 +113,17 @@ class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         message = super().get_object()
-
         if message.conversation.user != self.request.user:
             raise PermissionDenied("You do not have permission to access this message.")
-
         return message
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OllamaModelListCreateView(generics.ListCreateAPIView):

@@ -1,12 +1,14 @@
 import Panel from "@/components/ui/panel"
-import { TrashIcon, HeartIcon, MagicWandIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
+import { Flex } from "@radix-ui/themes";
+import { TrashIcon, MagicWandIcon } from "@radix-ui/react-icons";
 import { deleteAssistantMessageMutation } from "@/features/chatMessage/api/delete-assistant-message";
 import { deleteUserMessageMutation } from "@/features/chatMessage/api/delete-user-message";
-import { Flex } from "@radix-ui/themes";
+import { LikeMessageButton } from "./like-message-button";
 
 
-export function ChatMessage({ messageText, messageType, messageId, conversationId }: { messageText: string, messageType: string, messageId: string, conversationId: string }) {
+
+export function ChatMessage({ messageText, messageType, messageId, liked, conversationId }: { messageText: string, messageType: string, messageId: string, liked: boolean | undefined, conversationId: string }) {
     const deleteUserMutation = deleteUserMessageMutation({ conversationId: conversationId });
     const deleteAssistantMutation = deleteAssistantMessageMutation({ conversationId: conversationId });
 
@@ -24,9 +26,7 @@ export function ChatMessage({ messageText, messageType, messageId, conversationI
                     {messageType === 'assistant' ?
                         (
                             <>
-                                <Button variant='ghost' size={'icon'}>
-                                    <HeartIcon />
-                                </Button>
+                                <LikeMessageButton messageId={messageId} isLiked={liked} conversationId={conversationId}/>
                                 <Button variant='ghost' size={'icon'}>
                                     <MagicWandIcon />
                                 </Button>

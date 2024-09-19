@@ -18,6 +18,7 @@ export type AssistantMessage = Entity<{
     content: string;
     model: string;
     provider: string;
+    liked: boolean;
 }>;
 
 export type AuthResponse = {
@@ -36,6 +37,7 @@ export type ConversationDetailMessage = Entity<{
     type: string;
     model?: string;
     provider?: string;
+    liked?: boolean;
 }>;
 
 export type ConversationDetail = {
