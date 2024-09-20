@@ -5,24 +5,22 @@ import { TrashIcon, MagicWandIcon } from "@radix-ui/react-icons";
 import { deleteAssistantMessageMutation } from "@/features/chatMessage/api/delete-assistant-message";
 import { deleteUserMessageMutation } from "@/features/chatMessage/api/delete-user-message";
 import { LikeMessageButton } from "./like-message-button";
+import { DeleteMessageModal } from "./delete-message-modal";
 
 
 
-export function ChatMessage({ messageText, messageType, messageId, liked, conversationId }: { messageText: string, messageType: string, messageId: string, liked: boolean | undefined, conversationId: string }) {
+export function ChatMessage({ messageText, messageType, messageId, name, liked, conversationId }: { messageText: string, messageType: string, messageId: string, name: string, liked: boolean | undefined, conversationId: string }) {
     const deleteUserMutation = deleteUserMessageMutation({ conversationId: conversationId });
     const deleteAssistantMutation = deleteAssistantMessageMutation({ conversationId: conversationId });
 
     return (
         <div className="mb-2">
             <div>
-                <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} />
+                <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} name={name} />
             </div>
             <div className={messageType === 'user' ? 'flex justify-end' : 'flex justify-start'}>
                 <Flex gap="0" align="center">
-                    <Button variant='ghost' size={'icon'} onClick={async () => messageType === 'user' ? await deleteUserMutation.mutateAsync({ data: { messageId: messageId } }) : await deleteAssistantMutation.mutateAsync({ data: { messageId: messageId } })}>
-                        <TrashIcon />
-                    </Button>
-
+                    <DeleteMessageModal messageId={messageId} deleteMutation={ messageType === 'user' ? deleteUserMutation : deleteAssistantMutation} />
                     {messageType === 'assistant' ?
                         (
                             <>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@radix-ui/themes";
 import { PlusIcon, PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons";
 import { DeleteConversationModal } from "./delete-conversation-modal";
 import { useSearchParams } from 'react-router-dom';
@@ -42,7 +43,7 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
     return (
         <div className={`${expanded ? 'w-[250px] max-w-[250px] h-full' : 'h-full'}`}>
             {!expanded &&
-                <div className="border-r border-[#7d7d7d68] h-full">
+                <div className="border-r border-[#7d7d7d68] h-[100%]">
                     <div className="mx-2 mt-2">
                         <Button variant={'ghost'} className="m-1 p-1">
                             <PinRightIcon onClick={() => handleSetExpanded(true)} />
@@ -56,14 +57,16 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
                     <Button variant={'ghost'} className="m-1 p-1">
                         <PinLeftIcon onClick={() => handleSetExpanded(false)} />
                     </Button>
-                    <Button variant={'ghost'} className="m-1 p-1" onClick={async () => handleNewConversation()}>
-                        <PlusIcon />
-                    </Button>
+                    <Tooltip content="New Conversation" side="right">
+                        <Button variant={'ghost'} className="m-1 p-1" onClick={async () => handleNewConversation()}>
+                            <PlusIcon />
+                        </Button>
+                    </Tooltip>
                 </div>
                 <div className="mx-2">
                     <div className="flex flex-col justify-center align-top">
                         <div className="flex flex-col w-full">
-                            {chats?.map((chat, index) => (
+                            {chats?.map((chat) => (
                                 <div className="w-full flex justify-between items-center">
                                     <div className="w-full overflow-hidden">
                                         {chat.id === currentConversationId ?

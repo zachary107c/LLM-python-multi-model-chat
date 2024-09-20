@@ -47,5 +47,11 @@ export type ConversationDetail = {
     messages: ConversationDetailMessage[];
 };
 
+export type Model = {
+    id: number;
+    name: string;
+    model: string;
+    liked: boolean;
+}
 
 

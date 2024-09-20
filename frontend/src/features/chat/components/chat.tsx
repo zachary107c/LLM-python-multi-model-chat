@@ -10,17 +10,19 @@ import { createAssistantMessage } from '@/features/chatMessage/api/create-assist
 import { ConversationDetailMessage } from '@/types/api';
 import { updateConversationMutation } from '@/features/conversation/api/update-conversation';
 import { useGetConversationQuery } from '@/features/conversation/api/get-conversation';
-import { Callout } from '@radix-ui/themes';
+import { Callout, DropdownMenu } from '@radix-ui/themes';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import { HashLoader } from 'react-spinners';
 
 
 export function Chat({ chatId }: any) {
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
+    const [model, setModel] = useState("Marcus:latest");
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
     const updateMutation = updateConversationMutation();
     const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId: chatId });
+
 
     useEffect(() => {
         if (data) {
@@ -30,6 +32,7 @@ export function Chat({ chatId }: any) {
                 id: message.id,
                 createdAt: message.createdAt,
                 liked: message.liked,
+                model: message.model,
             }));
             setMessages(newMessages);
         }
@@ -44,23 +47,23 @@ export function Chat({ chatId }: any) {
             if (messages.length == 0) {
                 await updateMutation.mutateAsync({ conversationId: chatId, data: { title: message } });
             }
-            setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt }]);
+            setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt, model: 'user' }]);
             setIsLoading(true);
             var payload = {
-                model: "llama3.1",
+                model: model,
                 messages: [{ role: "user", content: message }],
                 stream: false,
             }
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
             setIsLoading(false);
-            const assistantPostData = await createAssistantMessage({ data: { conversation: chatId, content: response.data.message.content, model: "llama3.1", provider: "ollama" } });
-            setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt }]);
+            const assistantPostData = await createAssistantMessage({ data: { conversation: chatId, content: response.data.message.content, model: model, provider: "ollama" } });
+            setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt, model: assistantPostData.model }]);
         }
     }
 
     return (
-        <div className='flex flex-col items-center'>
-            <div className='flex flex-col justify-between align-middle h-screen w-[60%]'>
+        <div className='flex flex-col items-center relative'>
+            <div className='flex flex-col justify-between align-middle h-screen w-[60%] z-10 relative'>
                 {
                     conversationLoading && (
                         <div className='w-full h-full flex flex-col items-center justify-center'>
@@ -79,12 +82,12 @@ export function Chat({ chatId }: any) {
                             </Callout.Text>
                         </Callout.Root>)
                     }
-                    {messages.map((message, index) => (
-                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} liked={message.liked} conversationId={chatId} />
+                    {messages.map((message) => (
+                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} name={message.model ? message.model : ""} liked={message.liked} conversationId={chatId} />
                     ))}
                     {
                         (isLoading) && (
-                            <div className='flex justify-start'>
+                            <div className='flex justify-start mb-4'>
                                 <Panel title='LLM' justify='justify-start'>
                                     <ChatLoader />
                                 </Panel>
@@ -93,7 +96,7 @@ export function Chat({ chatId }: any) {
                     }
                     <div ref={ref} />
                 </div>
-                <ChatInput onSendMessage={handleSendMessage} />
+                <ChatInput onSendMessage={handleSendMessage} onModelChange={setModel} />
             </div>
         </div>
     );
