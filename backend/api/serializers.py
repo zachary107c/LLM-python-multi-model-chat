@@ -17,7 +17,7 @@ class UserMessageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AsistantMessageSerializer(serializers.ModelSerializer):
+class AssistantMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssistantMessage
         fields = "__all__"
@@ -42,6 +42,7 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
             "updated_at",
             "user",
             "messages",
+            "liked",
         )
         read_only_fields = ["id", "user", "created_at", "updated_at"]
 
@@ -50,7 +51,7 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
             "id", "content", "created_at"
         )
         assistant_messages = AssistantMessage.objects.filter(conversation=obj).values(
-            "id", "content", "model", "provider", "created_at"
+            "id", "content", "model", "provider", "created_at", "liked"
         )
 
         user_message_list = [
@@ -71,6 +72,7 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
                 "type": "assistant",
                 "model": am["model"],
                 "provider": am["provider"],
+                "liked": am["liked"]
             }
             for am in assistant_messages
         ]

@@ -7,6 +7,7 @@ class OllamaModel(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=False)
     model = models.CharField(max_length=255, unique=False)
+    liked = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -18,6 +19,7 @@ class Conversation(models.Model):
     user = models.ForeignKey(User, related_name="conversations", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    liked = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Conversation {self.id} - {self.title}"
@@ -40,6 +42,7 @@ class AssistantMessage(models.Model):
     model = models.CharField(max_length=255)
     provider = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+    liked = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Assistant Message {self.id} - {self.model}"

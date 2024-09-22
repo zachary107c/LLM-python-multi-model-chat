@@ -5,7 +5,10 @@ import { Conversation } from '@/types/api';
 import Cookies from 'js-cookie';
 
 export const createConversationInputSchema = z.object({
-    title: z.string(),
+    previousConversationId: z.string().optional(),
+    data: z.object({
+        title: z.string(),
+    })
 });
 
 export type CreateConversationInput = z.infer<typeof createConversationInputSchema>;
@@ -14,7 +17,10 @@ export const createConversationMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ data }: { data: CreateConversationInput }): Promise<Conversation> => {
-            return api.post(`/conversations/`, data, { headers: { Authorization: `Token ${Cookies.get('token')}` } });
+            if (data.previousConversationId) {
+                queryClient.invalidateQueries({ queryKey: [`conversation`, data.previousConversationId] });
+            }
+            return api.post(`/conversations/`, data.data, { headers: { Authorization: `Token ${Cookies.get('token')}` } });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["conversations"] });

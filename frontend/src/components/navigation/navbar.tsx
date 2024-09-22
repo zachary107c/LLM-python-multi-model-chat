@@ -1,51 +1,100 @@
-import { useState } from 'react';
-import { Button, Avatar, Text } from "@radix-ui/themes";
-import { HomeIcon, GearIcon, SunIcon, MoonIcon, ExitIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
+import { Tooltip, Popover, Flex, Avatar, Box, TextArea, Text, Checkbox } from "@radix-ui/themes";
+import { Button } from '@/components/ui/button';
+import { GearIcon, PersonIcon, ChatBubbleIcon, DotsHorizontalIcon, MoonIcon, SunIcon, ExitIcon } from "@radix-ui/react-icons";
 import { Link } from 'react-router-dom';
 import { handleLogout } from '@/components/utils/handle-logout.ts';
 
 
-export default function Navbar() {
+const ThemeToggleButton = () => {
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+    const [animate, setAnimate] = useState(false);
 
-    function onChangeMode() {
-        if (localStorage.theme === 'dark') {
-            document.getElementById('body')!.classList.remove('dark')
-            localStorage.setItem('theme', '')
-            setTheme('light')
+    const handleClick = () => {
+        setAnimate(true);
+        if (theme === 'light') {
+            setTheme('dark');
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('body')!.classList.add('dark');
         } else {
-            document.getElementById('body')!.classList.add('dark')
-            localStorage.setItem('theme', 'dark')
-            setTheme('dark')
+            setTheme('light');
+            localStorage.setItem('theme', '');
+            document.getElementById('body')!.classList.remove('dark');
         }
-    }
+        (theme === 'light' ? setTheme('dark') : setTheme('light'))
+        setTimeout(() => {
+            setAnimate(false);
+        }, 500);
+    };
 
     return (
-        <aside className="border-r border-[#7d7d7db3] bg-[#2222222f]">
-            <div className="flex flex-col my-2 mx-2 items-center">
+        <Button variant="ghost" size="icon" onClick={handleClick}>
+            {theme === 'light' ? (
+                <MoonIcon className={`size-4 ${animate ? 'animate-in spin-in-180' : ''}`} strokeWidth="1.5" />
+            ) : (
+                <SunIcon className={`size-4 ${animate ? 'animate-out spin-out-180' : ''}`} strokeWidth="1.5" />
+            )}
+        </Button>
+    );
+};
+
+export default function Navbar() {
+    const [index, setIndex] = useState(1);
+
+    return (
+        <aside className="border-r border-[#7d7d7db3] bg-[#22222211]">
+            <div className="flex flex-col m-2 items-center">
                 <div className="mb-2">
-                    <Link to="/">
-                        <Button variant='soft' size='1'>
-                            <HomeIcon />
-                        </Button>
-                    </Link>
+                    <Tooltip content="Profile" side="right">
+                        <Link to="/profile">
+                            <Button variant='ghost' size='icon' onClick={() => setIndex(0)} className={index === 0 ? 'bg-accent text-accent-foreground' : ''}>
+                                <PersonIcon />
+                            </Button>
+                        </Link>
+                    </Tooltip>
                 </div>
                 <div className="mb-2">
-                    <Link to="/settings">
-                        <Button variant='soft' size='1'>
-                            <GearIcon />
-                        </Button>
-                    </Link>
+                    <Tooltip content="Home" side="right">
+                        <Link to="/">
+                            <Button variant='ghost' size='icon' onClick={() => setIndex(1)} className={index === 1 ? 'bg-accent text-accent-foreground' : ''}>
+                                <ChatBubbleIcon />
+                            </Button>
+                        </Link>
+                    </Tooltip>
                 </div>
                 <div className="mb-2">
-                    <Button onClick={onChangeMode} variant='soft' size='1'>
-                        {theme === 'light' ? <MoonIcon /> : <SunIcon />}
-                    </Button>
+                    <Tooltip content="Settings" side="right">
+                        <Link to="/settings">
+                            <Button variant='ghost' size='icon' onClick={() => setIndex(2)} className={index === 2 ? 'bg-accent text-accent-foreground' : ''}>
+                                <GearIcon />
+                            </Button>
+                        </Link>
+                    </Tooltip>
                 </div>
                 <div className="mb-2">
-                    <Button variant='soft' size='1' onClick={handleLogout}>
-                        <ExitIcon />
-                    </Button>
+                    <Popover.Root>
+                        <Popover.Trigger>
+                            <Button variant="ghost" size='icon'>
+                                <DotsHorizontalIcon />
+                            </Button>
+                        </Popover.Trigger>
+                        <Popover.Content side="right" size='1'>
+                            <div className="flex">
+                                <div>
+                                    <Tooltip content="Theme" side="right">
+                                        <ThemeToggleButton />
+                                    </Tooltip>
+                                </div>
+                                <div>
+                                    <Tooltip content="Logout" side="right">
+                                        <Button variant='ghost' size='icon' onClick={handleLogout}>
+                                            <ExitIcon />
+                                        </Button>
+                                    </Tooltip>
+                                </div>
+                            </div>
+                        </Popover.Content>
+                    </Popover.Root>
                 </div>
             </div>
         </aside>

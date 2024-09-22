@@ -10,17 +10,24 @@ import { createAssistantMessage } from '@/features/chatMessage/api/create-assist
 import { ConversationDetailMessage } from '@/types/api';
 import { updateConversationMutation } from '@/features/conversation/api/update-conversation';
 import { useGetConversationQuery } from '@/features/conversation/api/get-conversation';
-import { Callout } from '@radix-ui/themes';
+import { Callout, DropdownMenu } from '@radix-ui/themes';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import { HashLoader } from 'react-spinners';
+import { createConversationMutation } from '@/features/conversation/api/create-conversation';
+
+import { useSearchParams } from 'react-router-dom';
+import { set } from 'js-cookie';
 
 
-export function Chat({ chatId }: any) {
+export function Chat({ chatId, onCreateNewChat }: any) {
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
+    const [model, setModel] = useState("Marcus:latest");
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
     const updateMutation = updateConversationMutation();
+    const createMutation = createConversationMutation();
     const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId: chatId });
+    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         if (data) {
@@ -29,38 +36,56 @@ export function Chat({ chatId }: any) {
                 content: message.content,
                 id: message.id,
                 createdAt: message.createdAt,
+                liked: message.liked,
+                model: message.model,
             }));
             setMessages(newMessages);
         }
+        if (!chatId) {
+            setMessages([]);
+        }
     }, [data]);
+
+    async function handleCreateNewConversation(firstMessage: string) {
+        var response = await createMutation.mutateAsync({ data: { previousConversationId: chatId || undefined, data: { title: firstMessage } } });
+        onCreateNewChat(response.id);
+        return response.id;
+    }
 
     async function handleSendMessage(message: string) {
         if (message.trim().length > 0) {
-            const userPostData = await createUserMessage({ data: { conversation: chatId, content: message } });
-            if (messages.length == 0) {
-                await updateMutation.mutateAsync({ conversationId: chatId, data: { title: message } });
+
+            var currentChatId = chatId;
+
+            if (!chatId) {
+                currentChatId = await handleCreateNewConversation(message);
             }
-            setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt }]);
+
+            const userPostData = await createUserMessage({ data: { conversation: currentChatId, content: message } });
+            if (messages.length == 0) {
+                await updateMutation.mutateAsync({ data: { conversationId: currentChatId, updates: { title: message } } });
+            }
+            setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt, model: 'user' }]);
             setIsLoading(true);
             var payload = {
-                model: "llama3.1",
+                model: model,
                 messages: [{ role: "user", content: message }],
                 stream: false,
             }
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
             setIsLoading(false);
-            const assistantPostData = await createAssistantMessage({ data: { conversation: chatId, content: response.data.message.content, model: "llama3.1", provider: "ollama" } });
-            setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt }]);
+            const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: response.data.message.content, model: model, provider: "ollama" } });
+            setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt, model: assistantPostData.model }]);
         }
     }
 
     return (
-        <div className='flex flex-col items-center'>
-            <div className='flex flex-col justify-between align-middle h-screen w-[60%]'>
+        <div className='flex flex-col items-center relative'>
+            <div className='flex flex-col justify-between align-middle h-screen w-[60%] z-10 relative'>
                 {
                     conversationLoading && (
                         <div className='w-full h-full flex flex-col items-center justify-center'>
-                            <HashLoader color='#484848' size={100}/>
+                            <HashLoader color='#484848' size={100} />
                         </div>
                     )
                 }
@@ -75,12 +100,12 @@ export function Chat({ chatId }: any) {
                             </Callout.Text>
                         </Callout.Root>)
                     }
-                    {messages.map((message, index) => (
-                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} conversationId={chatId} />
+                    {messages.map((message) => (
+                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} name={message.model ? message.model : ""} liked={message.liked} conversationId={chatId} />
                     ))}
                     {
                         (isLoading) && (
-                            <div className='flex justify-start'>
+                            <div className='flex justify-start mb-4'>
                                 <Panel title='LLM' justify='justify-start'>
                                     <ChatLoader />
                                 </Panel>
@@ -89,7 +114,7 @@ export function Chat({ chatId }: any) {
                     }
                     <div ref={ref} />
                 </div>
-                <ChatInput onSendMessage={handleSendMessage} />
+                <ChatInput onSendMessage={handleSendMessage} onModelChange={setModel} />
             </div>
         </div>
     );

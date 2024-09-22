@@ -1,20 +1,23 @@
 import { AlertDialog, Flex, Button } from "@radix-ui/themes";
-import { Button as LocalButton  } from '@/components/ui/button';
+import { Button as LocalButton } from '@/components/ui/button';
 import { TrashIcon } from '@radix-ui/react-icons'; // Add this if not already imported
 import { useSearchParams } from 'react-router-dom';
+import { deleteConversationMutation } from "../api/delete-conversation";
 
 interface DeleteConversationModalProps {
     conversationId: string;
-    deleteMutation: any;
 }
 
-export function DeleteConversationModal({ conversationId, deleteMutation }: DeleteConversationModalProps) {
+export function DeleteConversationModal({ conversationId }: DeleteConversationModalProps) {
     const [searchParams, setSearchParams] = useSearchParams();
+    const deleteMutation = deleteConversationMutation();
 
     const handleDelete = async () => {
         try {
-            await deleteMutation.mutateAsync({ data: { conversationId } });
-            setSearchParams({});
+            await deleteMutation.mutateAsync({ data: { conversationId: conversationId } });
+            if (searchParams.get('conversationId') === conversationId) {
+                setSearchParams({});
+            }
         } catch (e) {
             console.log(e);
         }
@@ -23,8 +26,11 @@ export function DeleteConversationModal({ conversationId, deleteMutation }: Dele
     return (
         <AlertDialog.Root>
             <AlertDialog.Trigger>
-                <LocalButton variant={"ghost-no-hover"} className="mx-1 px-1 py-0 my-0">
-                    <TrashIcon />
+                <LocalButton variant='ghost' className="p-2 w-full flex justify-start">
+                    <TrashIcon className="mr-2" />
+                    <div className="w-full">
+                        Delete Conversation
+                    </div>
                 </LocalButton>
             </AlertDialog.Trigger>
             <AlertDialog.Content size='1'>
@@ -32,7 +38,6 @@ export function DeleteConversationModal({ conversationId, deleteMutation }: Dele
                 <AlertDialog.Description size="1">
                     Are you sure? This conversation will no longer be accessible.
                 </AlertDialog.Description>
-
                 <Flex gap="3" mt="4" justify="between">
                     <AlertDialog.Cancel>
                         <Button variant="soft" color="gray" size='1'>
