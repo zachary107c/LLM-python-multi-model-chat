@@ -5,7 +5,10 @@ import { Conversation } from '@/types/api';
 import Cookies from 'js-cookie';
 
 export const updateConversationInputSchema = z.object({
-    title: z.string(),
+    conversationId: z.string(),
+    updates: z.object({
+        title: z.string().optional(),
+    })
 });
 
 export type UpdateConversationInput = z.infer<typeof updateConversationInputSchema>;
@@ -14,8 +17,9 @@ export type UpdateConversationInput = z.infer<typeof updateConversationInputSche
 export const updateConversationMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ conversationId, data }: { conversationId: string, data: UpdateConversationInput }): Promise<Conversation> => {
-            return api.put(`/conversations/${conversationId}/`, data, { headers: { Authorization: `Token ${Cookies.get('token')}` } });
+        mutationFn: async ({ data }: { data: UpdateConversationInput }): Promise<Conversation> => {
+            return api.put(`/conversations/${data.conversationId}/`, data.updates,
+                { headers: { Authorization: `Token ${Cookies.get('token')}` } });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["conversations"] });

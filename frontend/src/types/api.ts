@@ -9,12 +9,12 @@ export type Entity<T> = {
 
 
 export type UserMessage = Entity<{
-    conversation: number;
+    conversation: string;
     content: string;
 }>;
 
 export type AssistantMessage = Entity<{
-    conversation: number;
+    conversation: string;
     content: string;
     model: string;
     provider: string;
@@ -54,4 +54,7 @@ export type Model = {
     liked: boolean;
 }
 
+export type GenerateConversationTitle = {
+    generatedTitle: string;
+}
 

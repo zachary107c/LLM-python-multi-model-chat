@@ -15,7 +15,7 @@ export function ChatInput({ onSendMessage, onModelChange }: Props) {
     const [textAreaHeight, setTextAreaHeight] = useState(48);
     const [lastMessage, setLastMessage] = useState('');
     const { data } = useGetModelsQuery();
-    const [model, setModel] = useState(data ? data[0].name : "Marcus:latest");
+    const [model, setModel] = useState(data ? data[0].name : "llama3.1:latest");
 
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

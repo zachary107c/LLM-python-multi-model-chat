@@ -1,21 +1,22 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Tooltip } from "@radix-ui/themes";
-import { PlusIcon, PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons";
-import { DeleteConversationModal } from "./delete-conversation-modal";
 import { useSearchParams } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Tooltip, Popover } from "@radix-ui/themes";
+import { PlusIcon, PinLeftIcon, PinRightIcon, DotsHorizontalIcon, MagicWandIcon } from "@radix-ui/react-icons";
+import { DeleteConversationModal } from "./delete-conversation-modal";
+import { UpdateConversationModal } from "./edit-conversation-modal";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
-import { deleteConversationMutation } from "@/features/conversation/api/delete-conversation";
-import { useGetConversationQuery } from "@/features/conversation/api/get-conversations";
+import { useGetConversationsQuery } from "@/features/conversation/api/get-conversations";
+import { useGenerateConversationTitle } from "../hooks/generate-conversation-title";
+import { MagicTitleButton } from "@/features/conversation/components/magic-title-button";
 
 
 export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [expanded, setExpanded] = useState(true);
     const currentConversationId = searchParams.get('c');
-    const { data: chats, isLoading } = useGetConversationQuery();
+    const { data: chats, isLoading } = useGetConversationsQuery();
     const createMutation = createConversationMutation();
-    const deleteMutation = deleteConversationMutation();
 
 
     function handleSetExpanded(e: any) {
@@ -32,7 +33,7 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
 
     async function handleNewConversation() {
         try {
-            var response = await createMutation.mutateAsync({ data: { title: "New Conversation" } });
+            var response = await createMutation.mutateAsync({ data: { previousConversationId: currentConversationId || undefined, data: { title: "New Conversation" } } });
             setSearchParams({ c: response.id });
             handleSetSelected(response.id);
         } catch (e) {
@@ -43,7 +44,7 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
     return (
         <div className={`${expanded ? 'w-[250px] max-w-[250px] h-full' : 'h-full'}`}>
             {!expanded &&
-                <div className="border-r border-[#7d7d7d68] h-[100%]">
+                <div className="overflow-y-scroll no-scrollbar border-r border-[#7d7d7d68] h-full">
                     <div className="mx-2 mt-2">
                         <Button variant={'ghost'} className="m-1 p-1">
                             <PinRightIcon onClick={() => handleSetExpanded(true)} />
@@ -51,7 +52,7 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
                     </div>
                 </div>
             }
-            <div className={`${expanded ? '' : 'hidden'
+            <div className={`${expanded ? 'overflow-y-scroll no-scrollbar' : 'hidden'
                 } border-r border-[#7d7d7d68] w-full h-full`}>
                 <div className="flex justify-between items-center mx-2 mt-2">
                     <Button variant={'ghost'} className="m-1 p-1">
@@ -69,16 +70,32 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
                             {chats?.map((chat) => (
                                 <div className="w-full flex justify-between items-center">
                                     <div className="w-full overflow-hidden">
-                                        {chat.id === currentConversationId ?
-                                            <Button size='sm' variant={'ghost'} className="w-full justify-between bg-accent text-accent-foreground" onClick={() => handleSetSelected(chat.id)}>
-                                                {chat.title}
-                                            </Button> :
-                                            <Button size='sm' variant={'ghost'} className="w-full justify-between " onClick={() => handleSetSelected(chat.id)}>
-                                                {chat.title}
-                                            </Button>
-                                        }
+                                        <Tooltip content={chat.title} side="right">
+                                            {chat.id === currentConversationId ?
+                                                <Button size='sm' variant={'ghost'} className="w-full justify-between bg-accent text-accent-foreground" onClick={() => handleSetSelected(chat.id)}>
+                                                    {chat.title}
+                                                </Button>
+                                                :
+                                                <Button size='sm' variant={'ghost'} className="w-full justify-between " onClick={() => handleSetSelected(chat.id)}>
+                                                    {chat.title}
+                                                </Button>
+                                            }
+                                        </Tooltip>
                                     </div>
-                                    <DeleteConversationModal conversationId={chat.id} deleteMutation={deleteMutation} />
+                                    <Popover.Root>
+                                        <Popover.Trigger>
+                                            <Button variant="ghost" size='icon'>
+                                                <DotsHorizontalIcon />
+                                            </Button>
+                                        </Popover.Trigger>
+                                        <Popover.Content side="right">
+                                            <div className="flex flex-col items-start">
+                                                <UpdateConversationModal conversationId={chat.id} currentTitle={chat.title} />
+                                                <DeleteConversationModal conversationId={chat.id} />
+                                                <MagicTitleButton conversationId={chat.id} />
+                                            </div>
+                                        </Popover.Content>
+                                    </Popover.Root>
                                 </div>
                             ))}
                         </div>

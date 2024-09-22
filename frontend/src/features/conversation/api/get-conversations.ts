@@ -3,7 +3,7 @@ import { api } from '@/lib/api-client';
 import { Conversation } from '@/types/api';
 import Cookies from 'js-cookie';
 
-export const useGetConversationQuery = () => {
+export const useGetConversationsQuery = () => {
     return useQuery({
         queryFn: (): Promise<Conversation[]> => {
             return api.get(`/conversations/`, {

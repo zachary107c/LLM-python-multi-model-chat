@@ -13,16 +13,21 @@ import { useGetConversationQuery } from '@/features/conversation/api/get-convers
 import { Callout, DropdownMenu } from '@radix-ui/themes';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import { HashLoader } from 'react-spinners';
+import { createConversationMutation } from '@/features/conversation/api/create-conversation';
+
+import { useSearchParams } from 'react-router-dom';
+import { set } from 'js-cookie';
 
 
-export function Chat({ chatId }: any) {
+export function Chat({ chatId, onCreateNewChat }: any) {
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
     const [model, setModel] = useState("Marcus:latest");
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
     const updateMutation = updateConversationMutation();
+    const createMutation = createConversationMutation();
     const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId: chatId });
-
+    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         if (data) {
@@ -41,11 +46,24 @@ export function Chat({ chatId }: any) {
         }
     }, [data]);
 
+    async function handleCreateNewConversation(firstMessage: string) {
+        var response = await createMutation.mutateAsync({ data: { previousConversationId: chatId || undefined, data: { title: firstMessage } } });
+        onCreateNewChat(response.id);
+        return response.id;
+    }
+
     async function handleSendMessage(message: string) {
         if (message.trim().length > 0) {
-            const userPostData = await createUserMessage({ data: { conversation: chatId, content: message } });
+
+            var currentChatId = chatId;
+
+            if (!chatId) {
+                currentChatId = await handleCreateNewConversation(message);
+            }
+
+            const userPostData = await createUserMessage({ data: { conversation: currentChatId, content: message } });
             if (messages.length == 0) {
-                await updateMutation.mutateAsync({ conversationId: chatId, data: { title: message } });
+                await updateMutation.mutateAsync({ data: { conversationId: currentChatId, updates: { title: message } } });
             }
             setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt, model: 'user' }]);
             setIsLoading(true);
@@ -56,7 +74,7 @@ export function Chat({ chatId }: any) {
             }
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
             setIsLoading(false);
-            const assistantPostData = await createAssistantMessage({ data: { conversation: chatId, content: response.data.message.content, model: model, provider: "ollama" } });
+            const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: response.data.message.content, model: model, provider: "ollama" } });
             setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt, model: assistantPostData.model }]);
         }
     }
