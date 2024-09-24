@@ -756,6 +756,10 @@ video {
   min-height: 48px;
 }
 
+.w-14 {
+  width: 3.5rem;
+}
+
 .w-9 {
   width: 2.25rem;
 }
@@ -779,18 +783,6 @@ video {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-4 {
-  width: 1rem;
-}
-
-.w-12 {
-  width: 3rem;
-}
-
-.w-14 {
-  width: 3.5rem;
 }
 
 .max-w-\[250px\] {

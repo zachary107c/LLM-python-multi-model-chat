@@ -20,15 +20,19 @@ import { useQueryClient } from '@tanstack/react-query';
 
 
 export function Chat({ chatId, onCreateNewChat }: any) {
-    const queryClient = useQueryClient();
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
     const [model, setModel] = useState("");
-    const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
     const [isLoading, setIsLoading] = useState(false);
-    const ref = useScrollToEnd(messages);
+
     const updateMutation = updateConversationMutation();
     const createMutation = createConversationMutation();
+
+    const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
     const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId: chatId });
+
+    const ref = useScrollToEnd(messages);
+
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (data) {
