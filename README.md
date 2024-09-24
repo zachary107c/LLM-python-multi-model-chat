@@ -13,7 +13,6 @@ BS-LLM-WebUI is a web application with a frontend built using React and Vite, an
   - [Frontend Setup (React with Vite)](#frontend-setup-react-with-vite)
   - [Backend Setup (Django with Poetry)](#backend-setup-django-with-poetry)
   - [Running the Application](#running-the-application)
-  - [Contributing](#contributing)
   - [License](#license)
 
 ## Prerequisites
@@ -21,6 +20,7 @@ BS-LLM-WebUI is a web application with a frontend built using React and Vite, an
 - **Node.js**: Make sure you have Node.js installed to manage frontend dependencies.
 - **Python**: Ensure that Python 3.8+ is installed for running the Django backend.
 - **Poetry**: Make sure you have Poetry installed to manage Python dependencies.
+- **[Ollama](https://ollama.com/)**: Ensure you have Ollama installed on your machine, or a machine on your local network.
 
 ## Frontend Setup (React with Vite)
 
@@ -39,7 +39,7 @@ npm install
 npm run dev
 ```
 
-This will start the Vite development server, and you should be able to access the frontend at `http://localhost:3000` by default.
+This will start the Vite development server, and you should be able to access the frontend at `http://localhost:5173` by default.
 
 ## Backend Setup (Django with Poetry)
 
