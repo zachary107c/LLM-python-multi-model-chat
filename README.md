@@ -1,5 +1,7 @@
 # BS-LLM-WebUI
 
+![image](https://github.com/user-attachments/assets/22412e6f-cada-4967-adeb-cc5806c1706e)
+
 ## Description
 
 BS-LLM-WebUI is a web application with a frontend built using React and Vite, and a backend powered by Django with a Poetry-managed virtual environment.
