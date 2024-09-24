@@ -756,6 +756,10 @@ video {
   min-height: 48px;
 }
 
+.w-14 {
+  width: 3.5rem;
+}
+
 .w-9 {
   width: 2.25rem;
 }

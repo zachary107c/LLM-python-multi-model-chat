@@ -1,28 +1,27 @@
-import { TextField, TextArea, IconButton, Text, Button, Card, Popover, Box, Flex, Checkbox, Avatar, DropdownMenu } from '@radix-ui/themes';
+import { TextField, TextArea, IconButton, Text, Button, Card, Popover, Box, Flex, Checkbox, Avatar, DropdownMenu, Skeleton } from '@radix-ui/themes';
 import { RocketIcon, ChatBubbleIcon, FileIcon, ImageIcon, FileTextIcon } from '@radix-ui/react-icons';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
-import { useGetModelsQuery } from '@/features/model/api/get-models';
+import { Model } from '@/types/api';
 
 interface Props {
     onSendMessage: (message: string) => void;
-    onModelChange: (message: string) => void;
+    onModelChange: (model: string) => void;
+    selectedModel: string;  // Pass selected model from parent
+    models: Model[] | undefined;  // Pass models array from parent
+    modelsLoading: boolean;
 }
 
-export function ChatInput({ onSendMessage, onModelChange }: Props) {
+export function ChatInput({ onSendMessage, onModelChange, selectedModel, models, modelsLoading }: Props) {
     const [newMessage, setNewMessage] = useState('');
-    const [newContext, setNewContext] = useState('');
     const [textAreaHeight, setTextAreaHeight] = useState(48);
     const [lastMessage, setLastMessage] = useState('');
-    const { data } = useGetModelsQuery();
-    const [model, setModel] = useState(data ? data[0].name : "llama3.1:latest");
 
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        onSendMessage(newMessage + '\n\n' + newContext);
+        onSendMessage(newMessage);
         setLastMessage(newMessage);
         setNewMessage('');
-        setNewContext('');
         setTextAreaHeight(48);
     };
 
@@ -35,7 +34,6 @@ export function ChatInput({ onSendMessage, onModelChange }: Props) {
             onSendMessage(newMessage);
             setLastMessage(newMessage);
             setNewMessage('');
-            setNewContext('');
             setTextAreaHeight(48);
         } else if (event.key === 'Backspace' && textAreaHeight > 48) {
             if (newMessage.endsWith('\n')) {
@@ -45,7 +43,6 @@ export function ChatInput({ onSendMessage, onModelChange }: Props) {
     };
 
     function handleModelChange(model: string) {
-        setModel(model);
         onModelChange(model);
     }
 
@@ -75,12 +72,19 @@ export function ChatInput({ onSendMessage, onModelChange }: Props) {
                                     <DropdownMenu.Root>
                                         <DropdownMenu.Trigger>
                                             <Button variant="surface" size='1'>
-                                                {model}
+                                                {modelsLoading ? (
+                                                    <div className='w-14'>
+                                                        <Skeleton />
+                                                    </div>
+                                                ) : (
+                                                    selectedModel || "Select a model"
+                                                ) }
+
                                                 <DropdownMenu.TriggerIcon />
                                             </Button>
                                         </DropdownMenu.Trigger>
                                         <DropdownMenu.Content>
-                                            {data?.map((model) => (
+                                            {models?.map((model) => (
                                                 <DropdownMenu.Item onClick={() => handleModelChange(model.name)}>{model.name}</DropdownMenu.Item>
                                             ))}
                                         </DropdownMenu.Content>

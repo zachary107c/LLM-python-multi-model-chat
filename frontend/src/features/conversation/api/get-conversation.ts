@@ -21,6 +21,6 @@ export const useGetConversationQuery = ({ conversationId }: GetConversationInput
             });
         },
         enabled: !!conversationId,
-        staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 5
     });
 };
