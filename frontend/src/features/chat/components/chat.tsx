@@ -10,24 +10,25 @@ import { createAssistantMessage } from '@/features/chatMessage/api/create-assist
 import { ConversationDetailMessage } from '@/types/api';
 import { updateConversationMutation } from '@/features/conversation/api/update-conversation';
 import { useGetConversationQuery } from '@/features/conversation/api/get-conversation';
-import { Callout, DropdownMenu } from '@radix-ui/themes';
+import { Callout } from '@radix-ui/themes';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import { HashLoader } from 'react-spinners';
 import { createConversationMutation } from '@/features/conversation/api/create-conversation';
+import { useGetModelsQuery } from '@/features/model/api/get-models';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { useSearchParams } from 'react-router-dom';
-import { set } from 'js-cookie';
 
 
 export function Chat({ chatId, onCreateNewChat }: any) {
+    const queryClient = useQueryClient();
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
-    const [model, setModel] = useState("Marcus:latest");
+    const [model, setModel] = useState("");
+    const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
     const [isLoading, setIsLoading] = useState(false);
     const ref = useScrollToEnd(messages);
     const updateMutation = updateConversationMutation();
     const createMutation = createConversationMutation();
     const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId: chatId });
-    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         if (data) {
@@ -45,6 +46,22 @@ export function Chat({ chatId, onCreateNewChat }: any) {
             setMessages([]);
         }
     }, [data]);
+
+    useEffect(() => {
+        if (models && models?.length > 0 && !model) {
+            setModel(models[0].name);
+        }
+        if (modelsLoading) {
+            console.log("modelsLoading");
+        }
+    }, [models]);
+
+    useEffect(() => {
+        if (chatId) {
+            queryClient.invalidateQueries({queryKey: ["conversation", chatId]});
+        }
+    }, [chatId]);
+
 
     async function handleCreateNewConversation(firstMessage: string) {
         var response = await createMutation.mutateAsync({ data: { previousConversationId: chatId || undefined, data: { title: firstMessage } } });
@@ -114,7 +131,7 @@ export function Chat({ chatId, onCreateNewChat }: any) {
                     }
                     <div ref={ref} />
                 </div>
-                <ChatInput onSendMessage={handleSendMessage} onModelChange={setModel} />
+                <ChatInput onSendMessage={handleSendMessage} onModelChange={setModel} selectedModel={model} models={models} modelsLoading={modelsLoading} />
             </div>
         </div>
     );
