@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@radix-ui/themes';
-import { MagicWandIcon } from '@radix-ui/react-icons'; // Add this if not already imported
+import { MagicWandIcon } from '@radix-ui/react-icons';
 import { updateConversationMutation } from "../api/update-conversation";
 import { useGenerateConversationTitle } from "@/features/conversation/hooks/generate-conversation-title";
 import { BarLoader } from 'react-spinners';

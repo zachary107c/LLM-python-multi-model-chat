@@ -7,7 +7,6 @@ import { DeleteConversationModal } from "./delete-conversation-modal";
 import { UpdateConversationModal } from "./edit-conversation-modal";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
 import { useGetConversationsQuery } from "@/features/conversation/api/get-conversations";
-import { useGenerateConversationTitle } from "../hooks/generate-conversation-title";
 import { MagicTitleButton } from "@/features/conversation/components/magic-title-button";
 
 
