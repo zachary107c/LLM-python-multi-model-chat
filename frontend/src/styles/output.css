@@ -703,6 +703,10 @@ video {
   margin-top: 1rem;
 }
 
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
 .block {
   display: block;
 }
@@ -1040,6 +1044,28 @@ video {
   outline-style: solid;
 }
 
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.duration-4000 {
+  transition-duration: 4000ms;
+}
+
+.duration-10000 {
+  transition-duration: 10000ms;
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
 @keyframes enter {
   from {
     opacity: var(--tw-enter-opacity, 1);
@@ -1080,6 +1106,22 @@ video {
 
 .spin-out-180 {
   --tw-exit-rotate: 180deg;
+}
+
+.duration-4000 {
+  animation-duration: 4000ms;
+}
+
+.duration-10000 {
+  animation-duration: 10000ms;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
+}
+
+.duration-300 {
+  animation-duration: 300ms;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

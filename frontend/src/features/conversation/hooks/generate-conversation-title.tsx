@@ -2,7 +2,7 @@ import { useGetConversationQuery } from "@/features/conversation/api/get-convers
 import axios from 'axios';
 import { useState } from "react";
 
-export const useGenerateConversationTitle = (conversationId: string) => {
+export const useGenerateConversationTitle = (conversationId: string ) => {
     const { data, error: queryError, isLoading: isQueryLoading } = useGetConversationQuery({ conversationId });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -16,14 +16,24 @@ export const useGenerateConversationTitle = (conversationId: string) => {
         try {
             setIsLoading(true);
             await sleep(1000);
-            var prompt = 'Generate a concise, creative title for the following conversation using relevant keywords and up to two emojis. Always start and end the title with an emoji. Return only the title, no other text or markdown.\nCONVERSATION:\n';
+            var prompt = 'CONVERSATION:\n';
             data.messages.forEach(message => {
-                prompt += `${message.type}: ${message.content}\n`;
+                prompt += `${message.type.toUpperCase()} MESSAGE: ${message.content}\n\n`;
             });
+
+            const summaryPayload = {
+                model: "llama3.1",
+                messages: [{ role: "system", content: "Create a summary of the following conversation. Return only the summary, no other text or markdown." }, { role: "user", content: prompt }],
+                stream: false,
+            };
+
+            const summaryResponse = await axios.post('http://192.168.1.11:11434/api/chat', summaryPayload);
+            const summary = summaryResponse.data.message.content.replace(/"/g, "");
+            console.log("Summary: ", summary);
 
             const payload = {
                 model: "llama3.1",
-                messages: [{ role: "user", content: prompt }],
+                messages: [{ role: "system", content: "Generate a concise, creative title for the following conversation using the provided summary. Always start and end the title with an emoji. Return only the title, no other text or markdown. Always return text. If there is no conversation, make a random title." }, { role: "user", content: summary }],
                 stream: false,
             };
 

@@ -17,9 +17,12 @@ import { createConversationMutation } from '@/features/conversation/api/create-c
 import { useGetModelsQuery } from '@/features/model/api/get-models';
 import { useQueryClient } from '@tanstack/react-query';
 
+interface ChatProps {
+    chatId: string;
+    onCreateNewChat: (newChatId: string) => void;
+}
 
-
-export function Chat({ chatId, onCreateNewChat }: any) {
+export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
     const [model, setModel] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -45,8 +48,7 @@ export function Chat({ chatId, onCreateNewChat }: any) {
                 model: message.model,
             }));
             setMessages(newMessages);
-        }
-        if (!chatId) {
+        } else if (!chatId) {
             setMessages([]);
         }
     }, [data]);
@@ -62,7 +64,8 @@ export function Chat({ chatId, onCreateNewChat }: any) {
 
     useEffect(() => {
         if (chatId) {
-            queryClient.invalidateQueries({queryKey: ["conversation", chatId]});
+            setMessages([]);
+            queryClient.invalidateQueries({ queryKey: ["conversation", chatId] });
         }
     }, [chatId]);
 
