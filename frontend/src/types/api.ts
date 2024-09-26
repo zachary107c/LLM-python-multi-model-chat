@@ -58,3 +58,18 @@ export type GenerateConversationTitle = {
     generatedTitle: string;
 }
 
+export type Profile = {
+    "image": string,
+    "bio": string,
+    "preferredModel": Model,
+}
+
+export type UserProfile = {
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    profile: Profile;
+}
+
+

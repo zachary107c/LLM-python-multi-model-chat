@@ -7,9 +7,9 @@ from api.models import OllamaModel
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name="userprofile", on_delete=models.CASCADE)
-    image = models.ImageField(default="profile_pics/default/default.png", upload_to="profile_pics")
-    bio = models.TextField(default="")
-    perferred_model = models.ForeignKey(OllamaModel, related_name="preferred_model", on_delete=models.SET_NULL, null=True, blank=True)
+    image = models.ImageField(default="profile_pics/default/default.jpg", upload_to="profile_pics/")
+    bio = models.TextField(null=True, blank=True)
+    preferred_model = models.ForeignKey(OllamaModel, related_name="preferred_model", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} Profile"

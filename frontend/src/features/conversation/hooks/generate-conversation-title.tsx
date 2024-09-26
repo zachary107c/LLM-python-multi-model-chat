@@ -1,23 +1,24 @@
-import { useGetConversationQuery } from "@/features/conversation/api/get-conversation";
+import { useGetConversationQuery } from '@/features/conversation/api/get-conversation';
 import axios from 'axios';
-import { useState } from "react";
+import { useState } from 'react';
 
-export const useGenerateConversationTitle = (conversationId: string ) => {
+export const useConversationalTitleGenerator = (conversationId: string) => {
     const { data, error: queryError, isLoading: isQueryLoading } = useGetConversationQuery({ conversationId });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const CONVERSATION_TITLE_GENERATION_DELAY_MS = 1000;
 
     const generateConversationTitle = async (): Promise<string> => {
-        if (!data) {
-            return '';
-        }
+        if (!data) return '';
 
         try {
             setIsLoading(true);
-            await sleep(1000);
+
+            await sleep(CONVERSATION_TITLE_GENERATION_DELAY_MS);
+
             var prompt = 'CONVERSATION:\n';
-            data.messages.forEach(message => {
+            data.messages.forEach((message) => {
                 prompt += `${message.type.toUpperCase()} MESSAGE: ${message.content}\n\n`;
             });
 
@@ -28,8 +29,8 @@ export const useGenerateConversationTitle = (conversationId: string ) => {
             };
 
             const summaryResponse = await axios.post('http://192.168.1.11:11434/api/chat', summaryPayload);
-            const summary = summaryResponse.data.message.content.replace(/"/g, "");
-            console.log("Summary: ", summary);
+            const summary = summaryResponse.data.message.content.replace(/"/g, '');
+            console.log("Summary:", summary);
 
             const payload = {
                 model: "llama3.1",
@@ -38,7 +39,7 @@ export const useGenerateConversationTitle = (conversationId: string ) => {
             };
 
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
-            return response.data.message.content.replace(/"/g, "");
+            return response.data.message.content.replace(/"/g, '');
         } catch (err) {
             setError("Failed to generate a title.");
             console.error(err);
@@ -47,6 +48,8 @@ export const useGenerateConversationTitle = (conversationId: string ) => {
             setIsLoading(false);
         }
     };
+
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
     return { generateConversationTitle, isLoading: isQueryLoading || isLoading, error: queryError || error };
 };
