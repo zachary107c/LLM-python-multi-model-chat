@@ -11,6 +11,7 @@ export type Entity<T> = {
 export type UserMessage = Entity<{
     conversation: string;
     content: string;
+    image: string | null;
 }>;
 
 export type AssistantMessage = Entity<{
@@ -39,6 +40,7 @@ export type ConversationDetailMessage = Entity<{
     model?: string;
     provider?: string;
     liked?: boolean;
+    image: string | null;
 }>;
 
 export type ConversationDetail = {

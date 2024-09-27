@@ -1,27 +1,31 @@
-import { TextField, TextArea, IconButton, Text, Button, Card, Popover, Box, Flex, Checkbox, Avatar, DropdownMenu, Skeleton } from '@radix-ui/themes';
-import { RocketIcon, ChatBubbleIcon, FileIcon, ImageIcon, FileTextIcon, CameraIcon } from '@radix-ui/react-icons';
+import { Text, Button, Card, DropdownMenu, Skeleton, Badge } from '@radix-ui/themes';
+import { RocketIcon, FileIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Model } from '@/types/api';
 import { Button as LocalButton } from '@/components/ui/button';
+import { ImageUploadButton } from '@/features/imageUpload/components/image-upload-button';
 
 interface Props {
-    onSendMessage: (message: string) => void;
+    onSendMessage: (message: string, image: File | null) => void;
     onModelChange: (model: string) => void;
+    onImageDataChange: (model: File | null ) => void;
     selectedModel: string;  // Pass selected model from parent
     models: Model[] | undefined;  // Pass models array from parent
     modelsLoading: boolean;
 }
 
-export function ChatInput({ onSendMessage, onModelChange, selectedModel, models, modelsLoading }: Props) {
+export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, selectedModel, models, modelsLoading }: Props) {
     const [newMessage, setNewMessage] = useState('');
     const [textAreaHeight, setTextAreaHeight] = useState(48);
     const [lastMessage, setLastMessage] = useState('');
+    const [imageName, setImageName] = useState<string | null>(null);
+    const [imageData, setImageData] = useState<File | null>(null);
 
 
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        onSendMessage(newMessage);
+        onSendMessage(newMessage, imageData);
         setLastMessage(newMessage);
         setNewMessage('');
         setTextAreaHeight(48);
@@ -33,7 +37,7 @@ export function ChatInput({ onSendMessage, onModelChange, selectedModel, models,
         }
         else if (event.key === 'Enter') {
             event.preventDefault();
-            onSendMessage(newMessage);
+            onSendMessage(newMessage, imageData);
             setLastMessage(newMessage);
             setNewMessage('');
             setTextAreaHeight(48);
@@ -46,6 +50,23 @@ export function ChatInput({ onSendMessage, onModelChange, selectedModel, models,
 
     function handleModelChange(model: string) {
         onModelChange(model);
+    }
+
+    const handleFileChange = useCallback((newFile: File | null) => {
+        onImageDataChange(newFile);
+        setImageData(newFile)
+        setImageName(newFile ? newFile.name : null)
+    }, [])
+
+    const handleClear = useCallback(() => {
+        onImageDataChange(null);
+        setImageData(null)
+        setImageName(null)
+    }, [])
+
+    const handleOuterClear = () => {
+        handleClear()
+        console.log('File cleared from parent component')
     }
 
     return (
@@ -76,7 +97,7 @@ export function ChatInput({ onSendMessage, onModelChange, selectedModel, models,
                                             <DropdownMenu.Trigger>
                                                 <Button variant="surface" size='1'>
                                                     {modelsLoading ? (
-                                                        <Skeleton width='60px'/>
+                                                        <Skeleton width='60px' />
                                                     ) : (
                                                         selectedModel || "Select a model"
                                                     )}
@@ -95,11 +116,20 @@ export function ChatInput({ onSendMessage, onModelChange, selectedModel, models,
                                                 <FileIcon />
                                             </LocalButton>
                                         </div>
-                                        <div>
-                                            <LocalButton variant='ghost-no-hover' className='m-1 p-0'>
-                                                <ImageIcon />
-                                            </LocalButton>
-                                        </div>
+                                        {imageName ? null : <div>
+                                            <ImageUploadButton fileName={imageName} onFileChange={handleFileChange} onClear={handleClear} />
+                                        </div>}
+                                        {imageName ?
+                                            <div>
+                                                <Badge radius='full' variant='surface' color='mint'>
+                                                    <div className='w-full flex justify-between items-center px-2'>
+                                                        <Text weight='light' size='1'>{imageName}</Text>
+                                                        <LocalButton size='tiny' variant='ghost-no-hover' className='h-6' onClick={handleOuterClear}>
+                                                            <Cross1Icon height={10} width={10} />
+                                                        </LocalButton>
+                                                    </div>
+                                                </Badge>
+                                            </div> : null}
                                     </div>
                                 </div>
                                 <Button type='submit' size='1' variant='surface' color='green'>

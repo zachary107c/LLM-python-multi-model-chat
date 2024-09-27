@@ -161,3 +161,4 @@ cython_debug/
 #.idea/
 media/profile_pics/*.png
 media/profile_pics/*.jpg
+media/user_message_images/*
