@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Chat } from "@/features/chat/components/chat";
-import { ChatHistory } from "@/features/conversation/components/chat-history";
+import { ConversationHistory } from "@/features/conversation/components/conversation-history";
 import { useSearchParams } from 'react-router-dom';
 
 export default function ChatPage() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [selectedChatId, setSelectedChatId] = useState(searchParams.get("c") || null);
+    const [selectedChatId, setSelectedChatId] = useState(searchParams.get("c") || "");
 
     function handleSelectedChatId(id: string) {
         setSelectedChatId(id);
@@ -13,12 +13,12 @@ export default function ChatPage() {
     }
 
     useEffect(() => {
-        setSelectedChatId(searchParams.get("c") || null);
+        setSelectedChatId(searchParams.get("c") || "");
     }, [searchParams]);
 
     return (
         <div className="w-full h-screen flex overflow-hidden">
-            <ChatHistory onSelectedIdChange={handleSelectedChatId} />
+            <ConversationHistory onSelectedIdChange={handleSelectedChatId} />
             <div className="w-full h-full flex flex-col justify-between">
                 <Chat chatId={selectedChatId} onCreateNewChat={handleSelectedChatId}/>
             </div>

@@ -32,8 +32,6 @@ export function UpdateProfileModal() {
                         '--base-card-padding-left': 'var(--space-2)',
                         '--base-card-padding-right': 'var(--space-2)',
                     } as any} size="1" variant='surface'>
-
-                    <h1>COCK</h1>
                 </Card>
                 <Flex gap="3" mt="4" justify="between">
                     <AlertDialog.Cancel>

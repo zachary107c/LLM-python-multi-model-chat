@@ -1,8 +1,9 @@
 import { TextField, TextArea, IconButton, Text, Button, Card, Popover, Box, Flex, Checkbox, Avatar, DropdownMenu, Skeleton } from '@radix-ui/themes';
-import { RocketIcon, ChatBubbleIcon, FileIcon, ImageIcon, FileTextIcon } from '@radix-ui/react-icons';
+import { RocketIcon, ChatBubbleIcon, FileIcon, ImageIcon, FileTextIcon, CameraIcon } from '@radix-ui/react-icons';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { Model } from '@/types/api';
+import { Button as LocalButton } from '@/components/ui/button';
 
 interface Props {
     onSendMessage: (message: string) => void;
@@ -16,6 +17,7 @@ export function ChatInput({ onSendMessage, onModelChange, selectedModel, models,
     const [newMessage, setNewMessage] = useState('');
     const [textAreaHeight, setTextAreaHeight] = useState(48);
     const [lastMessage, setLastMessage] = useState('');
+
 
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -67,28 +69,38 @@ export function ChatInput({ onSendMessage, onModelChange, selectedModel, models,
                                 onKeyDown={handleKeyDown}
                                 style={{ height: `${textAreaHeight}px` }}
                             />
-                            <div className='flex justify-between'>
+                            <div className='flex justify-between items-center'>
                                 <div className='mr-2'>
-                                    <DropdownMenu.Root>
-                                        <DropdownMenu.Trigger>
-                                            <Button variant="surface" size='1'>
-                                                {modelsLoading ? (
-                                                    <div className='w-14'>
-                                                        <Skeleton />
-                                                    </div>
-                                                ) : (
-                                                    selectedModel || "Select a model"
-                                                ) }
+                                    <div className='flex items-center'>
+                                        <DropdownMenu.Root>
+                                            <DropdownMenu.Trigger>
+                                                <Button variant="surface" size='1'>
+                                                    {modelsLoading ? (
+                                                        <Skeleton width='60px'/>
+                                                    ) : (
+                                                        selectedModel || "Select a model"
+                                                    )}
 
-                                                <DropdownMenu.TriggerIcon />
-                                            </Button>
-                                        </DropdownMenu.Trigger>
-                                        <DropdownMenu.Content>
-                                            {models?.map((model) => (
-                                                <DropdownMenu.Item onClick={() => handleModelChange(model.name)}>{model.name}</DropdownMenu.Item>
-                                            ))}
-                                        </DropdownMenu.Content>
-                                    </DropdownMenu.Root>
+                                                    <DropdownMenu.TriggerIcon />
+                                                </Button>
+                                            </DropdownMenu.Trigger>
+                                            <DropdownMenu.Content>
+                                                {models?.map((model) => (
+                                                    <DropdownMenu.Item onClick={() => handleModelChange(model.name)}>{model.name}</DropdownMenu.Item>
+                                                ))}
+                                            </DropdownMenu.Content>
+                                        </DropdownMenu.Root>
+                                        <div className='mx-2'>
+                                            <LocalButton variant='ghost-no-hover' className='m-1 p-0'>
+                                                <FileIcon />
+                                            </LocalButton>
+                                        </div>
+                                        <div>
+                                            <LocalButton variant='ghost-no-hover' className='m-1 p-0'>
+                                                <ImageIcon />
+                                            </LocalButton>
+                                        </div>
+                                    </div>
                                 </div>
                                 <Button type='submit' size='1' variant='surface' color='green'>
                                     <Text size='1'>

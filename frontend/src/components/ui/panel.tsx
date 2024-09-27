@@ -7,7 +7,7 @@ export default function Panel({ title, role, name, text, children }: any) {
         <div>
             {(title) && (
                 <div className={`mb-1 flex ${role === 'user' ? 'justify-end' : 'justify-start'} items-center`}>
-                    {(name !== "user" && name !== undefined && name !== '' && name !== null) && (<Badge variant='surface' color="plum">{name}</Badge>)}
+                    {(name !== "user" && name !== undefined && name !== '' && name !== null) && (<div className="flex items-center"><Badge variant='surface' color="plum" className="mr-1">{name}</Badge></div>)}
                 </div>)}
             <div className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <Card className="w-fit">

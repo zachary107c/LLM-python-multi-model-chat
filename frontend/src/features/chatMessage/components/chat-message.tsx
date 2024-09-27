@@ -16,7 +16,7 @@ export function ChatMessage({ messageText, messageType, messageId, name, liked, 
     return (
         <div className="mb-2">
             <div>
-                <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} name={name} />
+                <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} name={name}/>
             </div>
             <div className={messageType === 'user' ? 'flex justify-end' : 'flex justify-start'}>
                 <Flex gap="0" align="center">
@@ -25,9 +25,6 @@ export function ChatMessage({ messageText, messageType, messageId, name, liked, 
                         (
                             <>
                                 <LikeMessageButton messageId={messageId} isLiked={liked} conversationId={conversationId}/>
-                                <Button variant='ghost' size={'icon'}>
-                                    <MagicWandIcon />
-                                </Button>
                             </>
                         ) : ''
                     }

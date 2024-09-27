@@ -1,6 +1,6 @@
 export type BaseEntity = {
     id: string;
-    createdAt: number;
+    createdAt: string;
 };
 
 export type Entity<T> = {
@@ -30,6 +30,7 @@ export type Conversation = Entity<{
     title: string;
     user: string;
     updatedAt: number;
+    liked: boolean;
 }>;
 
 export type ConversationDetailMessage = Entity<{
@@ -44,6 +45,7 @@ export type ConversationDetail = {
     title: string;
     user: string;
     updatedAt: number;
+    liked: boolean;
     messages: ConversationDetailMessage[];
 };
 
@@ -61,14 +63,14 @@ export type GenerateConversationTitle = {
 export type Profile = {
     "image": string,
     "bio": string,
-    "preferredModel": Model,
+    "preferred_model": Model,
 }
 
 export type UserProfile = {
     username: string;
     email: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     profile: Profile;
 }
 

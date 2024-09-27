@@ -16,6 +16,8 @@ import { HashLoader } from 'react-spinners';
 import { createConversationMutation } from '@/features/conversation/api/create-conversation';
 import { useGetModelsQuery } from '@/features/model/api/get-models';
 import { useQueryClient } from '@tanstack/react-query';
+import { set } from 'js-cookie';
+
 
 interface ChatProps {
     chatId: string;
@@ -43,12 +45,16 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                 type: message.type,
                 content: message.content,
                 id: message.id,
-                createdAt: message.createdAt,
+                createdAt: message.created_at,
                 liked: message.liked,
                 model: message.model,
             }));
             setMessages(newMessages);
-        } else if (!chatId) {
+        } else {
+            setMessages([]);
+        }
+
+        if (!chatId) {
             setMessages([]);
         }
     }, [data]);
@@ -64,7 +70,6 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
 
     useEffect(() => {
         if (chatId) {
-            setMessages([]);
             queryClient.invalidateQueries({ queryKey: ["conversation", chatId] });
         }
     }, [chatId]);
@@ -109,7 +114,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                 {
                     conversationLoading && (
                         <div className='w-full h-full flex flex-col items-center justify-center'>
-                            <HashLoader color='#484848' size={100} />
+                            <HashLoader color='#484848' size={200} />
                         </div>
                     )
                 }

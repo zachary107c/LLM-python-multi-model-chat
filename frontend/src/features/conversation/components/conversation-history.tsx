@@ -1,27 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Tooltip, Popover } from "@radix-ui/themes";
-import { PlusIcon, PinLeftIcon, PinRightIcon, DotsHorizontalIcon, MagicWandIcon, TextAlignLeftIcon } from "@radix-ui/react-icons";
-import { DeleteConversationModal } from "./delete-conversation-modal";
-import { UpdateConversationModal } from "./edit-conversation-modal";
+import { Tooltip, Text } from "@radix-ui/themes";
+import { PlusIcon, PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
 import { useGetConversationsQuery } from "@/features/conversation/api/get-conversations";
-import { MagicTitleButton } from "@/features/conversation/components/magic-title-button";
+import { Conversation } from "@/types/api";
+import { ConversationList } from "./conversation-list";
+import { ConversationListLoading } from "./conversation-list-loading";
 
 
-export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
+export function ConversationHistory({ onSelectedIdChange }: any) {
     const [searchParams, setSearchParams] = useSearchParams();
     const [expanded, setExpanded] = useState(true);
     const currentConversationId = searchParams.get('c');
     const { data: chats, isLoading } = useGetConversationsQuery();
     const createMutation = createConversationMutation();
-
+    const [bookmarkedChats, setBookmarkChats] = useState<Conversation[]>([]);
+    const [nonBookmarkedChats, setNonBookmarkChats] = useState<Conversation[]>([]);
 
     function handleSetExpanded(e: any) {
         setExpanded(e);
     };
-
 
     function handleSetSelected(conversationId: string) {
         if (chats !== null && chats !== undefined) {
@@ -39,6 +39,13 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
             console.log(e)
         }
     }
+
+    useEffect(() => {
+        if (chats) {
+            setBookmarkChats(chats.filter((chat) => chat.liked));
+            setNonBookmarkChats(chats.filter((chat) => !chat.liked));
+        }
+    }, [chats]);
 
     return (
         <div className={`${expanded ? 'w-[250px] max-w-[250px] h-full' : 'h-full'}`}>
@@ -66,37 +73,14 @@ export function ChatHistory({ onSelectedIdChange, setMessages }: any) {
                 <div className="mx-2">
                     <div className="flex flex-col justify-center align-top">
                         <div className="flex flex-col w-full">
-                            {chats?.map((chat) => (
-                                <div className="w-full flex justify-between items-center">
-                                    <div className="w-full overflow-hidden">
-                                        <Tooltip content={chat.title} side="right">
-                                            {chat.id === currentConversationId ?
-                                                <Button size='sm' variant={'ghost'} className="w-full justify-between bg-accent text-accent-foreground" onClick={() => handleSetSelected(chat.id)}>
-                                                    {chat.title}
-                                                </Button>
-                                                :
-                                                <Button size='sm' variant={'ghost'} className="w-full justify-between " onClick={() => handleSetSelected(chat.id)}>
-                                                    {chat.title}
-                                                </Button>
-                                            }
-                                        </Tooltip>
-                                    </div>
-                                    <Popover.Root>
-                                        <Popover.Trigger>
-                                            <Button variant="ghost" size='icon'>
-                                                <DotsHorizontalIcon />
-                                            </Button>
-                                        </Popover.Trigger>
-                                        <Popover.Content side="right">
-                                            <div className="flex flex-col items-start">
-                                                <UpdateConversationModal conversationId={chat.id} currentTitle={chat.title} />
-                                                <DeleteConversationModal conversationId={chat.id} />
-                                                <MagicTitleButton conversationId={chat.id} />
-                                            </div>
-                                        </Popover.Content>
-                                    </Popover.Root>
-                                </div>
-                            ))}
+                            <div>
+                                <Text weight='bold'>Bookmarked Chats</Text>
+                                {isLoading ? <ConversationListLoading /> : <ConversationList chats={bookmarkedChats} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
+                            </div>
+                            <div>
+                                <Text weight='bold'>Other Chats</Text>
+                                {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkedChats} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
+                            </div>
                         </div>
                     </div>
                 </div>
