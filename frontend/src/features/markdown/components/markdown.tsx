@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
-import "highlight.js/styles/vs.css";
-
+import "highlight.js/styles/github.css"; // Changed to GitHub style
+import DOMPurify from "dompurify";
 
 interface MarkdownRendererProps {
   markdown: string;
@@ -12,27 +12,39 @@ interface MarkdownRendererProps {
 const markedInstance = new Marked(
   markedHighlight({
     langPrefix: "hljs language-",
-    highlight(code) {
-      const result = hljs.highlightAuto(code);
-      return result.value;
+    highlight(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : "plaintext";
+      return hljs.highlight(code, { language }).value;
     },
   })
 );
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ markdown }) => {
-  const containerRef = useRef(null);
+// Configure marked for better rendering
+markedInstance.setOptions({
+  gfm: true,
+  breaks: true,
+});
 
-  useEffect(() => {
-    hljs.highlightAll();
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ markdown }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const sanitizedHtml = useMemo(() => {
+    const html = markedInstance.parse(markdown);
+    return DOMPurify.sanitize(html as string);
   }, [markdown]);
 
-  // Parsing markdown and sanitizing the resulting HTML
-  const html = markedInstance.parse(markdown);
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.querySelectorAll("pre code").forEach((block) => {
+        hljs.highlightElement(block as HTMLElement);
+      });
+    }
+  }, [sanitizedHtml]);
 
   return (
     <div
       ref={containerRef}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );
 };

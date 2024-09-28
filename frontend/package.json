@@ -18,6 +18,7 @@
     "@tanstack/react-query-devtools": "^5.56.2",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
+    "confetti-js": "^0.0.18",
     "dompurify": "^3.1.6",
     "highlight.js": "^11.10.0",
     "js-cookie": "^3.0.5",
@@ -28,6 +29,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-confetti": "^6.1.0",
+    "react-confetti-explosion": "^2.1.2",
     "react-dom": "^18.3.1",
     "react-epic-spinners": "^0.5.0",
     "react-router-dom": "^6.26.1",
@@ -38,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^22.5.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

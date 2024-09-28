@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@radix-ui/themes';
-import { MagicWandIcon } from '@radix-ui/react-icons'; // Add this if not already imported
+import { MagicWandIcon } from '@radix-ui/react-icons';
 import { updateConversationMutation } from "../api/update-conversation";
-import { useGenerateConversationTitle } from "@/features/conversation/hooks/generate-conversation-title";
+import { useConversationalTitleGenerator } from "@/features/conversation/hooks/generate-conversation-title";
 import { BarLoader } from 'react-spinners';
 
 
@@ -12,7 +11,7 @@ interface MagicTitleModalProps {
 
 export function MagicTitleButton({ conversationId }: MagicTitleModalProps) {
     const updateMutation = updateConversationMutation();
-    const { generateConversationTitle, isLoading, error } = useGenerateConversationTitle(conversationId);
+    const { generateConversationTitle, isLoading, error } = useConversationalTitleGenerator(conversationId);
 
     const handleUpdate = async (title: string) => {
         try {
@@ -35,7 +34,7 @@ export function MagicTitleButton({ conversationId }: MagicTitleModalProps) {
                 </div>
             ) : (
                 <>
-                    <MagicWandIcon className="mr-2" color='yellow'/>
+                    <MagicWandIcon className="mr-2" />
                     <div className="w-full">
                         Magic Title
                     </div>

@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 ollama_model, created = OllamaModel.objects.update_or_create(
                     name=name,
                     model=model,
-                    defaults={"name": name, "model": model},
+                    defaults={"name": name, "model": model}
                 )
 
                 if created:

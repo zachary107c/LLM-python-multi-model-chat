@@ -1,6 +1,6 @@
 # BS-LLM-WebUI
 
-![image](https://github.com/user-attachments/assets/22412e6f-cada-4967-adeb-cc5806c1706e)
+![image](https://github.com/user-attachments/assets/08bce57d-75d9-4a41-81dc-babaa85c386f)
 
 ## Description
 

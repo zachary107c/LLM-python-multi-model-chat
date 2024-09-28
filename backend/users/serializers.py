@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile
-
+from api.serializers import OllamaModelSerializer
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -40,19 +40,35 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data["password"])
         user.save()
 
+        Profile.objects.create(user=user).save()
+
         return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    preferred_model = OllamaModelSerializer(read_only=True)
+    image = serializers.ImageField()
+
     class Meta:
         model = Profile
-        fields = ("image", "bio", "perferred_model")
+        fields = ("image", "bio", "preferred_model")
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get('request')
+        
+        # Modify image URL to include /api/v1 prefix if image exists
+        if instance.image:
+            image_url = request.build_absolute_uri(instance.image.url)
+            representation['image'] = image_url.replace("/media/", "/api/v1/media/")
+        
+        return representation
 
     def update(self, instance, validated_data):
         instance.image = validated_data.get("image", instance.image)
         instance.bio = validated_data.get("bio", instance.bio)
-        instance.perferred_model = validated_data.get(
-            "perferred_model", instance.perferred_model
+        instance.preferred_model = validated_data.get(
+            "preferred_model", instance.preferred_model
         )
         instance.save()
         return instance

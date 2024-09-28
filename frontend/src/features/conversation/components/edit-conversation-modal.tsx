@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { AlertDialog, Flex, Button, Card, Skeleton } from "@radix-ui/themes";
+import { AlertDialog, Flex, Button, Card } from "@radix-ui/themes";
 import { Textarea } from '@/components/ui/textarea';
 import { Button as LocalButton } from '@/components/ui/button';
 import { Pencil2Icon, MagicWandIcon } from '@radix-ui/react-icons'; // Add this if not already imported
 import { useSearchParams } from 'react-router-dom';
 import { updateConversationMutation } from "../api/update-conversation";
-import { useGenerateConversationTitle } from "@/features/conversation/hooks/generate-conversation-title";
+import { useConversationalTitleGenerator } from "@/features/conversation/hooks/generate-conversation-title";
 import { BarLoader } from "react-spinners";
 
 
@@ -18,7 +18,7 @@ export function UpdateConversationModal({ conversationId, currentTitle }: Update
     const [searchParams, setSearchParams] = useSearchParams();
     const [newTitle, setNewTitle] = useState(currentTitle);
     const updateMutation = updateConversationMutation();
-    const { generateConversationTitle, isLoading, error } = useGenerateConversationTitle(conversationId);
+    const { generateConversationTitle, isLoading, error } = useConversationalTitleGenerator(conversationId);
 
 
     useEffect(() => {
@@ -74,7 +74,7 @@ export function UpdateConversationModal({ conversationId, currentTitle }: Update
                     }
                     <div className="flex justify-end">
                         <LocalButton variant="ghost" onClick={async () => handleGenerateAiTitle()} className="p-3">
-                            <MagicWandIcon color='yellow' />
+                            <MagicWandIcon />
                         </LocalButton>
                     </div>
                 </Card>

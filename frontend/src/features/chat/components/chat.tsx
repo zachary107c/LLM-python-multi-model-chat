@@ -18,11 +18,16 @@ import { useGetModelsQuery } from '@/features/model/api/get-models';
 import { useQueryClient } from '@tanstack/react-query';
 
 
+interface ChatProps {
+    chatId: string;
+    onCreateNewChat: (newChatId: string) => void;
+}
 
-export function Chat({ chatId, onCreateNewChat }: any) {
+export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
     const [model, setModel] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [imageData, setImageData] = useState<File | null>(null);
 
     const updateMutation = updateConversationMutation();
     const createMutation = createConversationMutation();
@@ -40,12 +45,16 @@ export function Chat({ chatId, onCreateNewChat }: any) {
                 type: message.type,
                 content: message.content,
                 id: message.id,
-                createdAt: message.createdAt,
+                createdAt: message.created_at,
                 liked: message.liked,
                 model: message.model,
+                image: message.image
             }));
             setMessages(newMessages);
+        } else {
+            setMessages([]);
         }
+
         if (!chatId) {
             setMessages([]);
         }
@@ -62,7 +71,7 @@ export function Chat({ chatId, onCreateNewChat }: any) {
 
     useEffect(() => {
         if (chatId) {
-            queryClient.invalidateQueries({queryKey: ["conversation", chatId]});
+            queryClient.invalidateQueries({ queryKey: ["conversation", chatId] });
         }
     }, [chatId]);
 
@@ -73,6 +82,25 @@ export function Chat({ chatId, onCreateNewChat }: any) {
         return response.id;
     }
 
+    const toDataURL = async (url: string | null): Promise<string | null> => {
+        if (!url) return null;
+        const response = await fetch(url);
+        const blob = await response.blob();
+        
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Data = reader.result as string;
+            // Extract the base64 string without the "data:image/png;base64," prefix
+            const base64String = base64Data.split(',')[1]; 
+            resolve(base64String);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+
+
     async function handleSendMessage(message: string) {
         if (message.trim().length > 0) {
 
@@ -82,21 +110,24 @@ export function Chat({ chatId, onCreateNewChat }: any) {
                 currentChatId = await handleCreateNewConversation(message);
             }
 
-            const userPostData = await createUserMessage({ data: { conversation: currentChatId, content: message } });
+            const userPostData = await createUserMessage({ data: { conversation: currentChatId, content: message, image: imageData } });
+            console.log(userPostData.image);
             if (messages.length == 0) {
                 await updateMutation.mutateAsync({ data: { conversationId: currentChatId, updates: { title: message } } });
             }
-            setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt, model: 'user' }]);
+            setMessages(erm => [...erm, { content: userPostData.content, type: 'user', id: userPostData.id, createdAt: userPostData.createdAt, model: 'user', image: userPostData.image }]);
             setIsLoading(true);
+            var image_data = await toDataURL(userPostData.image);
             var payload = {
                 model: model,
-                messages: [{ role: "user", content: message }],
-                stream: false,
+                messages: [{ role: "user", content: message, images: image_data ? [image_data] : [] }],
+                stream: false
             }
+            console.log(payload);
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
             setIsLoading(false);
             const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: response.data.message.content, model: model, provider: "ollama" } });
-            setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt, model: assistantPostData.model }]);
+            setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt, model: assistantPostData.model, image: null }]);
         }
     }
 
@@ -106,7 +137,7 @@ export function Chat({ chatId, onCreateNewChat }: any) {
                 {
                     conversationLoading && (
                         <div className='w-full h-full flex flex-col items-center justify-center'>
-                            <HashLoader color='#484848' size={100} />
+                            <HashLoader color='#484848' size={200} />
                         </div>
                     )
                 }
@@ -122,7 +153,7 @@ export function Chat({ chatId, onCreateNewChat }: any) {
                         </Callout.Root>)
                     }
                     {messages.map((message) => (
-                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} name={message.model ? message.model : ""} liked={message.liked} conversationId={chatId} />
+                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} image={message.image} name={message.model ? message.model : ""} liked={message.liked} conversationId={chatId} />
                     ))}
                     {
                         (isLoading) && (
@@ -135,7 +166,7 @@ export function Chat({ chatId, onCreateNewChat }: any) {
                     }
                     <div ref={ref} />
                 </div>
-                <ChatInput onSendMessage={handleSendMessage} onModelChange={setModel} selectedModel={model} models={models} modelsLoading={modelsLoading} />
+                <ChatInput onSendMessage={handleSendMessage} onModelChange={setModel} onImageDataChange={setImageData} selectedModel={model} models={models} modelsLoading={modelsLoading} />
             </div>
         </div>
     );

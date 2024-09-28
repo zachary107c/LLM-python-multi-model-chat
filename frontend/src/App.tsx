@@ -8,7 +8,7 @@ const queryClient = new QueryClient();
 
 function App() {
     useEffect(() => {
-        const theme = localStorage.getItem("theme");
+        const theme = localStorage.getItem("theme") || "dark";
         if (theme) {
             document.getElementById("body")?.classList.add("theme", theme);
         }
