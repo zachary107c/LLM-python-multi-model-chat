@@ -1,7 +1,5 @@
 import Panel from "@/components/ui/panel"
-import { Button } from "@/components/ui/button";
 import { Flex, } from "@radix-ui/themes";
-import { TrashIcon, MagicWandIcon } from "@radix-ui/react-icons";
 import { deleteAssistantMessageMutation } from "@/features/chatMessage/api/delete-assistant-message";
 import { deleteUserMessageMutation } from "@/features/chatMessage/api/delete-user-message";
 import { LikeMessageButton } from "./like-message-button";
@@ -17,10 +15,7 @@ export function ChatMessage({ messageText, messageType, messageId, image, name, 
     return (
         <div className="mb-2">
             <div>
-                <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} name={name}></Panel>
-                <div className="flex justify-end">
-                    {image ? ImageExpandModal({ imagePath: image }) : null}
-                </div>
+                <Panel title={messageType === 'user' ? 'You' : 'LLM'} text={messageText} role={messageType} name={name} image={image ? ImageExpandModal({ imagePath: image }) : null} />
             </div>
             <div className={messageType === 'user' ? 'flex justify-end' : 'flex justify-start'}>
                 <Flex gap="0" align="center">

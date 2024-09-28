@@ -34,7 +34,7 @@ export function MagicTitleButton({ conversationId }: MagicTitleModalProps) {
                 </div>
             ) : (
                 <>
-                    <MagicWandIcon className="mr-2" color='yellow'/>
+                    <MagicWandIcon className="mr-2" />
                     <div className="w-full">
                         Magic Title
                     </div>

@@ -61,11 +61,11 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
             <div className={`${expanded ? 'overflow-y-scroll no-scrollbar' : 'hidden'
                 } border-r border-[#7d7d7d68] w-full h-full`}>
                 <div className="flex justify-between items-center mx-2 mt-2">
-                    <Button variant={'ghost'} className="p-2">
+                    <Button variant='ghost' className="p-2">
                         <PinLeftIcon onClick={() => handleSetExpanded(false)} />
                     </Button>
                     <Tooltip content="New Conversation" side="right">
-                        <Button variant={'ghost'} className="ml-2 p-2" onClick={async () => handleNewConversation()}>
+                        <Button variant='ghost' className="ml-2 p-2" onClick={async () => handleNewConversation()}>
                             <PlusIcon />
                         </Button>
                     </Tooltip>

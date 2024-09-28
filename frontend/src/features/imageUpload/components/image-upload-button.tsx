@@ -18,7 +18,7 @@ export function ImageUploadButton({ fileName, onFileChange }: ImageUploadButtonP
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0];
-            onFileChange(file);            
+            onFileChange(file);
         }
     }
 
@@ -40,7 +40,7 @@ export function ImageUploadButton({ fileName, onFileChange }: ImageUploadButtonP
                 className="hidden"
                 aria-label="Upload image"
             />
-            <div className="flex space-x-2">
+            <div className="flex">
                 <Button
                     variant="ghost-no-hover"
                     size="icon"

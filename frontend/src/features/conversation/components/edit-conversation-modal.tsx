@@ -74,7 +74,7 @@ export function UpdateConversationModal({ conversationId, currentTitle }: Update
                     }
                     <div className="flex justify-end">
                         <LocalButton variant="ghost" onClick={async () => handleGenerateAiTitle()} className="p-3">
-                            <MagicWandIcon color='yellow' />
+                            <MagicWandIcon />
                         </LocalButton>
                     </div>
                 </Card>

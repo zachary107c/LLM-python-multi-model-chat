@@ -29,6 +29,7 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
         setLastMessage(newMessage);
         setNewMessage('');
         setTextAreaHeight(48);
+        handleClear();
     };
 
     const handleKeyDown = (event: any) => {
@@ -41,6 +42,7 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
             setLastMessage(newMessage);
             setNewMessage('');
             setTextAreaHeight(48);
+            handleClear();
         } else if (event.key === 'Backspace' && textAreaHeight > 48) {
             if (newMessage.endsWith('\n')) {
                 setTextAreaHeight(Math.max(textAreaHeight - 24, 48));
@@ -83,7 +85,7 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
                     <div className='flex justify-between items-center h-full'>
                         <div className='flex flex-col w-full'>
                             <Textarea
-                                className='mr-2 outline-none border-none w-full py-3 px-1 rounded-l resize-none h-[48px] no-scrollbar'
+                                className='outline-none border-none w-full py-3 px-1 rounded-l resize-none h-[48px] no-scrollbar'
                                 onChange={(event) => setNewMessage(event.target.value)}
                                 value={newMessage}
                                 placeholder='Type your message here'
@@ -111,7 +113,7 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
                                                 ))}
                                             </DropdownMenu.Content>
                                         </DropdownMenu.Root>
-                                        <div className='mx-2'>
+                                        <div className='ml-2'>
                                             <LocalButton variant='ghost-no-hover' className='m-1 p-0'>
                                                 <FileIcon />
                                             </LocalButton>
@@ -121,7 +123,7 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
                                         </div>}
                                         {imageName ?
                                             <div>
-                                                <Badge radius='full' variant='surface' color='mint'>
+                                                <Badge radius='full' variant='surface' color='gray' className='ml-2'>
                                                     <div className='w-full flex justify-between items-center px-2'>
                                                         <Text weight='light' size='1'>{imageName}</Text>
                                                         <LocalButton size='tiny' variant='ghost-no-hover' className='h-6' onClick={handleOuterClear}>
