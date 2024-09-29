@@ -56,6 +56,13 @@ class OllamaService:
         try:
             models_list = self.client.list()
             return models_list
-        except(RequestError, ResponseError) as e:
+        except (RequestError, ResponseError) as e:
             self.logger.error(f"Failed to retrieve models: {e}")
+            return None
+        
+    def model(self, model_name: str) -> Dict:
+        try:
+            model_info = self.client.show(model=model_name)
+            return model_info
+        except (RequestError, ResponseError) as e:
             return None

@@ -107,3 +107,4 @@ class OllamaModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = OllamaModel
         fields = "__all__"
+        read_only_fields = ["id", "name", "model"]

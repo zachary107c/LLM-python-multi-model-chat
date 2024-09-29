@@ -1,4 +1,7 @@
 import requests
+from io import StringIO
+
+from django.core.management import call_command
 from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
@@ -134,6 +137,37 @@ class OllamaModelListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
 
+class OllamaModelsPopulateAPIView(APIView):
+    """
+    View to handle chat requests with the Ollama API.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+
+    def post(self, request):
+        try:
+            output = StringIO()
+            call_command("populate_ollama_models", stdout=output)
+
+            return Response(
+                {
+                    "message": "Successfully re-populated Ollama models!",
+                    "details": output.getvalue(),
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {"error": str(e), "message": "Failed to re-populate Ollama models!"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
 class OllamaModelDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = OllamaModel.objects.all()
     serializer_class = OllamaModelSerializer
@@ -144,26 +178,62 @@ class OllamaChatAPIView(APIView):
     """
     View to handle chat requests with the Ollama API.
     """
+
+    permission_classes = [IsAuthenticated]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
 
     def post(self, request):
         try:
-            headers = {"Content-Type": "application/json"}
-
-            payload = request.data
-
             model = request.data.get("model")
             messages = request.data.get("messages")
 
             if not model or not messages:
-                return Response({"error": "Model and messages are required"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Model and messages are required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             chat_completion = self.ollama_service.chat(model, messages)
 
             if chat_completion:
                 return Response(chat_completion, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"error": "Failed to fetch response from Ollama API."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class OllamaModelInfoView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+
+    def post(self, request):
+        try:
+            model= request.data.get("model")
+
+            if not model:
+                return Response(
+                    {"error": "Model is required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            model_info = self.ollama_service.model(model)
+
+            if model_info:
+                return Response(model_info, status=status.HTTP_200_OK)
             else:
                 return Response(
                     {"error": "Failed to fetch response from Ollama API."},

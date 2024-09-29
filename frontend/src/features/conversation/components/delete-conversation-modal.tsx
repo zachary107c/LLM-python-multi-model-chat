@@ -1,4 +1,4 @@
-import { AlertDialog, Flex, Button } from "@radix-ui/themes";
+import { AlertDialog, Flex, Button, Text } from "@radix-ui/themes";
 import { Button as LocalButton } from '@/components/ui/button';
 import { TrashIcon } from '@radix-ui/react-icons'; // Add this if not already imported
 import { useSearchParams } from 'react-router-dom';
@@ -27,10 +27,8 @@ export function DeleteConversationModal({ conversationId }: DeleteConversationMo
         <AlertDialog.Root>
             <AlertDialog.Trigger>
                 <LocalButton variant='ghost' className="p-2 w-full flex justify-start">
-                    <TrashIcon className="mr-2" />
-                    <div className="w-full">
-                        Delete Conversation
-                    </div>
+                    <TrashIcon className="mr-2"/>
+                    <Text color='red'>Delete Conversation</Text>
                 </LocalButton>
             </AlertDialog.Trigger>
             <AlertDialog.Content size='1'>

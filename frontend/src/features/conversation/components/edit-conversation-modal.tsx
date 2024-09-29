@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertDialog, Flex, Button, Card } from "@radix-ui/themes";
+import { Dialog, Flex, Button, Card } from "@radix-ui/themes";
 import { Textarea } from '@/components/ui/textarea';
 import { Button as LocalButton } from '@/components/ui/button';
 import { Pencil2Icon, MagicWandIcon } from '@radix-ui/react-icons';
@@ -37,17 +37,17 @@ export function UpdateConversationModal({ conversationId, currentTitle }: Update
     }
 
     return (
-        <AlertDialog.Root>
-            <AlertDialog.Trigger>
+        <Dialog.Root>
+            <Dialog.Trigger>
                 <LocalButton variant='ghost' className="p-2 w-full flex justify-start">
                     <Pencil2Icon className="mr-2" />
                     <div className="w-full">
                         Edit Conversation
                     </div>
                 </LocalButton>
-            </AlertDialog.Trigger>
-            <AlertDialog.Content size='1'>
-                <AlertDialog.Title size='2'>Edit Conversation Title</AlertDialog.Title>
+            </Dialog.Trigger>
+            <Dialog.Content size='1'>
+                <Dialog.Title size='2'>Edit Conversation Title</Dialog.Title>
                 <Card className='w-full flex justify-between items-center'
                     style={{
                         '--base-card-padding-top': 'var(--space-1)',
@@ -77,18 +77,18 @@ export function UpdateConversationModal({ conversationId, currentTitle }: Update
                     </div>
                 </Card>
                 <Flex gap="3" mt="4" justify="between">
-                    <AlertDialog.Cancel>
+                    <Dialog.Close>
                         <Button variant="soft" color="gray" size='1'>
                             Close
                         </Button>
-                    </AlertDialog.Cancel>
-                    <AlertDialog.Action>
+                    </Dialog.Close>
+                    <Dialog.Close>
                         <Button variant="solid" color="green" onClick={() => handleUpdate(newTitle)} size='1'>
                             Update Conversation
                         </Button>
-                    </AlertDialog.Action>
+                    </Dialog.Close>
                 </Flex>
-            </AlertDialog.Content>
-        </AlertDialog.Root>
+            </Dialog.Content>
+        </Dialog.Root>
     );
 }

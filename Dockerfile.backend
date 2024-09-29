@@ -1,9 +1,7 @@
-# Backend Dockerfile (Dockerfile.backend)
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy only the backend-specific files
 COPY backend/pyproject.toml backend/poetry.lock /app/
 
 RUN pip install --no-cache-dir poetry
