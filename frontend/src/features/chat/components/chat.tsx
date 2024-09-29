@@ -7,7 +7,7 @@ import { ChatInput } from '@/features/chatInput/components/chat-input';
 import { ChatMessage } from '@/features/chatMessage/components/chat-message';
 import { createUserMessage } from '@/features/chatMessage/api/create-user-message';
 import { createAssistantMessage } from '@/features/chatMessage/api/create-assistant-message';
-import { ConversationDetailMessage } from '@/types/api';
+import { ConversationDetailMessage, BaseModelEntity } from '@/types/api';
 import { updateConversationMutation } from '@/features/conversation/api/update-conversation';
 import { useGetConversationQuery } from '@/features/conversation/api/get-conversation';
 import { Callout } from '@radix-ui/themes';
@@ -25,7 +25,7 @@ interface ChatProps {
 
 export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     const [messages, setMessages] = useState<ConversationDetailMessage[]>([]);
-    const [model, setModel] = useState("");
+    const [model, setModel] = useState<BaseModelEntity | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [imageData, setImageData] = useState<File | null>(null);
 
@@ -62,10 +62,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
 
     useEffect(() => {
         if (models && models?.length > 0 && !model) {
-            setModel(models[0].name);
-        }
-        if (modelsLoading) {
-            console.log("modelsLoading");
+            setModel(models[0]);
         }
     }, [models]);
 
@@ -91,7 +88,6 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64Data = reader.result as string;
-            // Extract the base64 string without the "data:image/png;base64," prefix
             const base64String = base64Data.split(',')[1]; 
             resolve(base64String);
           };
@@ -111,7 +107,6 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             }
 
             const userPostData = await createUserMessage({ data: { conversation: currentChatId, content: message, image: imageData } });
-            console.log(userPostData.image);
             if (messages.length == 0) {
                 await updateMutation.mutateAsync({ data: { conversationId: currentChatId, updates: { title: message } } });
             }
@@ -119,14 +114,13 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             setIsLoading(true);
             var image_data = await toDataURL(userPostData.image);
             var payload = {
-                model: model,
+                model: model?.name,
                 messages: [{ role: "user", content: message, images: image_data ? [image_data] : [] }],
                 stream: false
             }
-            console.log(payload);
             const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
             setIsLoading(false);
-            const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: response.data.message.content, model: model, provider: "ollama" } });
+            const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: response.data.message.content, model: model?.name || 'model', provider: "ollama" } });
             setMessages(erm => [...erm, { content: assistantPostData.content, type: 'assistant', id: assistantPostData.id, createdAt: assistantPostData.createdAt, model: assistantPostData.model, image: null }]);
         }
     }
@@ -153,7 +147,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         </Callout.Root>)
                     }
                     {messages.map((message) => (
-                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} image={message.image} name={message.model ? message.model : ""} liked={message.liked} conversationId={chatId} />
+                        <ChatMessage messageText={message.content} messageType={message.type} messageId={message.id} image={message.image} name={message.model ? message.model : ""} liked={message.liked} conversationId={chatId} key={message.id} />
                     ))}
                     {
                         (isLoading) && (

@@ -1,62 +1,57 @@
-import { Badge, Card, Text, ScrollArea, Box } from "@radix-ui/themes";
-import { ModelDetail } from "@/types/api";
+import { Badge, Card, Text, ScrollArea, Box, Skeleton } from "@radix-ui/themes";
 
-interface ModelCardProps {
-    data: ModelDetail | undefined;
-}
-
-export function ModelCard({ data }: ModelCardProps) {
+export function ModelCardLoading() {
     return (
         <div className="p-1 w-full overflow-y-scroll no-scrollbar">
             <Card>
-                <Badge color={data?.color} variant='surface' className="w-full flex  justify-center items-center">
-                    <Text size='4' weight='bold'>{data?.model}</Text>
+                <Badge variant='surface' className="w-full flex  justify-center items-center">
+                    <Skeleton />
                 </Badge>
                 <div className="mt-2">
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>License</Text>
+                            <Text as="p" size='3' weight='bold'>License</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">
                                 <Text as="p">
-                                    {data?.details.license}
+                                    <Skeleton />
                                 </Text>
                             </Box>
                         </ScrollArea>
                     </div>
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>Template</Text>
+                            <Text as="p" size='3' weight='bold'>Template</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">
                                 <Text as="p">
-                                    {data?.details.template}
+                                    <Skeleton />
                                 </Text>
                             </Box>
                         </ScrollArea>
                     </div>
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>Parameters</Text>
+                            <Text as="p" size='3' weight='bold'>Parameters</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">
                                 <Text as="p">
-                                    {data?.details.parameters}
+                                    <Skeleton />
                                 </Text>
                             </Box>
                         </ScrollArea>
                     </div>
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>Model File</Text>
+                            <Text as="p" size='3' weight='bold'>Model File</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">
                                 <Text as="p">
-                                    {data?.details.modelfile}
+                                    <Skeleton />
                                 </Text>
                             </Box>
                         </ScrollArea>

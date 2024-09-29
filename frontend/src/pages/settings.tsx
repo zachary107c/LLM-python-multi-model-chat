@@ -1,20 +1,16 @@
-import { useGetModelsQuery } from "@/features/model/api/get-models";
-import { ModelCard } from "@/features/model/components/model-card";
+import { useState } from "react";
+import { Models } from "@/features/model/components/models";
+import { ModelInfo } from "@/features/model/components/model-info";
 
 export default function SettingsPage() {
-    const { data, isLoading } = useGetModelsQuery();
-
-    if (isLoading || !data) {
-        return <p>Loading...</p>;
-    }
+    const [selectedModelId, setSelectedModelId] = useState<number>(-1);
 
     return (
-        <div className="overflow-y-scroll no-scrollbar m-4 w-full">
-            <div className="overflow-y-scroll no-scrollbar">
-                {data.map((model) => (
-                    <ModelCard model={model.model} name={model.name} color={model.color} />
-                ))}
+        <div className="w-full h-screen flex overflow-hidden">
+            <Models selectedModelId={selectedModelId} onSelectedModelIdChange={setSelectedModelId} />
+            <div className="w-full h-full flex flex-col justify-between">
+                <ModelInfo modelId={selectedModelId} />
             </div>
         </div>
     );
-}
+};

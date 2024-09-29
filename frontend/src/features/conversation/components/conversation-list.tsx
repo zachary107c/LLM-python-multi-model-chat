@@ -13,7 +13,7 @@ export function ConversationList({ chats, currentConversationId, handleSetSelect
     return (
         <div>
             {chats?.map((chat) => (
-                <div className="w-full flex justify-between items-center">
+                <div className="w-full flex justify-between items-center" key={chat.id}>
                     <div className="w-full overflow-hidden">
                         <Tooltip content={chat.title} side="right">
                             {chat.id === currentConversationId ?

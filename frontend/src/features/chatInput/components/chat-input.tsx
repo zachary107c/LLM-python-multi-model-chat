@@ -2,16 +2,16 @@ import { Text, Button, Card, DropdownMenu, Skeleton, Badge } from '@radix-ui/the
 import { RocketIcon, FileIcon, Cross1Icon } from '@radix-ui/react-icons';
 import { Textarea } from '@/components/ui/textarea';
 import { useState, useCallback } from 'react';
-import { Model } from '@/types/api';
+import { BaseModelEntity } from '@/types/api';
 import { Button as LocalButton } from '@/components/ui/button';
 import { ImageUploadButton } from '@/features/imageUpload/components/image-upload-button';
 
 interface Props {
     onSendMessage: (message: string, image: File | null) => void;
-    onModelChange: (model: string) => void;
+    onModelChange: (model: BaseModelEntity) => void;
     onImageDataChange: (model: File | null ) => void;
-    selectedModel: string;
-    models: Model[] | undefined;
+    selectedModel: BaseModelEntity | null;
+    models: BaseModelEntity[] | undefined;
     modelsLoading: boolean;
 }
 
@@ -47,7 +47,7 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
         }
     };
 
-    function handleModelChange(model: string) {
+    function handleModelChange(model: BaseModelEntity) {
         onModelChange(model);
     }
 
@@ -94,11 +94,11 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
                                     <div className='flex items-center'>
                                         <DropdownMenu.Root>
                                             <DropdownMenu.Trigger>
-                                                <Button variant="surface" size='1'>
+                                                <Button variant="surface" color={selectedModel?.color || 'gray'} size='1'>
                                                     {modelsLoading ? (
                                                         <Skeleton width='60px' />
                                                     ) : (
-                                                        selectedModel || "Select a model"
+                                                        selectedModel?.name || "Select a model"
                                                     )}
 
                                                     <DropdownMenu.TriggerIcon />
@@ -106,7 +106,7 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
                                             </DropdownMenu.Trigger>
                                             <DropdownMenu.Content>
                                                 {models?.map((model) => (
-                                                    <DropdownMenu.Item onClick={() => handleModelChange(model.name)}>{model.name}</DropdownMenu.Item>
+                                                    <DropdownMenu.Item onClick={() => handleModelChange(model)} key={model.id}>{model.name}</DropdownMenu.Item>
                                                 ))}
                                             </DropdownMenu.Content>
                                         </DropdownMenu.Root>

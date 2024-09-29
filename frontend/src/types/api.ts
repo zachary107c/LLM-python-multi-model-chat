@@ -51,13 +51,32 @@ export type ConversationDetail = {
     messages: ConversationDetailMessage[];
 };
 
-export type Model = {
+export type BaseModelEntity = {
     id: number;
     name: string;
     model: string;
     liked: boolean;
     color: 'gray' | 'gold' | 'bronze' | 'brown' | 'yellow' | 'amber' | 'orange' | 'tomato' | 'red' | 'ruby' | 'crimson' | 'pink' | 'plum' | 'purple' | 'violet' | 'iris' | 'indigo' | 'blue' | 'cyan' | 'teal' | 'jade' | 'green' | 'grass' | 'lime' | 'mint' | 'sky';
+};
+
+export type ModelEntity<T> = {
+    [K in keyof T]: T[K];
+} & BaseModelEntity;
+
+export type ModelDetails = {
+    license: string;
+    modelfile: string;
+    parameters: string;
+    template: string;
+    system: string;
+    modified_at: string;
 }
+
+
+export type ModelDetail = ModelEntity<{
+    details: ModelDetails
+}>;
+
 
 export type GenerateConversationTitle = {
     generatedTitle: string;
@@ -66,7 +85,7 @@ export type GenerateConversationTitle = {
 export type Profile = {
     "image": string,
     "bio": string,
-    "preferred_model": Model,
+    "preferred_model": BaseModelEntity,
 }
 
 export type UserProfile = {
