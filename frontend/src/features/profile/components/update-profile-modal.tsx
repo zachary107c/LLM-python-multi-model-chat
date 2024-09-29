@@ -1,13 +1,8 @@
-import { useEffect, useState } from "react";
 import { AlertDialog, Flex, Button, Card } from "@radix-ui/themes";
 import { Button as LocalButton } from '@/components/ui/button';
 import { Pencil2Icon } from '@radix-ui/react-icons'; // Add this if not already imported
-import { updateProfileMutation } from "../api/update-profile";
-
 
 export function UpdateProfileModal() {
-    const updateMutation = updateProfileMutation();
-
 
     const handleUpdate = async () => {
         console.log("ERM");

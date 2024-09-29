@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { Card, TextField, Heading, Flex, Text, Box, Link, Button, Callout, Inset } from '@radix-ui/themes';
+import { Card, TextField, Heading, Flex, Text, Box, Button, Callout } from '@radix-ui/themes';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ export function CreateAccountCard() {
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null)
 
     const navigate = useNavigate();  // Initialize useNavigate for redirection
 

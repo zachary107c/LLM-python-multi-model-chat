@@ -11,7 +11,7 @@ interface MagicTitleModalProps {
 
 export function MagicTitleButton({ conversationId }: MagicTitleModalProps) {
     const updateMutation = updateConversationMutation();
-    const { generateConversationTitle, isLoading, error } = useConversationalTitleGenerator(conversationId);
+    const { generateConversationTitle, isLoading } = useConversationalTitleGenerator(conversationId);
 
     const handleUpdate = async (title: string) => {
         try {

@@ -10,15 +10,14 @@ interface Props {
     onSendMessage: (message: string, image: File | null) => void;
     onModelChange: (model: string) => void;
     onImageDataChange: (model: File | null ) => void;
-    selectedModel: string;  // Pass selected model from parent
-    models: Model[] | undefined;  // Pass models array from parent
+    selectedModel: string;
+    models: Model[] | undefined;
     modelsLoading: boolean;
 }
 
 export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, selectedModel, models, modelsLoading }: Props) {
     const [newMessage, setNewMessage] = useState('');
     const [textAreaHeight, setTextAreaHeight] = useState(48);
-    const [lastMessage, setLastMessage] = useState('');
     const [imageName, setImageName] = useState<string | null>(null);
     const [imageData, setImageData] = useState<File | null>(null);
 
@@ -26,7 +25,6 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
     const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         onSendMessage(newMessage, imageData);
-        setLastMessage(newMessage);
         setNewMessage('');
         setTextAreaHeight(48);
         handleClear();
@@ -39,7 +37,6 @@ export function ChatInput({ onSendMessage, onModelChange, onImageDataChange, sel
         else if (event.key === 'Enter') {
             event.preventDefault();
             onSendMessage(newMessage, imageData);
-            setLastMessage(newMessage);
             setNewMessage('');
             setTextAreaHeight(48);
             handleClear();

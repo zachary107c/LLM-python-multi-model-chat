@@ -1,4 +1,4 @@
-import { AlertDialog, Button, Avatar, Badge, Inset } from "@radix-ui/themes";
+import { AlertDialog, Button, Inset } from "@radix-ui/themes";
 import { Button as LocalButton } from '@/components/ui/button';
 
 interface ImageExpandModalProps {

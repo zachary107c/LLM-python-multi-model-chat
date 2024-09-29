@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import { ImageIcon, Cross1Icon } from '@radix-ui/react-icons'
+import { ImageIcon } from '@radix-ui/react-icons'
 import { Button } from '@/components/ui/button'
 
 interface ImageUploadButtonProps {
@@ -46,6 +46,7 @@ export function ImageUploadButton({ fileName, onFileChange }: ImageUploadButtonP
                     size="icon"
                     onClick={handleUploadClick}
                     aria-label="Upload image"
+                    type="button"
                 >
                     <ImageIcon />
                 </Button>

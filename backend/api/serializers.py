@@ -78,8 +78,6 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
             for um in user_messages
         ]
 
-        print(user_message_list)
-
         assistant_message_list = [
             {
                 "id": am["id"],

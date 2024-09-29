@@ -1,7 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
-import { api } from '@/lib/api-client';
-import { Model, GenerateConversationTitle } from '@/types/api';
-import Cookies from 'js-cookie';
 import { z } from 'zod';
 import axios from 'axios';
 import { useGetConversationQuery } from "@/features/conversation/api/get-conversation";
@@ -13,7 +9,7 @@ export const generateConversationTitleInputSchema = z.object({
 export type GenerateConversationTitleInput = z.infer<typeof generateConversationTitleInputSchema>;
 
 export const generateConversationTitle = async ({ conversationId }: GenerateConversationTitleInput) => {
-    const { data, error, isLoading } = useGetConversationQuery({ conversationId: conversationId });
+    const { data } = useGetConversationQuery({ conversationId: conversationId });
     if (data) {
         var messages = data.messages;
         var prompt = 'Given the following messages in a conversation, generate a title for the conversation, keep it short, use emojis:\n';

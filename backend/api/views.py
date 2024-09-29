@@ -1,3 +1,4 @@
+import requests
 from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
@@ -10,6 +11,7 @@ from .serializers import (
     ConversationDetailSerializer,
     OllamaModelSerializer,
 )
+from .services import OllamaService
 
 
 class Index(APIView):
@@ -116,7 +118,7 @@ class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
         if message.conversation.user != self.request.user:
             raise PermissionDenied("You do not have permission to access this message.")
         return message
-    
+
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
@@ -136,3 +138,39 @@ class OllamaModelDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = OllamaModel.objects.all()
     serializer_class = OllamaModelSerializer
     permission_classes = [IsAuthenticated]
+
+
+class OllamaChatAPIView(APIView):
+    """
+    View to handle chat requests with the Ollama API.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+
+    def post(self, request):
+        try:
+            headers = {"Content-Type": "application/json"}
+
+            payload = request.data
+
+            model = request.data.get("model")
+            messages = request.data.get("messages")
+
+            if not model or not messages:
+                return Response({"error": "Model and messages are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            chat_completion = self.ollama_service.chat(model, messages)
+
+            if chat_completion:
+                return Response(chat_completion, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"error": "Failed to fetch response from Ollama API."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

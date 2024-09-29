@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { AlertDialog, Flex, Button, Card } from "@radix-ui/themes";
 import { Textarea } from '@/components/ui/textarea';
 import { Button as LocalButton } from '@/components/ui/button';
-import { Pencil2Icon, MagicWandIcon } from '@radix-ui/react-icons'; // Add this if not already imported
-import { useSearchParams } from 'react-router-dom';
+import { Pencil2Icon, MagicWandIcon } from '@radix-ui/react-icons';
 import { updateConversationMutation } from "../api/update-conversation";
 import { useConversationalTitleGenerator } from "@/features/conversation/hooks/generate-conversation-title";
 import { BarLoader } from "react-spinners";
@@ -15,10 +14,9 @@ interface UpdateConversationModalProps {
 }
 
 export function UpdateConversationModal({ conversationId, currentTitle }: UpdateConversationModalProps) {
-    const [searchParams, setSearchParams] = useSearchParams();
     const [newTitle, setNewTitle] = useState(currentTitle);
     const updateMutation = updateConversationMutation();
-    const { generateConversationTitle, isLoading, error } = useConversationalTitleGenerator(conversationId);
+    const { generateConversationTitle, isLoading } = useConversationalTitleGenerator(conversationId);
 
 
     useEffect(() => {

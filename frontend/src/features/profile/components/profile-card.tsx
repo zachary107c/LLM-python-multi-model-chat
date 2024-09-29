@@ -1,7 +1,7 @@
 import { useGetProfileQuery } from "../api/get-profile"
 import { Card, Avatar } from "@radix-ui/themes"
 import { UpdateProfileModal } from "./update-profile-modal"
-import { PersonIcon, EnvelopeClosedIcon, Pencil2Icon, RocketIcon, IdCardIcon } from "@radix-ui/react-icons"
+import { PersonIcon, EnvelopeClosedIcon, RocketIcon, IdCardIcon } from "@radix-ui/react-icons"
 
 export function ProfileCard() {
     const { data, isLoading, error } = useGetProfileQuery()
