@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Models } from "@/features/model/components/models";
 import { ModelInfo } from "@/features/model/components/model-info";
 
-export default function SettingsPage() {
-    const [selectedModelId, setSelectedModelId] = useState<number>(-1);
+export default function ModelsPage() {
+    const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
 
     return (
         <div className="w-full h-screen flex overflow-hidden">

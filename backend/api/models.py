@@ -79,7 +79,7 @@ class AssistantMessage(models.Model):
     id = models.AutoField(primary_key=True)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     content = models.TextField()
-    model = models.CharField(max_length=255)
+    model = models.ForeignKey(OllamaModel, on_delete=models.DO_NOTHING)
     provider = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     liked = models.BooleanField(default=False)

@@ -63,8 +63,8 @@ export default function Navbar() {
                     </Tooltip>
                 </div>
                 <div className="mb-2">
-                    <Tooltip content="Settings" side="right">
-                        <Link to="/settings">
+                    <Tooltip content="Models" side="right">
+                        <Link to="/models">
                             <Button variant='ghost' size='icon' onClick={() => setIndex(2)} className={index === 2 ? 'bg-accent text-accent-foreground' : ''}>
                                 <GearIcon />
                             </Button>

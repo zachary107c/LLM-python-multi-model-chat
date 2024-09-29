@@ -7,7 +7,7 @@ import '@radix-ui/themes/styles.css'
 import { Theme } from "@radix-ui/themes";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ChatPage from '@/pages/chat.tsx';
-import SettingsPage from '@/pages/settings';
+import ModelsPage from './pages/models.tsx'
 import LoginPage from "@/pages/login";
 import CreateAccountPage from './pages/create-account.tsx'
 import ProtectedRoute from '@/components/navigation/protected-route';
@@ -26,12 +26,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 <ChatPage />
               </ProtectedRoute>
             } />
-            <Route path="settings" element={
+            <Route path="/models" element={
               <ProtectedRoute>
-                <SettingsPage />
+                <ModelsPage />
               </ProtectedRoute>
             } />
-            <Route path="profile" element={
+            <Route path="/profile" element={
               <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>

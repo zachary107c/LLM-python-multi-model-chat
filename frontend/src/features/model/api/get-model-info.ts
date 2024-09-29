@@ -6,7 +6,7 @@ import { ModelDetail } from "@/types/api";
 
 
 export const getModelInputSchema = z.object({
-    modelId: z.number(),
+    modelId: z.number().nullable(),
 });
 
 export type GetModelInput = z.infer<typeof getModelInputSchema>;

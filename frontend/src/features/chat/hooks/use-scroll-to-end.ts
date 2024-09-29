@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { ConversationDetailMessage } from '@/types/api';
+import { AssistantMessage, UserMessage } from '@/types/api';
 
-const useScrollToEnd = (messages: ConversationDetailMessage[]) => {
+const useScrollToEnd = (messages: (UserMessage | AssistantMessage)[]) => {
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

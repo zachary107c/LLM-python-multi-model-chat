@@ -3,7 +3,7 @@ import { ModelCard } from "@/features/model/components/model-card";
 import { ModelCardLoading } from "@/features/model/components/model-card-loading";
 
 
-export function ModelInfo({ modelId }: { modelId: number }) {
+export function ModelInfo({ modelId }: { modelId: number | null}) {
     const { data, isLoading, error } = useGetModelQuery({ modelId: modelId });
 
     if (isLoading) {

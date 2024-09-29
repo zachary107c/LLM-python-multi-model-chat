@@ -12,14 +12,16 @@ export type UserMessage = Entity<{
     conversation: string;
     content: string;
     image: string | null;
+    type: string;
 }>;
 
 export type AssistantMessage = Entity<{
     conversation: string;
     content: string;
-    model: string;
+    model: BaseModelEntity;
     provider: string;
     liked: boolean;
+    type: string
 }>;
 
 export type AuthResponse = {
@@ -34,12 +36,17 @@ export type Conversation = Entity<{
     liked: boolean;
 }>;
 
-export type ConversationDetailMessage = Entity<{
+export type ConversationDetailMessage = Entity<
+| {
     content: string;
     type: string;
-    model?: string;
-    provider?: string;
-    liked?: boolean;
+    model: BaseModelEntity;
+    provider: string;
+    liked: boolean;
+} 
+| {
+    content: string;
+    type: string;
     image: string | null;
 }>;
 
