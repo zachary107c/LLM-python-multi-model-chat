@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 export const createAssistantMessageInputSchema = z.object({
     conversation: z.string(),
     content: z.string(),
-    model: z.string(),
+    model: z.number(),
     provider: z.string(),
 });
 

@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 export const useGetModelsQuery = () => {
     return useQuery({
         queryFn: async (): Promise<Model[]> => {
-            return api.get(`/models/`, {
+            return api.get(`/ollama/models/`, {
                 headers: { Authorization: `Token ${Cookies.get('token')}` }
             });
         },

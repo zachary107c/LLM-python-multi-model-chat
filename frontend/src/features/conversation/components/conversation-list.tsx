@@ -6,13 +6,14 @@ import { UpdateConversationModal } from "./edit-conversation-modal";
 import { MagicTitleButton } from "@/features/conversation/components/magic-title-button";
 import { BookmarkConversationButton } from "./like-conversation-button";
 import { Conversation } from "@/types/api";
+import { Separator } from "@radix-ui/themes";
 
 
 export function ConversationList({ chats, currentConversationId, handleSetSelected }: { chats: Conversation[], currentConversationId: string | null, handleSetSelected: any }) {
     return (
         <div>
             {chats?.map((chat) => (
-                <div className="w-full flex justify-between items-center">
+                <div className="w-full flex justify-between items-center" key={chat.id}>
                     <div className="w-full overflow-hidden">
                         <Tooltip content={chat.title} side="right">
                             {chat.id === currentConversationId ?
@@ -34,11 +35,12 @@ export function ConversationList({ chats, currentConversationId, handleSetSelect
                                     <DotsHorizontalIcon />
                                 </Button>
                             </Popover.Trigger>
-                            <Popover.Content side="right">
+                            <Popover.Content side="bottom">
                                 <div className="flex flex-col items-start">
                                     <UpdateConversationModal conversationId={chat.id} currentTitle={chat.title} />
-                                    <DeleteConversationModal conversationId={chat.id} />
                                     <MagicTitleButton conversationId={chat.id} />
+                                    <Separator size='4'/>
+                                    <DeleteConversationModal conversationId={chat.id} />
                                 </div>
                             </Popover.Content>
                         </Popover.Root>
