@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, Flex, Button, Text, Badge } from "@radix-ui/themes";
 import { Button as LocalButton } from '@/components/ui/button';
-import { Pencil2Icon } from '@radix-ui/react-icons';
+import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Color } from "@/types/color";
 import { useGetModelQuery } from "../api/get-model-info";
 import { ColorPicker } from "@/features/radixColor/components/color-picker";
@@ -35,7 +35,7 @@ export function UpdateModelModal({ modelId }: UpdateModelModalProps) {
         <Dialog.Root>
             <Dialog.Trigger>
                 <LocalButton variant='ghost' className="p-2 flex justify-start">
-                    <Pencil2Icon className="mr-2" />
+                    <DotsHorizontalIcon />
                 </LocalButton>
             </Dialog.Trigger>
             <Dialog.Content size='1'>
@@ -47,11 +47,11 @@ export function UpdateModelModal({ modelId }: UpdateModelModalProps) {
                         '--base-card-padding-left': 'var(--space-2)',
                         '--base-card-padding-right': 'var(--space-2)',
                     } as any}>
-                    <div className="w-full flex mb-2">
-                        <Text weight='bold' className="mr-2">
+                    <div className="w-full flex mb-2 items-center">
+                        <Text size='2' weight='regular' className="mr-2">
                             Current Model Color:
                         </Text>
-                        <Badge className='w-16 flex items-center justify-center' size='2' variant="surface" color={data?.color}>{data?.color}</Badge>
+                        <Badge className='w-16 flex items-center justify-center' size='3' variant="surface" color={data?.color}>{data?.color}</Badge>
                     </div>
                     <ColorPicker outerColor={color} setOuterColor={handleSetColor} />
                 </div>

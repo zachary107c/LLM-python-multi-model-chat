@@ -1,5 +1,5 @@
 import { Color } from '@/types/color'
-import { Badge, Select, Text } from '@radix-ui/themes'
+import { Select, Text } from '@radix-ui/themes'
 
 interface ColorPickerProps {
     outerColor: Color
@@ -39,14 +39,14 @@ export function ColorPicker({ outerColor, setOuterColor }: ColorPickerProps) {
     return (
         <div className='w-full flex items-center'>
             <div className="mr-2">
-                <Text weight='bold'>New Color</Text>
+                <Text size='2' weight='regular'>New Color: </Text>
             </div>
             <Select.Root defaultValue={outerColor} onValueChange={(value) => setOuterColor(value as Color)}>
                 <Select.Trigger />
                 <Select.Content variant='soft'>
                     {colors.map((c) => (
                         <Select.Item className='w-full' value={c} key={c}>
-                            <Badge className='w-full' color={c} variant='surface'>{c}</Badge>
+                            <Text className='w-full' color={c}>{c}</Text>
                         </Select.Item>
                     ))}
                 </Select.Content>
