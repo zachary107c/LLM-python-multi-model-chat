@@ -16,14 +16,12 @@ import { useGetModelsQuery } from '@/features/model/api/get-models';
 import { useQueryClient } from '@tanstack/react-query';
 import { UserChatMessage } from '@/features/chatMessage/components/user-chat-message';
 import { AssistantChatMessage } from '@/features/chatMessage/components/assistant-chat-message';
-import { UserMessage, AssistantMessage, BaseModelEntity } from '@/types/api';
+import { UserMessage, AssistantMessage, BaseModelEntity, Message } from '@/types/api';
 
 interface ChatProps {
     chatId: string;
     onCreateNewChat: (newChatId: string) => void;
 }
-
-type Message = UserMessage | AssistantMessage;
 
 export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>([]);

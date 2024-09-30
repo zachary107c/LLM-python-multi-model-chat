@@ -24,6 +24,8 @@ export type AssistantMessage = Entity<{
     type: string
 }>;
 
+export type Message = UserMessage | AssistantMessage;
+
 export type AuthResponse = {
     token: string;
     expiry: number;

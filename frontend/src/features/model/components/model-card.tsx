@@ -9,13 +9,15 @@ export function ModelCard({ data }: ModelCardProps) {
     return (
         <div className="p-1 w-full overflow-y-scroll no-scrollbar">
             <Card>
-                <Badge color={data?.color} variant='surface' className="w-full flex  justify-center items-center">
-                    <Text size='4' weight='bold'>{data?.model}</Text>
-                </Badge>
+                <div className="mb-2">
+                    <Badge color={data?.color} variant='surface' className="w-full flex  justify-center items-center">
+                        <Text size='4' weight='bold'>{data?.model}</Text>
+                    </Badge>
+                </div>
                 <div className="mt-2">
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>License</Text>
+                            <Text as="p" size='3' weight='bold'>License</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">
@@ -27,7 +29,7 @@ export function ModelCard({ data }: ModelCardProps) {
                     </div>
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>Template</Text>
+                            <Text as="p" size='3' weight='bold'>Template</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">
@@ -39,7 +41,7 @@ export function ModelCard({ data }: ModelCardProps) {
                     </div>
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>Parameters</Text>
+                            <Text as="p" size='3' weight='bold'>Parameters</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">
@@ -51,7 +53,7 @@ export function ModelCard({ data }: ModelCardProps) {
                     </div>
                     <div className="mb-2">
                         <div className="mb-1">
-                           <Text as="p" size='3' weight='bold'>Model File</Text>
+                            <Text as="p" size='3' weight='bold'>Model File</Text>
                         </div>
                         <ScrollArea type="always" scrollbars="vertical" style={{ height: 120 }}>
                             <Box p="2" pr="8">

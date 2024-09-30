@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { BaseModelEntity } from "@/types/api";
+import { UpdateModelModal } from "./edit-model-modal";
 
 
 export function ModelList({ models, selectedModelId, handleSetSelected }: { models: BaseModelEntity[] | undefined, selectedModelId: number | null, handleSetSelected: any }) {
@@ -18,6 +19,7 @@ export function ModelList({ models, selectedModelId, handleSetSelected }: { mode
                                 </Button>
                             }
                     </div>
+                    <UpdateModelModal modelId={model.id} />
                 </div>
             ))}
         </div>
