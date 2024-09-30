@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Dialog, Flex, Button, Card, Text, Badge } from "@radix-ui/themes";
+import { Dialog, Flex, Button, Text, Badge } from "@radix-ui/themes";
 import { Button as LocalButton } from '@/components/ui/button';
 import { Pencil2Icon } from '@radix-ui/react-icons';
-import { BarLoader } from "react-spinners";
 import { Color } from "@/types/color";
 import { useGetModelQuery } from "../api/get-model-info";
 import { ColorPicker } from "@/features/radixColor/components/color-picker";
@@ -13,7 +12,7 @@ interface UpdateModelModalProps {
 }
 
 export function UpdateModelModal({ modelId }: UpdateModelModalProps) {
-    const { data, isLoading, error } = useGetModelQuery({ modelId: modelId });
+    const { data } = useGetModelQuery({ modelId: modelId });
     const [color, setColor] = useState<Color>('gray');
     const updateMutation = updateModelMutation();
 
@@ -52,9 +51,9 @@ export function UpdateModelModal({ modelId }: UpdateModelModalProps) {
                         <Text weight='bold' className="mr-2">
                             Current Model Color:
                         </Text>
-                        <Badge className='w-16 flex items-center justify-center' size='2' variant="surface" color={color}>{color}</Badge>
+                        <Badge className='w-16 flex items-center justify-center' size='2' variant="surface" color={data?.color}>{data?.color}</Badge>
                     </div>
-                    <ColorPicker color={color} setColor={handleSetColor} />
+                    <ColorPicker outerColor={color} setOuterColor={handleSetColor} />
                 </div>
                 <Flex gap="3" mt="4" justify="between">
                     <Dialog.Close>

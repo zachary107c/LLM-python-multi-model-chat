@@ -1,10 +1,9 @@
 import { Color } from '@/types/color'
-import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu'
-import { Badge, Button, DropdownMenu } from '@radix-ui/themes'
+import { Badge, Select, Text } from '@radix-ui/themes'
 
 interface ColorPickerProps {
-    color: Color
-    setColor: (color: Color) => void
+    outerColor: Color
+    setOuterColor: (color: Color) => void
 }
 
 const colors: Color[] = [
@@ -36,26 +35,22 @@ const colors: Color[] = [
     'sky',
 ]
 
-export function ColorPicker({ color, setColor }: ColorPickerProps) {
+export function ColorPicker({ outerColor, setOuterColor }: ColorPickerProps) {
     return (
-        <div className='w-full'>
-            <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                    <Button variant="surface">
-                        Colors
-                        <DropdownMenu.TriggerIcon />
-                    </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content className='w-full'>
+        <div className='w-full flex items-center'>
+            <div className="mr-2">
+                <Text weight='bold'>New Color</Text>
+            </div>
+            <Select.Root defaultValue={outerColor} onValueChange={(value) => setOuterColor(value as Color)}>
+                <Select.Trigger />
+                <Select.Content variant='soft'>
                     {colors.map((c) => (
-                        <DropdownMenuItem className='w-full'>
-                            <Button className='w-full' key={c} onClick={() => setColor(c)} variant='ghost'>
-                                <Badge className='w-full' color={c} variant='surface'>{c}</Badge>
-                            </Button>
-                        </DropdownMenuItem>
+                        <Select.Item className='w-full' value={c} key={c}>
+                            <Badge className='w-full' color={c} variant='surface'>{c}</Badge>
+                        </Select.Item>
                     ))}
-                </DropdownMenu.Content>
-            </DropdownMenu.Root>
-        </div>
+                </Select.Content>
+            </Select.Root>
+        </div >
     );
 }

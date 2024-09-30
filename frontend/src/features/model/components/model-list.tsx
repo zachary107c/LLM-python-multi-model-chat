@@ -7,7 +7,7 @@ export function ModelList({ models, selectedModelId, handleSetSelected }: { mode
     return (
         <div>
             {models?.map((model) => (
-                <div className="w-full flex justify-between items-center">
+                <div className="w-full flex justify-between items-center" key={model.id}>
                     <div className="w-full overflow-hidden">
                             {model.id === selectedModelId ?
                                 <Button size='sm' variant={'ghost'} className="w-full justify-between bg-accent text-accent-foreground" onClick={() => handleSetSelected(model.id)}>
