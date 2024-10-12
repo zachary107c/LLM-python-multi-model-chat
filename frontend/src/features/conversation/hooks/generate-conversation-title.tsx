@@ -7,7 +7,7 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const CONVERSATION_TITLE_GENERATION_DELAY_MS = 1000;
+    const CONVERSATION_TITLE_GENERATION_DELAY_MS = 500;
 
     const generateConversationTitle = async (): Promise<string> => {
         if (!data) return '';

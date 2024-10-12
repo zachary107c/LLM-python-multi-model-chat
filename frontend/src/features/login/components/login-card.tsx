@@ -91,11 +91,11 @@ export function LoginCard() {
                     </Box>
 
                     <Flex mt="6" justify="between" gap="3">
-                        <Button variant="soft">
-                            <RouterLink to="/register">
+                        <RouterLink to="/register" tabIndex={-1}>
+                            <Button variant="soft">
                                 Create an account
-                            </RouterLink>
-                        </Button>
+                            </Button>
+                        </RouterLink>
                         <Button onClick={handleLogin}>Sign in</Button>
                     </Flex>
 
