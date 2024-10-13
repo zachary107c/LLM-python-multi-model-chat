@@ -47,7 +47,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         type: message.type,
                         content: message.content,
                         id: message.id,
-                        createdAt: message.created_at,
+                        created_at: message.created_at,
                         liked: message.liked,
                         conversation: message.conversation,
                         image: message.image
@@ -57,7 +57,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         type: message.type,
                         content: message.content,
                         id: message.id,
-                        createdAt: message.created_at,
+                        created_at: message.created_at,
                         model: message.model,
                         provider: message.provider,
                         liked: message.liked,
@@ -134,7 +134,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             }
             const newUserMessage: UserMessage = {
                 id: userPostData.id,
-                createdAt: userPostData.createdAt,
+                created_at: userPostData.created_at,
                 content: userPostData.content,
                 conversation: userPostData.conversation,
                 image: userPostData.image,
@@ -153,9 +153,11 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             setIsLoading(false);
             const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: response.data.message.content, model: model?.id || -1, provider: "ollama" } });
 
+            console.log(assistantPostData)
+
             const newAssistantMessage: AssistantMessage = {
                 id: assistantPostData.id,
-                createdAt: assistantPostData.createdAt,
+                created_at: assistantPostData.created_at,
                 content: assistantPostData.content,
                 conversation: assistantPostData.conversation,
                 model: assistantPostData.model,

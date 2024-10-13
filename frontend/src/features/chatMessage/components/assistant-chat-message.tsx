@@ -19,7 +19,7 @@ export function AssistantChatMessage({ assistantMessageData }: { assistantMessag
                                 {assistantMessageData.model.name}
                             </Badge>
                             <Text weight='light' size='1'>
-                                {new Date(assistantMessageData.createdAt).toLocaleDateString('en-US', {
+                                {new Date(assistantMessageData.created_at).toLocaleDateString('en-US', {
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric',
