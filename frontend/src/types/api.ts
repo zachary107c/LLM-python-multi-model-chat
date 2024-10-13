@@ -31,12 +31,22 @@ export type AuthResponse = {
     expiry: number;
 };
 
+export type Grouping = 'Today' | 'This Week' | 'This Month' | 'Old';
+
 export type Conversation = Entity<{
     title: string;
     user: string;
     updatedAt: number;
     liked: boolean;
+    grouping: Grouping;
 }>;
+
+export type GroupedConverations = {
+    Today: Conversation[];
+    'This Week': Conversation[];
+    'This Month': Conversation[];
+    Old: Conversation[];
+};
 
 export type ConversationDetailMessage = Entity<
 | {

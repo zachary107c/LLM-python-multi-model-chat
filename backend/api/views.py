@@ -1,6 +1,7 @@
 import requests
 from io import StringIO
 
+import datetime
 from django.core.management import call_command
 from rest_framework.views import *
 from rest_framework.permissions import *
@@ -35,7 +36,22 @@ class ConversationListCreateView(generics.ListCreateAPIView):
     def get(self, request):
         conversations = self.get_queryset()
         serializer = self.get_serializer(conversations, many=True)
+
+        for conversation in serializer.data:
+            created_at = datetime.datetime.fromisoformat(conversation['created_at'].replace('Z', '+00:00'))
+            if (datetime.date.today() - created_at.date()).days == 0:
+                conversation['grouping'] = 'Today'
+            elif (datetime.date.today() - created_at.date()).days <= 7:
+                conversation['grouping'] = 'This Week'
+            elif (datetime.date.today().month == int(created_at.strftime('%m'))):
+                conversation['grouping'] = 'This Month'
+            else:
+                conversation['grouping'] = 'Old'
+
         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

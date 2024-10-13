@@ -170,7 +170,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
 
     return (
         <div className='flex flex-col items-center relative'>
-            <div className='flex flex-col justify-between align-middle h-screen w-[60%] z-10 relative'>
+            <div className='flex flex-col justify-between align-middle h-screen w-[80%] z-10 relative'>
                 {
                     conversationLoading && (
                         <div className='w-full h-full flex flex-col items-center justify-center'>

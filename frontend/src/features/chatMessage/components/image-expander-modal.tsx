@@ -1,4 +1,4 @@
-import { AlertDialog, Button, Inset } from "@radix-ui/themes";
+import { Dialog, Inset } from "@radix-ui/themes";
 import { Button as LocalButton } from '@/components/ui/button';
 
 interface ImageExpandModalProps {
@@ -8,8 +8,8 @@ interface ImageExpandModalProps {
 export function ImageExpandModal({ imagePath }: ImageExpandModalProps) {
     return (
         <Inset clip="padding-box" side="top" pb="current">
-            <AlertDialog.Root>
-                <AlertDialog.Trigger>
+            <Dialog.Root>
+                <Dialog.Trigger>
                     <LocalButton variant={"ghost-no-hover"} className="p-0 m-0 w-full">
                         <img
                             src={imagePath}
@@ -23,8 +23,8 @@ export function ImageExpandModal({ imagePath }: ImageExpandModalProps) {
                             }}
                         />
                     </LocalButton>
-                </AlertDialog.Trigger>
-                <AlertDialog.Content size='1'>
+                </Dialog.Trigger>
+                <Dialog.Content size='1'>
                     <div className="flex flex-col justify-start">
                         <img
                             src={imagePath}
@@ -35,14 +35,9 @@ export function ImageExpandModal({ imagePath }: ImageExpandModalProps) {
                                 borderRadius: 'var(--radius-2)',
                             }}
                         />
-                        <AlertDialog.Cancel>
-                            <Button variant='outline' color="gray" size='1'>
-                                Close
-                            </Button>
-                        </AlertDialog.Cancel>
                     </div>
-                </AlertDialog.Content>
-            </AlertDialog.Root>
+                </Dialog.Content>
+            </Dialog.Root>
         </Inset >
     );
 }
