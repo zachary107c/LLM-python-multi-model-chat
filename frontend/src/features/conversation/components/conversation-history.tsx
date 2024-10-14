@@ -98,24 +98,40 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
                 <div className="mx-2">
                     <div className="flex flex-col justify-center align-top">
                         <div className="flex flex-col w-full">
-                            <div>
-                                <Text weight='bold' size='1'>Bookmarked Chats</Text>
+                            {bookmarkedChats.length > 0 && (<div>
+                                <div className="flex items-center justify-start">
+                                    <Text weight='bold' size='1' className="mr-1">Bookmarked Chats</Text>
+                                    <Text weight='light' size='1'>{`(${bookmarkedChats.length})`}</Text>
+                                </div>
                                 {isLoading ? <ConversationListLoading /> : <ConversationList chats={bookmarkedChats} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
-                            </div>
+                            </div>)}
                             {nonBookmarkChats.Today.length > 0 && (<div>
-                                <Text weight='bold' size='1'>Today</Text>
+
+                                <div className="flex items-center justify-start">
+                                    <Text weight='bold' size='1' className="mr-1">Today</Text>
+                                    <Text weight='light' size='1'>{`(${nonBookmarkChats.Today.length})`}</Text>
+                                </div>
                                 {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats.Today} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
                             </div>)}
                             {nonBookmarkChats['This Week'].length > 0 && (<div>
-                                <Text weight='bold' size='1'>This Week</Text>
+                                <div className="flex items-center justify-start">
+                                    <Text weight='bold' size='1' className="mr-1">This Week</Text>
+                                    <Text weight='light' size='1'>{`(${nonBookmarkChats['This Week'].length})`}</Text>
+                                </div>
                                 {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats['This Week']} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
                             </div>)}
                             {nonBookmarkChats['This Month'].length > 0 && (<div>
-                                <Text weight='bold' size='1'>This Month</Text>
+                                <div className="flex items-center justify-start">
+                                    <Text weight='bold' size='1' className="mr-1">This Month</Text>
+                                    <Text weight='light' size='1'>{`(${nonBookmarkChats['This Month'].length})`}</Text>
+                                </div>
                                 {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats['This Month']} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
                             </div>)}
                             {nonBookmarkChats.Old.length > 0 && (<div>
-                                <Text weight='bold' size='1'>Older</Text>
+                                <div className="flex items-center justify-start">
+                                    <Text weight='bold' size='1' className="mr-1">Older</Text>
+                                    <Text weight='light' size='1'>{`(${nonBookmarkChats.Old.length})`}</Text>
+                                </div>
                                 {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats.Old} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
                             </div>)}
                         </div>

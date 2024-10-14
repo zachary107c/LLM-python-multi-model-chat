@@ -88,7 +88,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     }, [models]);
 
     useEffect(() => {
-        if (suggestionsData && suggestionsData.suggestions.length > 0) {
+        if (suggestionsData && suggestionsData.suggestions.length > 0 && !suggestionsLoading) {
             setSuggestions(suggestionsData.suggestions);
         }
     }, [suggestionsData])

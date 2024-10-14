@@ -24,6 +24,7 @@ export const createConversationMutation = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["conversations"] });
+            queryClient.resetQueries({ queryKey: ["suggestions"] });
         },
     });
 }
