@@ -5,10 +5,9 @@ import { Tooltip, Text } from "@radix-ui/themes";
 import { PlusIcon, PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
 import { useGetConversationsQuery } from "@/features/conversation/api/get-conversations";
-import { Conversation } from "@/types/api";
+import { Conversation, GroupedConverations } from "@/types/api";
 import { ConversationList } from "./conversation-list";
 import { ConversationListLoading } from "./conversation-list-loading";
-
 
 export function ConversationHistory({ onSelectedIdChange }: any) {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -17,7 +16,12 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
     const { data: chats, isLoading } = useGetConversationsQuery();
     const createMutation = createConversationMutation();
     const [bookmarkedChats, setBookmarkChats] = useState<Conversation[]>([]);
-    const [nonBookmarkedChats, setNonBookmarkChats] = useState<Conversation[]>([]);
+    const [nonBookmarkChats, setNonBookmarkChats] = useState<GroupedConverations>({
+        Today: [],
+        'This Week': [],
+        'This Month': [],
+        Old: []
+    });
 
     function handleSetExpanded(e: any) {
         setExpanded(e);
@@ -42,8 +46,29 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
 
     useEffect(() => {
         if (chats) {
-            setBookmarkChats(chats.filter((chat) => chat.liked));
-            setNonBookmarkChats(chats.filter((chat) => !chat.liked));
+            // Sort chats by created_at in descending order (latest first)
+            const sortedChats = [...chats].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+            // Collect all bookmarked chats
+            const likedChats = sortedChats.filter(chat => chat.liked);
+            setBookmarkChats(likedChats);
+
+            // Reset non-bookmarked chats grouping
+            const groupedNonBookmarkChats: GroupedConverations = {
+                Today: [],
+                'This Week': [],
+                'This Month': [],
+                Old: []
+            };
+
+            // Group non-bookmarked chats based on existing grouping
+            sortedChats.forEach((chat) => {
+                if (!chat.liked && chat.grouping !== undefined) {
+                    groupedNonBookmarkChats[chat.grouping].push(chat);
+                }
+            });
+
+            setNonBookmarkChats(groupedNonBookmarkChats);
         }
     }, [chats]);
 
@@ -74,13 +99,25 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
                     <div className="flex flex-col justify-center align-top">
                         <div className="flex flex-col w-full">
                             <div>
-                                <Text weight='bold'>Bookmarked Chats</Text>
+                                <Text weight='bold' size='1'>Bookmarked Chats</Text>
                                 {isLoading ? <ConversationListLoading /> : <ConversationList chats={bookmarkedChats} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
                             </div>
-                            <div>
-                                <Text weight='bold'>Other Chats</Text>
-                                {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkedChats} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
-                            </div>
+                            {nonBookmarkChats.Today.length > 0 && (<div>
+                                <Text weight='bold' size='1'>Today</Text>
+                                {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats.Today} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
+                            </div>)}
+                            {nonBookmarkChats['This Week'].length > 0 && (<div>
+                                <Text weight='bold' size='1'>This Week</Text>
+                                {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats['This Week']} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
+                            </div>)}
+                            {nonBookmarkChats['This Month'].length > 0 && (<div>
+                                <Text weight='bold' size='1'>This Month</Text>
+                                {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats['This Month']} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
+                            </div>)}
+                            {nonBookmarkChats.Old.length > 0 && (<div>
+                                <Text weight='bold' size='1'>Older</Text>
+                                {isLoading ? <ConversationListLoading /> : <ConversationList chats={nonBookmarkChats.Old} currentConversationId={currentConversationId} handleSetSelected={handleSetSelected} />}
+                            </div>)}
                         </div>
                     </div>
                 </div>

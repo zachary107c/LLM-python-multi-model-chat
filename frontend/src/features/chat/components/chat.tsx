@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '@/lib/api-client';
+import Cookies from 'js-cookie';
 import useScrollToEnd from '@/features/chat/hooks/use-scroll-to-end';
 import { ChatLoader } from '@/features/chatLoader/components/chat-loader';
 import Panel from '@/components/ui/panel';
@@ -16,24 +17,27 @@ import { useGetModelsQuery } from '@/features/model/api/get-models';
 import { useQueryClient } from '@tanstack/react-query';
 import { UserChatMessage } from '@/features/chatMessage/components/user-chat-message';
 import { AssistantChatMessage } from '@/features/chatMessage/components/assistant-chat-message';
-import { UserMessage, AssistantMessage, BaseModelEntity } from '@/types/api';
+import { UserMessage, AssistantMessage, BaseModelEntity, Message, Suggestion } from '@/types/api';
+import { Welcome } from '@/features/welcome/components/welcome';
+import { WelcomeLoading } from '@/features/welcome/components/welcome-loading';
+import { useGetSuggestionsQuery } from '../api/get-three-suggestions';
 
 interface ChatProps {
     chatId: string;
     onCreateNewChat: (newChatId: string) => void;
 }
 
-type Message = UserMessage | AssistantMessage;
-
 export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>([]);
     const [model, setModel] = useState<BaseModelEntity | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [imageData, setImageData] = useState<File | null>(null);
+    const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
     const updateMutation = updateConversationMutation();
     const createMutation = createConversationMutation();
 
+    const { data: suggestionsData, isLoading: suggestionsLoading } = useGetSuggestionsQuery();
     const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
     const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId: chatId });
 
@@ -49,7 +53,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         type: message.type,
                         content: message.content,
                         id: message.id,
-                        createdAt: message.created_at,
+                        created_at: message.created_at,
                         liked: message.liked,
                         conversation: message.conversation,
                         image: message.image
@@ -59,7 +63,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         type: message.type,
                         content: message.content,
                         id: message.id,
-                        createdAt: message.created_at,
+                        created_at: message.created_at,
                         model: message.model,
                         provider: message.provider,
                         liked: message.liked,
@@ -82,6 +86,12 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             setModel(models[0]);
         }
     }, [models]);
+
+    useEffect(() => {
+        if (suggestionsData && suggestionsData.suggestions.length > 0) {
+            setSuggestions(suggestionsData.suggestions);
+        }
+    }, [suggestionsData])
 
     useEffect(() => {
         if (chatId) {
@@ -136,7 +146,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             }
             const newUserMessage: UserMessage = {
                 id: userPostData.id,
-                createdAt: userPostData.createdAt,
+                created_at: userPostData.created_at,
                 content: userPostData.content,
                 conversation: userPostData.conversation,
                 image: userPostData.image,
@@ -149,15 +159,18 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             var payload = {
                 model: model?.name,
                 messages: [{ role: "user", content: message, images: image_data ? [image_data] : [] }],
-                stream: false
             }
-            const response = await axios.post('http://192.168.1.11:11434/api/chat', payload);
+            const response = await api.post('/ollama/chat/', payload, {
+                headers: {
+                    Authorization: `Token ${Cookies.get('token')}`,
+                }
+            });
             setIsLoading(false);
-            const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: response.data.message.content, model: model?.id || -1, provider: "ollama" } });
+            const assistantPostData = await createAssistantMessage({ data: { conversation: currentChatId, content: (response as any).message.content, model: model?.id || -1, provider: "ollama" } });
 
             const newAssistantMessage: AssistantMessage = {
                 id: assistantPostData.id,
-                createdAt: assistantPostData.createdAt,
+                created_at: assistantPostData.created_at,
                 content: assistantPostData.content,
                 conversation: assistantPostData.conversation,
                 model: assistantPostData.model,
@@ -172,7 +185,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
 
     return (
         <div className='flex flex-col items-center relative'>
-            <div className='flex flex-col justify-between align-middle h-screen w-[60%] z-10 relative'>
+            <div className='flex flex-col justify-between align-middle h-screen w-[80%] z-10 relative'>
                 {
                     conversationLoading && (
                         <div className='w-full h-full flex flex-col items-center justify-center'>
@@ -180,7 +193,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         </div>
                     )
                 }
-                <div className='pt-4 overflow-x-hidden overflow-y-scroll no-scrollbar'>
+                <div className='h-full pt-4 overflow-x-hidden overflow-y-scroll no-scrollbar'>
                     {
                         error && (<Callout.Root color='red' variant='surface'>
                             <Callout.Icon>
@@ -191,6 +204,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                             </Callout.Text>
                         </Callout.Root>)
                     }
+                    {(messages.length == 0 && suggestionsLoading) && (<WelcomeLoading />)} 
+                    {(messages.length == 0 && !suggestionsLoading) && (<Welcome suggestions={suggestions} handleMessageSend={handleSendMessage}/>)}
                     {messages.map((message) => {
                         if (isUserMessage(message)) {
                             return <UserChatMessage key={message.id} userMessageData={message} />;

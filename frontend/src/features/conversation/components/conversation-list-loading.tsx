@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export function ConversationListLoading() {
     const randomNumber = Math.floor(Math.random() * (10 - 3 + 1)) + 3;
-
+    
     return (
         <div>
             {[...Array(randomNumber)].map((_, index) => (

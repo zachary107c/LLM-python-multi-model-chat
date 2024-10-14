@@ -6,7 +6,6 @@ import { AssistantMessage } from "@/types/api";
 import MarkdownRenderer from "@/features/markdown/components/markdown";
 
 
-
 export function AssistantChatMessage({ assistantMessageData }: { assistantMessageData: AssistantMessage }) {
     const deleteMutation = deleteAssistantMessageMutation({ conversationId: assistantMessageData.conversation });
 
@@ -19,6 +18,16 @@ export function AssistantChatMessage({ assistantMessageData }: { assistantMessag
                             <Badge variant='surface' color={assistantMessageData.model.color} className="mr-1" radius="large">
                                 {assistantMessageData.model.name}
                             </Badge>
+                            <Text weight='light' size='1'>
+                                {new Date(assistantMessageData.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit',
+                                })}
+                            </Text>
                         </div>
                     </div>
                     <div className='flex justify-start'>

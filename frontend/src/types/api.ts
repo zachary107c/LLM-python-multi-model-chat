@@ -1,6 +1,6 @@
 export type BaseEntity = {
     id: string;
-    createdAt: string;
+    created_at: string;
 };
 
 export type Entity<T> = {
@@ -24,17 +24,29 @@ export type AssistantMessage = Entity<{
     type: string
 }>;
 
+export type Message = UserMessage | AssistantMessage;
+
 export type AuthResponse = {
     token: string;
     expiry: number;
 };
+
+export type Grouping = 'Today' | 'This Week' | 'This Month' | 'Old';
 
 export type Conversation = Entity<{
     title: string;
     user: string;
     updatedAt: number;
     liked: boolean;
+    grouping: Grouping;
 }>;
+
+export type GroupedConverations = {
+    Today: Conversation[];
+    'This Week': Conversation[];
+    'This Month': Conversation[];
+    Old: Conversation[];
+};
 
 export type ConversationDetailMessage = Entity<
 | {
@@ -103,4 +115,12 @@ export type UserProfile = {
     profile: Profile;
 }
 
+export type Suggestion = {
+    bucket: string;
+    question: string;
+}
+
+export type Suggestions = {
+    suggestions: Suggestion[];
+}
 
