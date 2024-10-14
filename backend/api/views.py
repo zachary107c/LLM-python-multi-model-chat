@@ -1,4 +1,5 @@
 import json
+import pytz
 import requests
 import datetime
 from io import StringIO
@@ -37,15 +38,25 @@ class ConversationListCreateView(generics.ListCreateAPIView):
         conversations = self.get_queryset()
         serializer = self.get_serializer(conversations, many=True)
 
+        utc = pytz.UTC  # UTC timezone instance
+
         for conversation in serializer.data:
+            # Parse and make the `created_at` aware of UTC
             created_at = datetime.datetime.fromisoformat(
                 conversation["created_at"].replace("Z", "+00:00")
-            )
-            if (datetime.date.today() - created_at.date()).days == 0:
+            ).astimezone(utc)
+
+            # Get current time in UTC
+            now_utc = datetime.datetime.now(datetime.UTC)
+
+            # Calculate the time difference in days
+            days_difference = (now_utc.date() - created_at.date()).days
+
+            if days_difference == 0:
                 conversation["grouping"] = "Today"
-            elif (datetime.date.today() - created_at.date()).days <= 7:
+            elif days_difference <= 7:
                 conversation["grouping"] = "This Week"
-            elif datetime.date.today().month == int(created_at.strftime("%m")):
+            elif now_utc.month == created_at.month:
                 conversation["grouping"] = "This Month"
             else:
                 conversation["grouping"] = "Old"
@@ -54,10 +65,6 @@ class ConversationListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
 
 class ConversationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = None
