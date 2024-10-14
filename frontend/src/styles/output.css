@@ -735,6 +735,22 @@ video {
   height: 100vh;
 }
 
+.h-40 {
+  height: 10rem;
+}
+
+.h-20 {
+  height: 5rem;
+}
+
+.h-24 {
+  height: 6rem;
+}
+
+.h-32 {
+  height: 8rem;
+}
+
 .max-h-\[100dvh\] {
   max-height: 100dvh;
 }
@@ -782,6 +798,10 @@ video {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-60 {
+  width: 15rem;
 }
 
 .max-w-\[250px\] {

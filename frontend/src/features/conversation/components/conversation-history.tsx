@@ -46,12 +46,15 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
 
     useEffect(() => {
         if (chats) {
+            // Sort chats by created_at in descending order (latest first)
+            const sortedChats = [...chats].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
             // Collect all bookmarked chats
-            const likedChats = chats.filter(chat => chat.liked);
+            const likedChats = sortedChats.filter(chat => chat.liked);
             setBookmarkChats(likedChats);
 
             // Reset non-bookmarked chats grouping
-            const groupedNonBookmarkChats : GroupedConverations  = {
+            const groupedNonBookmarkChats: GroupedConverations = {
                 Today: [],
                 'This Week': [],
                 'This Month': [],
@@ -59,7 +62,7 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
             };
 
             // Group non-bookmarked chats based on existing grouping
-            chats.forEach((chat) => {
+            sortedChats.forEach((chat) => {
                 if (!chat.liked && chat.grouping !== undefined) {
                     groupedNonBookmarkChats[chat.grouping].push(chat);
                 }

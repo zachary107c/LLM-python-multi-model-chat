@@ -115,4 +115,12 @@ export type UserProfile = {
     profile: Profile;
 }
 
+export type Suggestion = {
+    bucket: string;
+    question: string;
+}
+
+export type Suggestions = {
+    suggestions: Suggestion[];
+}
 

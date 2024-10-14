@@ -1,7 +1,7 @@
+import json
 import requests
-from io import StringIO
-
 import datetime
+from io import StringIO
 from django.core.management import call_command
 from rest_framework.views import *
 from rest_framework.permissions import *
@@ -38,15 +38,17 @@ class ConversationListCreateView(generics.ListCreateAPIView):
         serializer = self.get_serializer(conversations, many=True)
 
         for conversation in serializer.data:
-            created_at = datetime.datetime.fromisoformat(conversation['created_at'].replace('Z', '+00:00'))
+            created_at = datetime.datetime.fromisoformat(
+                conversation["created_at"].replace("Z", "+00:00")
+            )
             if (datetime.date.today() - created_at.date()).days == 0:
-                conversation['grouping'] = 'Today'
+                conversation["grouping"] = "Today"
             elif (datetime.date.today() - created_at.date()).days <= 7:
-                conversation['grouping'] = 'This Week'
-            elif (datetime.date.today().month == int(created_at.strftime('%m'))):
-                conversation['grouping'] = 'This Month'
+                conversation["grouping"] = "This Week"
+            elif datetime.date.today().month == int(created_at.strftime("%m")):
+                conversation["grouping"] = "This Month"
             else:
-                conversation['grouping'] = 'Old'
+                conversation["grouping"] = "Old"
 
         return Response(serializer.data)
 
@@ -169,7 +171,7 @@ class OllamaModelDetailWithInfoView(APIView):
             serializer = OllamaModelSerializer(ollama_model)
 
             # Query the Ollama API for additional details
-            model_info = self.ollama_service.model(serializer.data['name'])
+            model_info = self.ollama_service.model(serializer.data["name"])
 
             if model_info:
                 # Remove unnecessary fields from the Ollama response
@@ -178,8 +180,8 @@ class OllamaModelDetailWithInfoView(APIView):
 
                 # Combine the database model data with the Ollama service response
                 combined_data = {
-                    **serializer.data,   # The serialized model data from the database
-                    "details": model_info  # The extra details fetched from Ollama
+                    **serializer.data,  # The serialized model data from the database
+                    "details": model_info,  # The extra details fetched from Ollama
                 }
 
                 return Response(combined_data, status=status.HTTP_200_OK)
@@ -191,20 +193,20 @@ class OllamaModelDetailWithInfoView(APIView):
 
         except OllamaModel.DoesNotExist:
             return Response(
-                {"error": "Model not found."},
-                status=status.HTTP_404_NOT_FOUND
+                {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
             )
         except requests.exceptions.RequestException as e:
             return Response(
-                {"error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     # Update a model (PUT)
     def put(self, request, pk):
         try:
             ollama_model = OllamaModel.objects.get(pk=pk)
-            serializer = OllamaModelSerializer(ollama_model, data=request.data, partial=True)
+            serializer = OllamaModelSerializer(
+                ollama_model, data=request.data, partial=True
+            )
 
             if serializer.is_valid():
                 serializer.save()
@@ -213,8 +215,7 @@ class OllamaModelDetailWithInfoView(APIView):
 
         except OllamaModel.DoesNotExist:
             return Response(
-                {"error": "Model not found."},
-                status=status.HTTP_404_NOT_FOUND
+                {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
     # Delete a model (DELETE)
@@ -226,8 +227,7 @@ class OllamaModelDetailWithInfoView(APIView):
 
         except OllamaModel.DoesNotExist:
             return Response(
-                {"error": "Model not found."},
-                status=status.HTTP_404_NOT_FOUND
+                {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
 
@@ -297,4 +297,64 @@ class OllamaChatAPIView(APIView):
         except requests.exceptions.RequestException as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class OllamaThreeSuggestionsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+
+    def get(self, request):
+        prompt = """
+You are an expert suggestion generator.
+You generate three random questions a user could potentially ask to LLM, helping the user get started with a conversation.
+For each of the questions you generate, you also generate a bucket title this question / request falls under.
+Some bucket examples might be:
+- Programming Questions
+- Fun Facts
+- General Knowledge
+- Story Creation
+- Jokes and Humor
+- etc
+
+Response with three questions and their corresponding bucket as a json payload.
+
+Example response format:
+{
+  "suggestions": [
+    {
+      "bucket": "Programming Questions",
+      "question": "How do I reverse a string in Python?"
+    },
+    {
+      "bucket": "Fun Facts",
+      "question": "What are some interesting facts about the universe?"
+    },
+    {
+      "bucket": "Story Creation",
+      "question": "Can you help me write a short story about a time-traveling detective?"
+    }
+  ]
+}
+
+Only repond with the JSON payload surounded in triple back ticks ``` and nothing else.
+"""
+        chat_completion = self.ollama_service.chat(
+            model="llama3.1", messages=[{"role": "user", "content": prompt}]
+        )
+
+        if chat_completion:
+            try:
+                payload = json.loads(chat_completion["message"]["content"].replace("```json", "").replace("```", ""))
+                return Response(payload, status=status.HTTP_200_OK)
+            except Exception as e:
+                chat_completion["external_message"] = f"Failed to decode the json -> {e}"
+                return Response(chat_completion, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Failed to fetch response from Ollama API."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
