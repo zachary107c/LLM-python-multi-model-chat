@@ -707,6 +707,10 @@ video {
   height: 4rem;
 }
 
+.h-32 {
+  height: 8rem;
+}
+
 .h-4 {
   height: 1rem;
 }
@@ -733,22 +737,6 @@ video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-40 {
-  height: 10rem;
-}
-
-.h-20 {
-  height: 5rem;
-}
-
-.h-24 {
-  height: 6rem;
-}
-
-.h-32 {
-  height: 8rem;
 }
 
 .max-h-\[100dvh\] {
@@ -798,10 +786,6 @@ video {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-60 {
-  width: 15rem;
 }
 
 .max-w-\[250px\] {
@@ -1234,6 +1218,57 @@ video {
   /* optional */
 }
 
+.rainbow-border {
+  position: relative;
+  padding: 2px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  /* Ensures the mask is applied within the card bounds */
+}
+
+.rainbow-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: linear-gradient(45deg, 
+        #30005f,  /* vivid purple */
+        #45004e,  /* bright magenta */
+        #003166,  /* vivid blue */
+        #3f1b61,  /* blue violet */
+        #630939,  /* deep pink */
+        #0a2f53   /* dodger blue */
+    );
+  border-radius: inherit;
+  background-size: 200% 200%;
+  animation: chaotic-vivid-gradient 3s ease infinite;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  /* mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%); */
+}
+
+.rainbow-border:hover::before {
+  opacity: 1;
+}
+
+@keyframes chaotic-vivid-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .placeholder\:text-muted-foreground::-moz-placeholder {
   color: hsl(var(--muted-foreground));
 }
@@ -1292,3 +1327,5 @@ video {
 .disabled\:opacity-50:disabled {
   opacity: 0.5;
 }
+
+

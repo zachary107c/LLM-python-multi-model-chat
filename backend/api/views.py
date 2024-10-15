@@ -66,6 +66,7 @@ class ConversationListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+
 class ConversationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = None
     serializer_class = ConversationDetailSerializer

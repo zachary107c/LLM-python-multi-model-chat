@@ -21,6 +21,7 @@ import { UserMessage, AssistantMessage, BaseModelEntity, Message, Suggestion } f
 import { Welcome } from '@/features/welcome/components/welcome';
 import { WelcomeLoading } from '@/features/welcome/components/welcome-loading';
 import { useGetSuggestionsQuery } from '../api/get-three-suggestions';
+import { useSearchParams } from 'react-router-dom';
 
 interface ChatProps {
     chatId: string;
@@ -33,6 +34,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [imageData, setImageData] = useState<File | null>(null);
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+    const [_, setSearchParams] = useSearchParams();
 
     const updateMutation = updateConversationMutation();
     const createMutation = createConversationMutation();
@@ -98,6 +100,12 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             queryClient.invalidateQueries({ queryKey: ["conversation", chatId] });
         }
     }, [chatId]);
+
+    useEffect(() => {
+        if (error) {
+            setSearchParams({});
+        }
+    }, [error])
 
     function isUserMessage(message: Message): message is UserMessage {
         return message.type === 'user';
@@ -204,8 +212,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                             </Callout.Text>
                         </Callout.Root>)
                     }
-                    {(messages.length == 0 && suggestionsLoading) && (<WelcomeLoading />)} 
-                    {(messages.length == 0 && !suggestionsLoading) && (<Welcome suggestions={suggestions} handleMessageSend={handleSendMessage}/>)}
+                    {(messages.length == 0 && suggestionsLoading && !conversationLoading) && (<WelcomeLoading />)} 
+                    {(messages.length == 0 && !suggestionsLoading && !conversationLoading) && (<Welcome suggestions={suggestions} handleMessageSend={handleSendMessage}/>)}
                     {messages.map((message) => {
                         if (isUserMessage(message)) {
                             return <UserChatMessage key={message.id} userMessageData={message} />;
