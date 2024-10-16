@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Tooltip, Popover } from "@radix-ui/themes";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/navigation/ui/button";
 import { Link } from "react-router-dom";
 import { handleLogout } from "@/components/utils/handle-logout.ts";
 import {

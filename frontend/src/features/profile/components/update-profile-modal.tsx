@@ -1,5 +1,5 @@
 import { AlertDialog, Flex, Button, Card } from "@radix-ui/themes";
-import { Button as LocalButton } from "@/components/ui/button";
+import { Button as LocalButton } from "@/components/navigation/ui/button";
 import { Pencil2Icon } from "@radix-ui/react-icons"; // Add this if not already imported
 
 export function UpdateProfileModal() {

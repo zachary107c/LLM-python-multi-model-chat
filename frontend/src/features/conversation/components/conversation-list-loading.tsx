@@ -1,5 +1,5 @@
 import { Skeleton } from "@radix-ui/themes";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/navigation/ui/button";
 
 export function ConversationListLoading() {
   const randomNumber = Math.floor(Math.random() * (10 - 3 + 1)) + 3;

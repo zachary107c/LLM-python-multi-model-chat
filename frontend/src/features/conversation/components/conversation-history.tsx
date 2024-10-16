@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/navigation/ui/button";
 import { Tooltip, Text } from "@radix-ui/themes";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
 import { useGetConversationsQuery } from "@/features/conversation/api/get-conversations";

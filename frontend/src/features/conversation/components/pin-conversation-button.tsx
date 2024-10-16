@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/navigation/ui/button";
 import { Heart, HeartCrack } from "lucide-react";
 import { likeConversationMutation } from "@/features/conversation/api/like-conversation";
 

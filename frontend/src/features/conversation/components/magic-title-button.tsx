@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/navigation/ui/button";
 import { updateConversationMutation } from "../api/update-conversation";
 import { useConversationalTitleGenerator } from "@/features/conversation/hooks/generate-conversation-title";
 import { BarLoader } from "react-spinners";
