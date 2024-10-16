@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { Image } from "lucide-react";
-import { Button } from "@/components/navigation/ui/button";
+import { Button } from "@/components/ui/button";
 
 interface ImageUploadButtonProps {
   fileName: string | null;

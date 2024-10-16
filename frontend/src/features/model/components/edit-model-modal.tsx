@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Dialog, Flex, Button, Text, Badge } from "@radix-ui/themes";
-import { Button as LocalButton } from "@/components/navigation/ui/button";
+import { Button as LocalButton } from "@/components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Color } from "@/types/color";
 import { useGetModelQuery } from "../api/get-model-info";

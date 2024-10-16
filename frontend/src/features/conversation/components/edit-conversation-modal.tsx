@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, Flex, Button, Card } from "@radix-ui/themes";
-import { Textarea } from "@/components/navigation/ui/textarea";
-import { Button as LocalButton } from "@/components/navigation/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Button as LocalButton } from "@/components/ui/button";
 import { updateConversationMutation } from "../api/update-conversation";
 import { useConversationalTitleGenerator } from "@/features/conversation/hooks/generate-conversation-title";
 import { BarLoader } from "react-spinners";

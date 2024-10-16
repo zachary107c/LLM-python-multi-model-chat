@@ -1,4 +1,4 @@
-import { Button } from "@/components/navigation/ui/button";
+import { Button } from "@/components/ui/button";
 import { Popover } from "@radix-ui/themes";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { DeleteConversationModal } from "./delete-conversation-modal";

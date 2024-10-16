@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/navigation/ui/button";
+import { Button } from "@/components/ui/button";
 import { Tooltip, Text } from "@radix-ui/themes";
 import { PlusIcon, PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons";
 import { useGetModelsQuery } from "@/features/model/api/get-models";

@@ -1,6 +1,6 @@
 import { Card, Text, Skeleton } from "@radix-ui/themes";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
-import { Button } from "@/components/navigation/ui/button";
+import { Button } from "@/components/ui/button";
 
 export function WelcomeCardLoading() {
   return (

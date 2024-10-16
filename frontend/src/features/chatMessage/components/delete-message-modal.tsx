@@ -1,5 +1,5 @@
 import { AlertDialog, Flex, Button } from "@radix-ui/themes";
-import { Button as LocalButton } from "@/components/navigation/ui/button";
+import { Button as LocalButton } from "@/components/ui/button";
 import { TrashIcon } from "@radix-ui/react-icons";
 
 interface DeleteMessageModalProps {

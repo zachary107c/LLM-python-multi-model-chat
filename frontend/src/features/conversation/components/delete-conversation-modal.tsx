@@ -1,5 +1,5 @@
 import { AlertDialog, Flex, Button, Text } from "@radix-ui/themes";
-import { Button as LocalButton } from "@/components/navigation/ui/button";
+import { Button as LocalButton } from "@/components/ui/button";
 import { useSearchParams } from "react-router-dom";
 import { deleteConversationMutation } from "../api/delete-conversation";
 import { Trash2 } from "lucide-react";

@@ -6,10 +6,10 @@ import {
   Skeleton,
   Badge,
 } from "@radix-ui/themes";
-import { Textarea } from "@/components/navigation/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { useState, useCallback } from "react";
 import { BaseModelEntity } from "@/types/api";
-import { Button as LocalButton } from "@/components/navigation/ui/button";
+import { Button as LocalButton } from "@/components/ui/button";
 import { ImageUploadButton } from "@/features/imageUpload/components/image-upload-button";
 import { Rocket, Folder, X } from "lucide-react";
 

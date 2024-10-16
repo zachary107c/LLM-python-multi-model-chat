@@ -1,5 +1,5 @@
 import { Card, Text } from "@radix-ui/themes";
-import { Button } from "@/components/navigation/ui/button";
+import { Button } from "@/components/ui/button";
 import { Sparkles, ChevronRight } from "lucide-react";
 
 interface WelcomeCardProps {

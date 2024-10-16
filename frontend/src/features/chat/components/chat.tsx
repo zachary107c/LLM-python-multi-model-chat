@@ -3,7 +3,7 @@ import { api } from "@/lib/api-client";
 import Cookies from "js-cookie";
 import useScrollToEnd from "@/features/chat/hooks/use-scroll-to-end";
 import { ChatLoader } from "@/features/chatLoader/components/chat-loader";
-import Panel from "@/components/navigation/ui/panel";
+import Panel from "@/components/ui/panel";
 import { ChatInput } from "@/features/chatInput/components/chat-input";
 import { createUserMessage } from "@/features/chatMessage/api/create-user-message";
 import { createAssistantMessage } from "@/features/chatMessage/api/create-assistant-message";

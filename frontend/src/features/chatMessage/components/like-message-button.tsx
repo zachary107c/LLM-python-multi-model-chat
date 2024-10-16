@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/navigation/ui/button";
+import { Button } from "@/components/ui/button";
 import { HeartIcon, HeartFilledIcon } from "@radix-ui/react-icons";
 import { likeAssistantMessageMutation } from "../api/like-assistant-message";
 

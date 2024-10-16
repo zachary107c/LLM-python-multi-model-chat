@@ -1,5 +1,5 @@
 import { Dialog, Inset } from "@radix-ui/themes";
-import { Button as LocalButton } from "@/components/navigation/ui/button";
+import { Button as LocalButton } from "@/components/ui/button";
 
 interface ImageExpandModalProps {
   imagePath: string;

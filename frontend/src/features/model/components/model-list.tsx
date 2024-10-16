@@ -1,4 +1,4 @@
-import { Button } from "@/components/navigation/ui/button";
+import { Button } from "@/components/ui/button";
 import { BaseModelEntity } from "@/types/api";
 import { UpdateModelModal } from "./edit-model-modal";
 
