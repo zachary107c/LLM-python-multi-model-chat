@@ -41,7 +41,7 @@ export function MagicTitleButton({ conversationId }: MagicTitleModalProps) {
       ) : (
         <>
           <WandSparkles size={15} className="mr-2" />
-          <div className="w-full">Magic Title</div>
+          <div className="w-full text-left">Magic Title</div>
         </>
       )}
     </Button>

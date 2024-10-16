@@ -20,9 +20,9 @@ export function ConversationList({
   return (
     <div>
       {chats?.map((chat) => (
-        <div className="w-full flex justify-between items-center" key={chat.id}>
+        <div className="w-full flex justify-between items-center group" key={chat.id}>
           <div className="w-full overflow-hidden">
-            <Tooltip content={chat.title} side="right">
+            {/* <Tooltip content={chat.title} side="bottom"> */}
               {chat.id === currentConversationId ? (
                 <Button
                   size="sm"
@@ -36,15 +36,15 @@ export function ConversationList({
                 <Button
                   size="sm"
                   variant={"ghost"}
-                  className="w-full justify-between "
+                  className="w-full justify-between overflow-hidden"
                   onClick={() => handleSetSelected(chat.id)}
                 >
                   {chat.title}
                 </Button>
               )}
-            </Tooltip>
+            {/* </Tooltip> */}
           </div>
-          <div className="flex">
+          <div className="flex justify-center">
             <Popover.Root>
               <Popover.Trigger>
                 <Button variant="ghost" size="icon">

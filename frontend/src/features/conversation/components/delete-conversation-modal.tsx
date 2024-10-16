@@ -32,7 +32,7 @@ export function DeleteConversationModal({
       <AlertDialog.Trigger>
         <LocalButton variant="ghost" className="p-2 w-full flex justify-start">
           <Trash2 size={15} className="mr-2" />
-          <Text color="red">Delete Conversation</Text>
+          <Text color="red" className="text-left">Delete Conversation</Text>
         </LocalButton>
       </AlertDialog.Trigger>
       <AlertDialog.Content size="1">

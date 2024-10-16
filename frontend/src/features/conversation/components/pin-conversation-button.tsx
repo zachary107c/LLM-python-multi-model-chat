@@ -43,13 +43,13 @@ export function PinConversationButton({
     >
       {liked ? (
         <>
-          <HeartCrack size={15} />
-          <div className="w-full">Breakup</div>
+          <HeartCrack size={15} className="mr-2" />
+          <div className="w-full text-left">Breakup</div>
         </>
       ) : (
         <>
-          <Heart size={15} />
-          <div className="w-full">Love</div>
+          <Heart size={15} className="mr-2" />
+          <div className="w-full text-left">Love</div>
         </>
       )}
     </Button>

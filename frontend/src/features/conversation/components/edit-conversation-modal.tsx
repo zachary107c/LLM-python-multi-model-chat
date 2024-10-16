@@ -44,7 +44,7 @@ export function UpdateConversationModal({
       <Dialog.Trigger>
         <LocalButton variant="ghost" className="p-2 w-full flex justify-start">
           <Pencil size={15} className="mr-2" />
-          <div className="w-full">Edit Conversation</div>
+          <div className="w-full text-left">Edit Conversation</div>
         </LocalButton>
       </Dialog.Trigger>
       <Dialog.Content size="1">

@@ -8,13 +8,16 @@ export default function Panel({
   color,
   text,
   image,
+  className,
   children,
 }: any) {
   return (
     <div>
       {title && (
         <div
-          className={`mb-1 flex ${role === "user" ? "justify-end" : "justify-start"} items-center`}
+          className={`mb-1 flex ${
+            role === "user" ? "justify-end" : "justify-start"
+          } items-center ${className}`}
         >
           {name !== "user" &&
             name !== undefined &&
@@ -34,7 +37,7 @@ export default function Panel({
         </div>
       )}
       <div
-        className={`flex ${role === "user" ? "justify-end" : "justify-start"}`}
+        className={`flex ${role === "user" ? "justify-end" : "justify-start"} rainbow-border-always`}
       >
         <Card className="w-fit flex flex-col">
           {image}

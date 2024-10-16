@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer utilities {
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -89,18 +90,17 @@
 }
 
 .main-page {
-  background: radial-gradient(
-      at 100% 0%,
+  background: radial-gradient(at 100% 0%,
       rgba(0, 45, 245, 0.106) 0px,
-      transparent 50%
-    ),
+      transparent 50%),
     radial-gradient(at 93% 98%, hsla(237, 98%, 52%, 0) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(0, 17, 255, 0.095) 0px, transparent 50%);
 }
 
 .chat-history {
   background-image: url("http://127.0.0.1:8000/api/v1/media/user_message_images/snow2.gif");
-  background-size: cover; /* optional */
+  background-size: cover;
+  /* optional */
 }
 
 .rainbow-border {
@@ -108,7 +108,8 @@
   padding: 2px;
   border-radius: 8px;
   transition: all 0.3s ease;
-  overflow: hidden; /* Ensures the mask is applied within the card bounds */
+  overflow: hidden;
+  /* Ensures the mask is applied within the card bounds */
 }
 
 .rainbow-border::before {
@@ -119,15 +120,20 @@
   right: -2px;
   bottom: -2px;
   z-index: -1;
-  background: linear-gradient(
-    45deg,
-    #30005f,
-    /* vivid purple */ #45004e,
-    /* bright magenta */ #003166,
-    /* vivid blue */ #3f1b61,
-    /* blue violet */ #630939,
-    /* deep pink */ #0a2f53 /* dodger blue */
-  );
+  background: linear-gradient(45deg,
+      #30005f,
+      /* vivid purple */
+      #45004e,
+      /* bright magenta */
+      #003166,
+      /* vivid blue */
+      #3f1b61,
+      /* blue violet */
+      #630939,
+      /* deep pink */
+      #0a2f53
+      /* dodger blue */
+    );
   border-radius: inherit;
   background-size: 200% 200%;
   animation: chaotic-vivid-gradient 3s ease infinite;
@@ -144,9 +150,103 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.scroll-container {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  /* Adjust if specific width is known */
+  position: relative;
+  box-sizing: border-box;
+  /* Ensure padding is included in the width */
+}
+
+.scroll-container:hover .scroll-text {
+  animation: scrollText 10s linear infinite;
+  animation-delay: 1s;
+  /* Initial delay before starting */
+}
+
+.scroll-text {
+  display: inline-block;
+  position: absolute;
+}
+
+@keyframes scrollText {
+
+  0%,
+  10% {
+    transform: translateX(0);
+  }
+
+  45%,
+  55% {
+    transform: translateX(calc(-100% + 100px));
+    /* Adjust '100px' to approximate the container's width */
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.rainbow-border-always {
+  position: relative;
+  padding: 2px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  /* Ensures the mask is applied within the card bounds */
+}
+
+.rainbow-border-always::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: linear-gradient(45deg,
+      #30005f,
+      /* vivid purple */
+      #45004e,
+      /* bright magenta */
+      #003166,
+      /* vivid blue */
+      #3f1b61,
+      /* blue violet */
+      #630939,
+      /* deep pink */
+      #0a2f53
+      /* dodger blue */
+    );
+  border-radius: inherit;
+  background-size: 200% 200%;
+  animation: chaotic-vivid-gradient 3s ease infinite;
+  opacity: 1;
+  /* Ensure opacity is always 1 */
+}
+
+@keyframes chaotic-vivid-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
   100% {
     background-position: 0% 50%;
   }

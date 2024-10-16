@@ -8,6 +8,11 @@ import { useGetConversationsQuery } from "@/features/conversation/api/get-conver
 import { Conversation, GroupedConverations } from "@/types/api";
 import { ConversationList } from "./conversation-list";
 import { ConversationListLoading } from "./conversation-list-loading";
+import {
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  MessageSquarePlus,
+} from "lucide-react";
 
 export function ConversationHistory({ onSelectedIdChange }: any) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,7 +27,7 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
       "This Week": [],
       "This Month": [],
       Old: [],
-    },
+    }
   );
 
   function handleSetExpanded(e: any) {
@@ -56,7 +61,7 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
       // Sort chats by created_at in descending order (latest first)
       const sortedChats = [...chats].sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
 
       // Collect all bookmarked chats
@@ -87,11 +92,24 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
       className={`${expanded ? "w-[250px] max-w-[250px] h-full" : "h-full"}`}
     >
       {!expanded && (
-        <div className="overflow-y-scroll no-scrollbar border-r border-[#7d7d7d68] h-full">
-          <div className="mx-2 mt-2">
-            <Button variant={"ghost"} className="p-2">
-              <PinRightIcon onClick={() => handleSetExpanded(true)} />
+        <div className="overflow-y-scroll no-scrollbar h-full">
+          <div className="mx-2 mt-2 flex flex-col items-center">
+            <Button
+              variant={"ghost"}
+              className="p-2"
+              onClick={() => handleSetExpanded(true)}
+            >
+              <ArrowRightToLine size={15} strokeWidth={1.5} />
             </Button>
+            <Tooltip content="New Conversation" side="right">
+              <Button
+                variant="ghost"
+                className="p-2"
+                onClick={async () => handleNewConversation()}
+              >
+                <MessageSquarePlus size={15} strokeWidth={1.5} />
+              </Button>
+            </Tooltip>
           </div>
         </div>
       )}
@@ -101,8 +119,12 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
         } border-r border-[#7d7d7d68] w-full h-full`}
       >
         <div className="flex justify-between items-center mx-2 mt-2">
-          <Button variant="ghost" className="p-2">
-            <PinLeftIcon onClick={() => handleSetExpanded(false)} />
+          <Button
+            variant="ghost"
+            className="p-2"
+            onClick={() => handleSetExpanded(false)}
+          >
+            <ArrowLeftToLine size={15} strokeWidth={1.5} />
           </Button>
           <Tooltip content="New Conversation" side="right">
             <Button
@@ -110,7 +132,7 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
               className="ml-2 p-2"
               onClick={async () => handleNewConversation()}
             >
-              <PlusIcon />
+              <MessageSquarePlus size={15} strokeWidth={1.5} />
             </Button>
           </Tooltip>
         </div>
