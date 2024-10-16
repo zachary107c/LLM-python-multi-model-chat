@@ -1,3 +1,4 @@
+import os
 import json
 import pytz
 import requests
@@ -16,7 +17,11 @@ from .serializers import (
     ConversationDetailSerializer,
     OllamaModelSerializer,
 )
-from .services import OllamaService
+from .services import OllamaService, OpenAIService, AzureOpenAIService
+
+PROMPTS = {
+    "three_suggestions": "You are an expert suggestion generator.\nYou generate three random questions a user could potentially ask to LLM, helping the user get started with a conversation.\nFor each of the questions you generate, you also generate a bucket title this question / request falls under.\nSome bucket examples might be:\n- Programming Questions\n- Fun Facts\n- General Knowledge\n- Story Creation\n- Jokes and Humor\n- etc\n\nResponse with three questions and their corresponding bucket as a json payload.\n\nExample response format:\n{\n  \"suggestions\": [\n    {\n      \"bucket\": \"Programming Questions\",\n      \"question\": \"How do I reverse a string in Python?\"\n    },\n    {\n      \"bucket\": \"Fun Facts\",\n      \"question\": \"What are some interesting facts about the universe?\"\n    },\n    {\n      \"bucket\": \"Story Creation\",\n      \"question\": \"Can you help me write a short story about a time-traveling detective?\"\n    }\n  ]\n}\n\nOnly repond with the JSON payload surounded in triple back ticks ``` and nothing else."
+}
 
 
 class Index(APIView):
@@ -169,7 +174,7 @@ class OllamaModelDetailWithInfoView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+        self.ollama_service = OllamaService()
 
     # Fetch and combine model data and Ollama details (GET)
     def get(self, request, pk):
@@ -248,7 +253,7 @@ class OllamaModelsPopulateAPIView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+        self.ollama_service = OllamaService()
 
     def post(self, request):
         try:
@@ -279,7 +284,7 @@ class OllamaChatAPIView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+        self.ollama_service = OllamaService()
 
     def post(self, request):
         try:
@@ -294,8 +299,10 @@ class OllamaChatAPIView(APIView):
 
             chat_completion = self.ollama_service.chat(model, messages)
 
-            if chat_completion:
+            if chat_completion and "error" not in chat_completion:
                 return Response(chat_completion, status=status.HTTP_200_OK)
+            elif chat_completion and "error" in chat_completion:
+                return Response(chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             else:
                 return Response(
                     {"error": "Failed to fetch response from Ollama API."},
@@ -313,56 +320,195 @@ class OllamaThreeSuggestionsAPIView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ollama_service = OllamaService(url="http://192.168.1.11:11434")
+        self.ollama_service = OllamaService()
 
-    def get(self, request):
-        prompt = """
-You are an expert suggestion generator.
-You generate three random questions a user could potentially ask to LLM, helping the user get started with a conversation.
-For each of the questions you generate, you also generate a bucket title this question / request falls under.
-Some bucket examples might be:
-- Programming Questions
-- Fun Facts
-- General Knowledge
-- Story Creation
-- Jokes and Humor
-- etc
+    def post(self, request):
+        model = request.data.get("model")
 
-Response with three questions and their corresponding bucket as a json payload.
-
-Example response format:
-{
-  "suggestions": [
-    {
-      "bucket": "Programming Questions",
-      "question": "How do I reverse a string in Python?"
-    },
-    {
-      "bucket": "Fun Facts",
-      "question": "What are some interesting facts about the universe?"
-    },
-    {
-      "bucket": "Story Creation",
-      "question": "Can you help me write a short story about a time-traveling detective?"
-    }
-  ]
-}
-
-Only repond with the JSON payload surounded in triple back ticks ``` and nothing else.
-"""
+        if not model :
+            return Response(
+                {"message": "Model is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        prompt = PROMPTS.get("three_suggestions")
         chat_completion = self.ollama_service.chat(
-            model="llama3.1", messages=[{"role": "user", "content": prompt}]
+            model=model, messages=[{"role": "user", "content": prompt}]
         )
 
-        if chat_completion:
+        if chat_completion and "error" not in chat_completion:
             try:
                 payload = json.loads(chat_completion["message"]["content"].replace("```json", "").replace("```", ""))
                 return Response(payload, status=status.HTTP_200_OK)
             except Exception as e:
                 chat_completion["external_message"] = f"Failed to decode the json -> {e}"
                 return Response(chat_completion, status=status.HTTP_200_OK)
+        elif chat_completion and "error" in chat_completion:
+            return Response(chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response(
-                {"error": "Failed to fetch response from Ollama API."},
+                {"message": "Failed to fetch response from Ollama API."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class OpenAIChatAPIView(APIView):
+    """
+    View to handle chat requests with the OpenAI API.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.openai_service = OpenAIService()
+
+    def post(self, request):
+        try:
+            model = request.data.get("model")
+            messages = request.data.get("messages")
+
+            if not model or not messages:
+                return Response(
+                    {"error": "Model and messages are required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            chat_completion = self.openai_service.chat(model, messages)
+
+            if chat_completion and "error" not in chat_completion:
+                return Response(chat_completion, status=status.HTTP_200_OK)
+            elif chat_completion and "error" in chat_completion:
+                return Response(
+                    chat_completion,
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+            else:
+                return Response(
+                    {"error": "Failed to fetch response from OpenAI API."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class OpenAIThreeSuggestionsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.openai_service = OpenAIService()
+
+    def post(self, request):
+        model = request.data.get("model")
+
+        if not model :
+            return Response(
+                {"error": "Model is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        prompt = PROMPTS.get("three_suggestions")
+        chat_completion = self.openai_service.chat(
+            model=model, messages=[{"role": "user", "content": prompt}]
+        )
+
+        print(type(chat_completion))
+
+        if chat_completion and "error" not in chat_completion:
+            try:
+                payload = json.loads(chat_completion["choices"][0]["message"]["content"].replace("```json", "").replace("```", ""))
+                return Response(payload, status=status.HTTP_200_OK)
+            except Exception as e:
+                chat_completion["external_message"] = f"Failed to decode the json -> {e}"
+                return Response(chat_completion, status=status.HTTP_200_OK)
+        elif chat_completion and "error" in chat_completion:
+            return Response(chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(
+                {"error": "Failed to fetch response from OpenAI API."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class AzureOpenAIChatAPIView(APIView):
+    """
+    View to handle chat requests with the OpenAI API.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.azure_openai_service = AzureOpenAIService()
+
+    def post(self, request):
+        try:
+            model = request.data.get("model")
+            messages = request.data.get("messages")
+
+            if not model or not messages:
+                return Response(
+                    {"message": "Model and messages are required."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            chat_completion = self.azure_openai_service.chat(model, messages)
+
+            if chat_completion and "error" not in chat_completion:
+                return Response(chat_completion, status=status.HTTP_200_OK)
+            elif chat_completion and "error" in chat_completion:
+                return Response(
+                    chat_completion,
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+            else:
+                return Response(
+                    {"message": "Failed to fetch response from Azure OpenAI API."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class AzureOpenAIThreeSuggestionsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.azure_openai_service = AzureOpenAIService()
+
+    def post(self, request):
+        model = request.data.get("model")
+
+        if not model :
+            return Response(
+                {"message": "Model is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        prompt = PROMPTS.get("three_suggestions")
+        chat_completion = self.azure_openai_service.chat(
+            model="llama3.1", messages=[{"role": "user", "content": prompt}]
+        )
+
+        if chat_completion and "error" not in chat_completion:
+            try:
+                payload = json.loads(chat_completion["choices"][0]["message"]["content"].replace("```json", "").replace("```", ""))
+                return Response(payload, status=status.HTTP_200_OK)
+            except Exception as e:
+                chat_completion["external_message"] = f"Failed to decode the json -> {e}"
+                return Response(chat_completion, status=status.HTTP_200_OK)
+        elif chat_completion and "error" in chat_completion:
+            return Response(chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response(
+                {"message": "Failed to fetch response from Azure OpenAI API."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

@@ -19,6 +19,8 @@ django-cors-headers = "^4.4.0"
 django-rest-knox = "^5.0.1"
 python-decouple = "^3.8"
 pytz = "^2024.2"
+openai = "^1.51.2"
+python-dotenv = "^1.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

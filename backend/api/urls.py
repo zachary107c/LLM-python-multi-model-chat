@@ -15,5 +15,9 @@ urlpatterns = [
     path("ollama/models/<int:pk>/", views.OllamaModelDetailWithInfoView.as_view(), name="model-detail"),
     path("ollama/models/populate/", views.OllamaModelsPopulateAPIView.as_view(), name="model-populate"),
     path("ollama/chat/", views.OllamaChatAPIView.as_view(), name="ollama-chat"),
-    path("ollama/suggestions/", views.OllamaThreeSuggestionsAPIView.as_view(), name="ollama-suggestions")
+    path("ollama/suggestions/", views.OllamaThreeSuggestionsAPIView.as_view(), name="ollama-suggestions"),
+    path("openai/chat/", views.OpenAIChatAPIView.as_view(), name="openai-chat"),
+    path("openai/suggestions/", views.OpenAIThreeSuggestionsAPIView.as_view(), name="openai-suggestions"),
+    path("azureopenai/chat/", views.AzureOpenAIChatAPIView.as_view(), name="azure-openai-chat"),
+    path("azureopenai/suggestions/", views.AzureOpenAIThreeSuggestionsAPIView.as_view(), name="azure-openai-suggestions"),
 ]

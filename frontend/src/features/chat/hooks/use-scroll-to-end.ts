@@ -1,14 +1,14 @@
-import { useEffect, useRef } from 'react';
-import { AssistantMessage, UserMessage } from '@/types/api';
+import { useEffect, useRef } from "react";
+import { AssistantMessage, UserMessage } from "@/types/api";
 
 const useScrollToEnd = (messages: (UserMessage | AssistantMessage)[]) => {
-    const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        ref.current?.scrollIntoView({ behavior: 'smooth'});
-    }, [messages]);
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-    return ref;
+  return ref;
 };
 
 export default useScrollToEnd;

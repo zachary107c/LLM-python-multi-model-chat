@@ -1,13 +1,13 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import React from "react";
+import { Navigate } from "react-router-dom";
+import Cookies from "js-cookie";
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 // Function to check if a CSRF token exists in the cookies
 const hasToken = (): boolean => {
-  const token = Cookies.get('token'); // Retrieve the csrf token from cookies
+  const token = Cookies.get("token"); // Retrieve the csrf token from cookies
   return !!token; // Return true if the csrf token exists
 };
 

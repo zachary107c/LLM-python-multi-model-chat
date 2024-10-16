@@ -16,7 +16,7 @@ const markedInstance = new Marked(
       const language = hljs.getLanguage(lang) ? lang : "plaintext";
       return hljs.highlight(code, { language }).value;
     },
-  })
+  }),
 );
 
 // Configure marked for better rendering
