@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Tooltip, Popover } from "@radix-ui/themes";
+import { Popover } from "@radix-ui/themes";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { DeleteConversationModal } from "./delete-conversation-modal";
 import { UpdateConversationModal } from "./edit-conversation-modal";

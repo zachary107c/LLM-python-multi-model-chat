@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tooltip, Text } from "@radix-ui/themes";
-import { PlusIcon, PinLeftIcon, PinRightIcon } from "@radix-ui/react-icons";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
 import { useGetConversationsQuery } from "@/features/conversation/api/get-conversations";
 import { Conversation, GroupedConverations } from "@/types/api";
