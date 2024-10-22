@@ -7,8 +7,8 @@ export const useGetSuggestionsQuery = () => {
   return useQuery({
     queryFn: async (): Promise<Suggestions | null> => {
       return api.post(
-        "/ollama/suggestions/",
-        { model: "llama3.1" },
+        "/suggestions/",
+        { provider: "ollama", model: "llama3.1" },
         {
           headers: {
             Authorization: `Token ${Cookies.get("token")}`,

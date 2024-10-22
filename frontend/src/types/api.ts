@@ -75,6 +75,7 @@ export type BaseModelEntity = {
   name: string;
   model: string;
   liked: boolean;
+  provider: string;
   color:
     | "gray"
     | "gold"
@@ -118,7 +119,7 @@ export type ModelDetails = {
 };
 
 export type ModelDetail = ModelEntity<{
-  details: ModelDetails;
+  details: ModelDetails | null;
 }>;
 
 export type GenerateConversationTitle = {
@@ -147,3 +148,8 @@ export type Suggestion = {
 export type Suggestions = {
   suggestions: Suggestion[];
 };
+
+export type Provider = {
+  id: number;
+  name: string;
+}

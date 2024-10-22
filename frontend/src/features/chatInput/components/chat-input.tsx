@@ -12,6 +12,7 @@ import { BaseModelEntity } from "@/types/api";
 import { Button as LocalButton } from "@/components/ui/button";
 import { ImageUploadButton } from "@/features/imageUpload/components/image-upload-button";
 import { Rocket, Folder, X } from "lucide-react";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
 interface Props {
   onSendMessage: (message: string, image: File | null) => void;
@@ -80,6 +81,15 @@ export function ChatInput({
     console.log("File cleared from parent component");
   };
 
+  const groupedModels = models?.reduce((acc, model) => {
+    const { provider } = model; // Ensure your model has a provider field
+    if (!acc[provider]) {
+      acc[provider] = [];
+    }
+    acc[provider].push(model);
+    return acc;
+  }, {} as Record<string, BaseModelEntity[]>);
+
   return (
     <div className="chat-input mb-4 flex flex-col w-full">
       <form onSubmit={handleSendMessage} className="flex justify-between">
@@ -126,14 +136,31 @@ export function ChatInput({
                         </Button>
                       </DropdownMenu.Trigger>
                       <DropdownMenu.Content>
-                        {models?.map((model) => (
-                          <DropdownMenu.Item
-                            onClick={() => handleModelChange(model)}
-                            key={model.id}
-                          >
-                            {model.name}
-                          </DropdownMenu.Item>
-                        ))}
+                        {groupedModels &&
+                          Object.keys(groupedModels).map((provider) => (
+                            <DropdownMenu.Group key={provider}>
+                              <Badge
+                                variant="soft"
+                                className="w-full"
+                                color="gray"
+                              >
+                                <Text size="2" weight="bold">
+                                  {provider}
+                                </Text>
+                              </Badge>
+                              {groupedModels[provider].map((model) => (
+                                <DropdownMenu.Item
+                                  onClick={() => handleModelChange(model)}
+                                  key={model.id}
+                                  color={model.color}
+                                >
+                                  <Text size="1" weight="regular">
+                                    {model.model}
+                                  </Text>
+                                </DropdownMenu.Item>
+                              ))}
+                            </DropdownMenu.Group>
+                          ))}
                       </DropdownMenu.Content>
                     </DropdownMenu.Root>
                     <div className="ml-2">

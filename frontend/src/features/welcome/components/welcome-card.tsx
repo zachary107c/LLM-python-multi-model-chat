@@ -18,7 +18,7 @@ export function WelcomeCard({
   }
 
   return (
-    <div className="p-1 w-full h-32 overflow-y-scroll no-scrollbar">
+    <div className="p-1 w-full h-44 overflow-y-scroll no-scrollbar">
       <Button
         variant="ghost-no-hover"
         className="p-0 m-0 flex items-center h-full w-full text-wrap"

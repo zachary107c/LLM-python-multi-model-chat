@@ -44,7 +44,6 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
         summaryPayload,
       );
       const summary = summaryResponse.data.message.content.replace(/"/g, "");
-      console.log("Summary:", summary);
 
       const payload = {
         model: "llama3.1",

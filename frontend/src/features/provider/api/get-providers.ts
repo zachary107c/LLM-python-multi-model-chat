@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import { BaseModelEntity } from "@/types/api";
+import { Provider } from "@/types/api";
 import Cookies from "js-cookie";
 
-export const useGetModelsQuery = () => {
+export const useGetProvidersQuery = () => {
   return useQuery({
-    queryFn: async (): Promise<BaseModelEntity[]> => {
-      return api.get(`/models/`, {
+    queryFn: (): Promise<Provider[]> => {
+      return api.get(`/providers/`, {
         headers: { Authorization: `Token ${Cookies.get("token")}` },
       });
     },
-    queryKey: ["models"],
+    queryKey: ["providers"],
     staleTime: 1000 * 60 * 0.25,
   });
 };

@@ -1,11 +1,11 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import Conversation, UserMessage, AssistantMessage, OllamaModel
+from .models import Conversation, UserMessage, AssistantMessage, Model
 
 
-class OllamaModelSerializer(serializers.ModelSerializer):
+class ModelSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OllamaModel
+        model = Model
         fields = "__all__"
         read_only_fields = ["id", "name", "model"]
 
@@ -36,7 +36,7 @@ class UserMessageSerializer(serializers.ModelSerializer):
 
 
 class AssistantMessageSerializer(serializers.ModelSerializer):
-    model = serializers.PrimaryKeyRelatedField(queryset=OllamaModel.objects.all())
+    model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
 
     class Meta:
         model = AssistantMessage
@@ -44,7 +44,7 @@ class AssistantMessageSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["model"] = OllamaModelSerializer(instance.model).data
+        representation["model"] = ModelSerializer(instance.model).data
         representation["type"] = "assistant"
         return representation
 

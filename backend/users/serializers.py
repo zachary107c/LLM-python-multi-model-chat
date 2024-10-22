@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile
-from api.serializers import OllamaModelSerializer
+from api.serializers import ModelSerializer
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -46,7 +46,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    preferred_model = OllamaModelSerializer(read_only=True)
+    preferred_model = ModelSerializer(read_only=True)
     image = serializers.ImageField()
 
     class Meta:

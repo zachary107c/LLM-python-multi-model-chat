@@ -1,13 +1,20 @@
+import os
 import requests
 from django.core.management.base import BaseCommand
-from api.models import OllamaModel
+from api.models import Model
 
 
 class Command(BaseCommand):
-    help = "Populate OllamaModel table with models from Ollama API"
+    help = "Populate Model table with models from Ollama"
 
     def handle(self, *args, **kwargs):
-        api_url = "http://127.0.0.1:11434/api/tags"
+        ollama_endpoint = os.getenv("OLLAMA_ENDPOINT")
+
+        if not ollama_endpoint:
+            self.stderr.write(self.style.WARNING("No ollama endpoint provided. Did you forget to set the OLLAMA_ENDPOINT variable in the .env?"))
+            return
+
+        api_url = f"{ollama_endpoint}/api/tags"
 
         try:
             response = requests.get(api_url)
@@ -23,9 +30,10 @@ class Command(BaseCommand):
             model = model_data.get("model")
 
             if name and model:
-                ollama_model, created = OllamaModel.objects.update_or_create(
+                _, created = Model.objects.update_or_create(
                     name=name,
                     model=model,
+                    provider="ollama",
                     defaults={"name": name, "model": model}
                 )
 

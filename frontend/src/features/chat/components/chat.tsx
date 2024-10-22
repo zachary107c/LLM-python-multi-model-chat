@@ -36,7 +36,7 @@ interface ChatProps {
 
 export function Chat({ chatId, onCreateNewChat }: ChatProps) {
   const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>(
-    [],
+    []
   );
   const [model, setModel] = useState<BaseModelEntity | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -97,10 +97,11 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
   }, [data]);
 
   useEffect(() => {
-    if (models && models?.length > 0 && !model) {
-      setModel(models[0]);
+    if (models && models.length > 0 && !model) {
+      const preferredModel = models.find((m) => m.name === "llama3.1:latest");
+      setModel(preferredModel ? preferredModel : models[0]);
     }
-  }, [models]);
+  }, [models, model]);
 
   useEffect(() => {
     if (
@@ -195,6 +196,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
       var image_data = await toDataURL(userPostData.image);
       var payload = {
         model: model?.name,
+        provider: model?.provider,
         messages: [
           {
             role: "user",
@@ -203,7 +205,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           },
         ],
       };
-      const response = await api.post("/ollama/chat/", payload, {
+      const response = await api.post("/chat/", payload, {
         headers: {
           Authorization: `Token ${Cookies.get("token")}`,
         },

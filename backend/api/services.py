@@ -2,11 +2,26 @@ import os
 import openai
 import logging
 from typing import List, Dict
+from abc import ABC, abstractmethod
 from openai import OpenAI, AzureOpenAI
 from ollama import Client, RequestError, ResponseError
 
 
-class OllamaService:
+class LLMService(ABC):
+    @abstractmethod
+    def chat(self, model: str, messages: List[Dict[str, str]], **kwargs) -> Dict:
+        pass
+
+    @abstractmethod
+    def get_models(self) -> Dict:
+        pass
+
+    @abstractmethod
+    def get_model(self) -> Dict:
+        pass
+
+
+class OllamaService(LLMService):
     """
     A service class for interacting with an Ollama API.
     """
@@ -20,8 +35,6 @@ class OllamaService:
             client (Client, optional): An instance of the Client class. If not provided, a new Client will be created using the specified endpoint.
         """
         self.endpoint = endpoint or os.getenv("OLLAMA_ENDPOINT")
-
-        print(f"OLLAMA ENDPOINT of: {self.endpoint}")
 
         if self.endpoint:
             self.client = client or Client(self.endpoint)
@@ -48,7 +61,7 @@ class OllamaService:
 
         if not self.client:
             return {
-                "message": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
             }
 
         try:
@@ -56,9 +69,9 @@ class OllamaService:
             return response
         except (RequestError, ResponseError) as e:
             self.logger.error(f"API request failed: {e}")
-            return {"message": str(e)}
+            return {"error": str(e)}
 
-    def models(self) -> List[Dict]:
+    def get_models(self) -> List[Dict]:
         """
         Retrieves a list of available models from the Ollama API.
 
@@ -71,7 +84,7 @@ class OllamaService:
 
         if not self.client:
             return {
-                "message": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
             }
 
         try:
@@ -79,22 +92,22 @@ class OllamaService:
             return models_list
         except (RequestError, ResponseError) as e:
             self.logger.error(f"Failed to retrieve models: {e}")
-            return {"message": str(e)}
+            return {"error": str(e)}
 
-    def model(self, model_name: str) -> Dict:
+    def get_model(self, model_name: str) -> Dict:
         if not self.client:
             return {
-                "message": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
             }
 
         try:
             model_info = self.client.show(model=model_name)
             return model_info
         except (RequestError, ResponseError) as e:
-            return {"message": str(e)}
+            return {"error": str(e)}
 
 
-class OpenAIService:
+class OpenAIService(LLMService):
     """
     A service class for interacting with OpenAI's Chat Completions API.
     """
@@ -131,7 +144,7 @@ class OpenAIService:
             openai.error.OpenAIError: If the API request fails.
         """
         if not self.client:
-            return {"message": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."}
+            return {"error": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."}
 
         try:
             from openai.types.chat import ChatCompletion
@@ -139,13 +152,34 @@ class OpenAIService:
                 model=model, messages=messages, **kwargs
             )
 
-            return response.model_dump()
+            response_json = response.model_dump()
+
+            response_json["message"] = response_json["choices"][0]["message"]
+            del response_json["choices"]
+
+            return response_json
         except Exception as e:
             self.logger.error(f"OpenAI API request failed: {e}")
-            return {"message": str(e)}
+            return {"error": str(e)}
+
+    def get_models(self) -> Dict:
+        if not self.client:
+            return {"error": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."}
+
+        model_list = self.client.models.list()
+
+        print("Model list:", model_list)
+
+        return []
+
+    def get_model(self) -> Dict:
+        if not self.client:
+            return {"error": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."}
+
+        return {}
 
 
-class AzureOpenAIService:
+class AzureOpenAIService(LLMService):
     """
     A service class for interacting with Azure's implementation of OpenAI's Chat Completions API.
     """
@@ -194,7 +228,7 @@ class AzureOpenAIService:
         """
 
         if not self.client:
-            return {"message": "Missing either Azure endpoint, apikey, or version."}
+            return {"error": "Missing either Azure endpoint, apikey, or version."}
 
         try:
             from openai.types.chat import ChatCompletion
@@ -204,4 +238,23 @@ class AzureOpenAIService:
             return response.model_dump()
         except openai.error.OpenAIError as e:
             self.logger.error(f"Azure OpenAI API request failed: {e}")
-            return {"message": str(e)}
+            return {"error": str(e)}
+
+    def get_models(self) -> Dict:
+        pass
+
+    def get_model(self) -> Dict:
+        pass
+
+
+class LLMServiceFactory:
+    @staticmethod
+    def get_service(provider: str = "ollama") -> LLMService:
+        if provider == "ollama":
+            return OllamaService()
+        elif provider == "openai":
+            return OpenAIService()
+        elif provider == "azure_openai":
+            return AzureOpenAIService()
+        else:
+            return None
