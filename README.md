@@ -1,5 +1,7 @@
 # BS-LLM-WebUI
 
+_Inspired by [nulzo - Ollama WebUI](https://github.com/nulzo/Ollama-WebUI)_
+
 ![image](https://github.com/user-attachments/assets/08bce57d-75d9-4a41-81dc-babaa85c386f)
 
 ![image](https://github.com/user-attachments/assets/2ce45a75-7838-4aad-934e-541132ce2c61)
