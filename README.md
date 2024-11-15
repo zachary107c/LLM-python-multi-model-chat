@@ -1,5 +1,7 @@
 # BS-LLM-WebUI
 
+_Inspired by [nulzo - Ollama WebUI](https://github.com/nulzo/Ollama-WebUI)_
+
 ![image](https://github.com/user-attachments/assets/08bce57d-75d9-4a41-81dc-babaa85c386f)
 
 ![image](https://github.com/user-attachments/assets/2ce45a75-7838-4aad-934e-541132ce2c61)
@@ -27,6 +29,7 @@ BS-LLM-WebUI is a web application with a frontend built using React and Vite, an
 - **[Ollama](https://ollama.com/)**: Ensure you have Ollama installed on your machine, or a machine on your local network.
 
 ## Quickstart using Docker
+
 ```sh
 docker compose up --build
 ```
@@ -34,16 +37,19 @@ docker compose up --build
 ## Frontend Setup (React with Vite)
 
 ### 1. Navigate to the Frontend Directory
+
 ```sh
 cd frontend
 ```
 
 ### 2. Install Dependencies
+
 ```sh
 npm install
 ```
 
 ### 3. Start the Development Server
+
 ```sh
 npm run dev
 ```
@@ -53,26 +59,31 @@ This will start the Vite development server, and you should be able to access th
 ## Backend Setup (Django with Poetry)
 
 ### 1. Navigate to the Backend Directory
+
 ```sh
 cd backend
 ```
 
 ### 2. Install Dependencies via Poetry
+
 ```sh
 poetry install
 ```
 
 ### 3. Apply Database Migrations
+
 ```sh
 poetry run python manage.py migrate
 ```
 
 ### 4. Create a Superuser (Optional, but recommended)
+
 ```sh
 poetry run python manage.py createsuperuser
 ```
 
 ### 5. Start the Django Development Server
+
 ```sh
 poetry run python manage.py runserver
 ```

@@ -1,1 +1,12 @@
-ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS="192.168.1.11,localhost,127.0.0.1"
+
+# Ollama Settings
+OLLAMA_ENDPOINT="http://localhost:11434"
+
+# OpenAI Settings
+OPENAI_API_KEY=""
+
+# Azure OpenAI Settings
+AZURE_OPENAI_ENDPOINT=""
+AZURE_OPENAI_API_KEY=""
+AZURE_OPENAI_VERSION=""

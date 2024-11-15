@@ -1,0 +1,29 @@
+[
+    {
+        "model": "api.Model",
+        "pk": 1,
+        "fields": {
+            "name": "gpt-4o",
+            "model": "gpt-4o",
+            "provider": "openai"
+        }
+    },
+    {
+        "model": "api.Model",
+        "pk": 1,
+        "fields": {
+            "name": "gpt-4o",
+            "model": "gpt-4o",
+            "provider": "openai"
+        }
+    },
+    {
+        "model": "api.Model",
+        "pk": 2,
+        "fields": {
+            "name": "gpt-4o-mini",
+            "model": "gpt-4o-mini",
+            "provider": "openai"
+        }
+    }
+]

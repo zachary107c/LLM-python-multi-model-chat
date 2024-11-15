@@ -1,11 +1,13 @@
-import { api } from '@/lib/api-client';
-import { UserMessage } from '@/types/api';
-import Cookies from 'js-cookie';
+import { api } from "@/lib/api-client";
+import { UserMessage } from "@/types/api";
+import Cookies from "js-cookie";
 
 export const getUserMessage = ({
-    messageId,
+  messageId,
 }: {
-    messageId: string;
+  messageId: string;
 }): Promise<{ data: UserMessage }> => {
-    return api.get(`/messages/user/${messageId}/`, { headers: { Authorization: `Token ${Cookies.get('token')}` } });
+  return api.get(`/messages/user/${messageId}/`, {
+    headers: { Authorization: `Token ${Cookies.get("token")}` },
+  });
 };

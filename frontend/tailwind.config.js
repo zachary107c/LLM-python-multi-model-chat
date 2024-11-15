@@ -1,22 +1,24 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: {
-    files: ["./index.html",
+    files: [
+      "./index.html",
       "./pages/**/*.{ts,tsx}",
       "./components/**/*.{ts,tsx}",
       "./app/**/*.{ts,tsx}",
-      "./src/**/*.{ts,tsx,html}"]
+      "./src/**/*.{ts,tsx,html}",
+    ],
   },
   theme: {
     extend: {
       transitionDuration: {
-        '2000': '2000ms',
-        '3000': '3000ms',
-        '4000': '4000ms',
-        '10000': '10000ms',
+        2000: "2000ms",
+        3000: "3000ms",
+        4000: "4000ms",
+        10000: "10000ms",
       },
       fontFamily: {
-        "work-sans": ["Work Sans"]
+        "work-sans": ["Work Sans"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -79,8 +81,5 @@ export default {
       },
     },
   },
-  plugins: [
-    require('tailwind-scrollbar'),
-    require("tailwindcss-animate"),
-  ],
-}
+  plugins: [require("tailwind-scrollbar"), require("tailwindcss-animate")],
+};
