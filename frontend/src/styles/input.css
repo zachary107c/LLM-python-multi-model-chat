@@ -89,13 +89,13 @@
   }
 }
 
-/* .main-page {
+.main-page {
   background: radial-gradient(at 100% 0%,
       rgba(0, 45, 245, 0.106) 0px,
       transparent 50%),
     radial-gradient(at 93% 98%, hsla(237, 98%, 52%, 0) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(0, 17, 255, 0.095) 0px, transparent 50%);
-} */
+}
 
 .chat-history {
   background-image: url("http://127.0.0.1:8000/api/v1/media/user_message_images/snow2.gif");
@@ -315,4 +315,23 @@
 
 .gradient-background {
   background: linear-gradient(to right, transparent, #e5e7eb); /* #e5e7eb equals Tailwind's gray-200 */
+}
+
+.rotate {
+  animation: overRotateBounce 1s infinite ease-in-out;
+}
+
+@keyframes overRotateBounce {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(360deg);
+  }
+  70% {
+    transform: rotate(380deg); /* Over-rotate a bit */
+  }
+  100% {
+    transform: rotate(360deg); /* Rotate back */
+  }
 }

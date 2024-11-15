@@ -76,11 +76,12 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
         } else {
           return {
             type: message.type,
-            content: message.content,
             id: message.id,
             created_at: message.created_at,
             model: message.model,
             provider: message.provider,
+            content_variations: message.content_variations,
+            generated_by: message.generated_by,
             liked: message.liked,
             conversation: message.conversation,
           } as AssistantMessage;
@@ -214,16 +215,18 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
       const assistantPostData = await createAssistantMessage({
         data: {
           conversation: currentChatId,
-          content: (response as any).message.content,
+          content_variations: [(response as any).message.content],
           model: model?.id || -1,
           provider: "ollama",
+          generated_by: newUserMessage.id
         },
       });
 
       const newAssistantMessage: AssistantMessage = {
         id: assistantPostData.id,
         created_at: assistantPostData.created_at,
-        content: assistantPostData.content,
+        content_variations: assistantPostData.content_variations,
+        generated_by: newUserMessage,
         conversation: assistantPostData.conversation,
         model: assistantPostData.model,
         provider: assistantPostData.provider,

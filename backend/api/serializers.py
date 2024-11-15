@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import Conversation, UserMessage, AssistantMessage, Model
+from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -35,12 +35,20 @@ class UserMessageSerializer(serializers.ModelSerializer):
         return representation
 
 
+class ContentVariationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContentVariation
+        fields = ['id', 'content']
+
+
 class AssistantMessageSerializer(serializers.ModelSerializer):
     model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
+    content_variations = ContentVariationSerializer(many=True)
+    generated_by = UserMessageSerializer()
 
     class Meta:
         model = AssistantMessage
-        fields = "__all__"
+        fields = '__all__'
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

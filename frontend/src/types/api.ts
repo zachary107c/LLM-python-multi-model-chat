@@ -14,9 +14,15 @@ export type UserMessage = Entity<{
   type: string;
 }>;
 
+export type ContentVariation = {
+  id: number;
+  content: string;
+}
+
 export type AssistantMessage = Entity<{
   conversation: string;
-  content: string;
+  content_variations: ContentVariation[];
+  generated_by: UserMessage;
   model: BaseModelEntity;
   provider: string;
   liked: boolean;
