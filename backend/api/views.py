@@ -9,7 +9,7 @@ from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import Conversation, UserMessage, AssistantMessage, Model
+from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation
 from .serializers import (
     ConversationSerializer,
     UserMessageSerializer,
@@ -133,10 +133,38 @@ class AssistantListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return AssistantMessage.objects.filter(conversation__user=self.request.user)
 
-    def get(self, request):
-        messages = self.get_queryset()
-        serializer = self.get_serializer(messages, many=True)
-        return Response(serializer.data)
+    def post(self, request, *args, **kwargs):
+        # Get the conversation and model from the request
+        conversation_id = request.data.get("conversation")
+        model_id = request.data.get("model")
+
+        # Retrieve the conversation and model instances
+        conversation = Conversation.objects.get(id=conversation_id, user=self.request.user)
+        model = Model.objects.get(id=model_id)
+
+        # Retireve the user message used to generate this assistant message
+        user_message = UserMessage.objects.get(id=request.data.get("generated_by"))
+
+        # Create an AssistantMessage instance without committing to the database
+        assistant_message = AssistantMessage(
+            conversation=conversation,
+            model=model,
+            provider=request.data.get("provider"),
+            liked=request.data.get("liked", False),
+            generated_by=user_message
+        )
+
+        assistant_message.save()  # Save the AssistantMessage to generate an ID
+
+        content_variations_data = request.data.get("content_variations", [])
+        for content in content_variations_data:
+            # Create a new ContentVariation instance
+            content_variation = ContentVariation.objects.create(content=content)
+            # Associate it with the AssistantMessage
+            assistant_message.content_variations.add(content_variation)
+
+        serializer = self.get_serializer(assistant_message)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -155,6 +183,13 @@ class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+
+        # Add single content variation if provided
+        new_content = request.data.get("new_content_variation", None)
+        if new_content:
+            content_variation = ContentVariation.objects.create(content=new_content)
+            instance.content_variations.add(content_variation)
+
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

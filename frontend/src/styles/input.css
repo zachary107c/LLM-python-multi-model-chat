@@ -89,13 +89,13 @@
   }
 }
 
-/* .main-page {
+.main-page {
   background: radial-gradient(at 100% 0%,
       rgba(0, 45, 245, 0.106) 0px,
       transparent 50%),
     radial-gradient(at 93% 98%, hsla(237, 98%, 52%, 0) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(0, 17, 255, 0.095) 0px, transparent 50%);
-} */
+}
 
 .chat-history {
   background-image: url("http://127.0.0.1:8000/api/v1/media/user_message_images/snow2.gif");
@@ -113,6 +113,36 @@
 }
 
 .rainbow-border::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: linear-gradient(45deg,
+      #8000ff,
+      /* vivid purple */
+      #db00f8,
+      /* bright magenta */
+      #007bff,
+      /* vivid blue */
+      #a547fd,
+      /* blue violet */
+      #fa1790,
+      /* deep pink */
+      #fa6f1e
+      /* dodger blue */
+    );
+  border-radius: inherit;
+  background-size: 200% 200%;
+  animation: chaotic-vivid-gradient 3s ease infinite;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
+}
+
+.dark .rainbow-border::before {
   content: "";
   position: absolute;
   top: -2px;
@@ -139,7 +169,7 @@
   animation: chaotic-vivid-gradient 3s ease infinite;
   opacity: 0;
   transition: opacity 0.1s ease;
-  /* mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%); */
+  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
 }
 
 .rainbow-border:hover::before {
@@ -218,6 +248,36 @@
   bottom: -2px;
   z-index: -1;
   background: linear-gradient(45deg,
+      #8000ff,
+      /* vivid purple */
+      #db00f8,
+      /* bright magenta */
+      #007bff,
+      /* vivid blue */
+      #a547fd,
+      /* blue violet */
+      #fa1790,
+      /* deep pink */
+      #fa6f1e
+      /* dodger blue */
+    );
+  border-radius: inherit;
+  background-size: 200% 200%;
+  animation: chaotic-vivid-gradient 3s ease infinite;
+  opacity: 1;
+  transition: opacity 0.1s ease;
+  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
+}
+
+.dark .rainbow-border-always::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: linear-gradient(45deg,
       #30005f,
       /* vivid purple */
       #45004e,
@@ -235,7 +295,8 @@
   background-size: 200% 200%;
   animation: chaotic-vivid-gradient 3s ease infinite;
   opacity: 1;
-  /* Ensure opacity is always 1 */
+  transition: opacity 0.1s ease;
+  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
 }
 
 @keyframes chaotic-vivid-gradient {
@@ -254,4 +315,23 @@
 
 .gradient-background {
   background: linear-gradient(to right, transparent, #e5e7eb); /* #e5e7eb equals Tailwind's gray-200 */
+}
+
+.rotate {
+  animation: overRotateBounce 1s infinite ease-in-out;
+}
+
+@keyframes overRotateBounce {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(360deg);
+  }
+  70% {
+    transform: rotate(380deg); /* Over-rotate a bit */
+  }
+  100% {
+    transform: rotate(360deg); /* Rotate back */
+  }
 }

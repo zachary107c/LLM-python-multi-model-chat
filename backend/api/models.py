@@ -75,11 +75,19 @@ class UserMessage(models.Model):
     def __str__(self):
         return f"User Message {self.id} - {self.conversation.user.username}"
 
+class ContentVariation(models.Model):
+    # Model to store different content versions
+    id = models.AutoField(primary_key=True)
+    content = models.TextField()
+
+    def __str__(self):
+        return f"Content Variation {self.id}"
 
 class AssistantMessage(models.Model):
     id = models.AutoField(primary_key=True)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
-    content = models.TextField()
+    content_variations = models.ManyToManyField(ContentVariation)
+    generated_by = models.ForeignKey(UserMessage, on_delete=models.DO_NOTHING)
     model = models.ForeignKey(Model, on_delete=models.DO_NOTHING)
     provider = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
