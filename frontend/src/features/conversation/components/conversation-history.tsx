@@ -142,7 +142,7 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
                 <div>
                   <div className="flex items-center justify-start">
                     <Text weight="bold" size="1" className="mr-1">
-                      Bookmarked Chats
+                      Chats You Loved
                     </Text>
                     <Text
                       weight="light"

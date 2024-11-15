@@ -37,7 +37,9 @@ export default function Panel({
         </div>
       )}
       <div
-        className={`flex ${role === "user" ? "justify-end" : "justify-start"} rainbow-border-always`}
+        className={`flex ${
+          role === "user" ? "justify-end" : "justify-start"
+        } rainbow-border-always`}
       >
         <Card className="w-fit flex flex-col">
           {image}

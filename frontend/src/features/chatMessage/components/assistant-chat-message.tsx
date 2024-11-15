@@ -1,4 +1,5 @@
-import { Flex, Card, Text, Badge } from "@radix-ui/themes";
+import { Flex, Card, Text } from "@radix-ui/themes";
+import { DividerVerticalIcon, SlashIcon } from "@radix-ui/react-icons";
 import { deleteAssistantMessageMutation } from "@/features/chatMessage/api/delete-assistant-message";
 import { LikeMessageButton } from "./like-message-button";
 import { DeleteMessageModal } from "./delete-message-modal";
@@ -20,14 +21,16 @@ export function AssistantChatMessage({
         <div>
           <div className="mb-1 flex justify-start items-center">
             <div className="flex items-center">
-              <Badge
-                variant="surface"
+              <Text
                 color={assistantMessageData.model.color}
-                className="mr-1"
-                radius="large"
+                className="ml-1"
+                size='1'
               >
                 {assistantMessageData.model.name}
-              </Badge>
+              </Text>
+              <Text>
+                <SlashIcon />
+              </Text>
               <Text weight="light" size="1">
                 {new Date(assistantMessageData.created_at).toLocaleDateString(
                   "en-US",
