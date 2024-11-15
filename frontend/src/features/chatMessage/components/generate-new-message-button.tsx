@@ -18,6 +18,24 @@ const GenerateNewMessageButton: React.FC<{
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const toDataURL = async (url: string | null): Promise<string | null> => {
+    if (!url) return null;
+    const response = await fetch(url);
+    const blob = await response.blob();
+    console.log(blob);
+
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Data = reader.result as string;
+        const base64String = base64Data.split(",")[1];
+        resolve(base64String);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
   const handleClick = async () => {
     setIsLoading(true);
     var assistantMessageId = assistantMessage.id;
@@ -29,9 +47,14 @@ const GenerateNewMessageButton: React.FC<{
           {
             role: "user",
             content: assistantMessage.generated_by.content,
+            images: []
           },
         ],
       };
+      if (assistantMessage.generated_by.image) {
+        payload["messages"][0]["images"] = [await toDataURL(assistantMessage.generated_by.image)]
+      }
+      console.log(payload)
       const response = await api.post("/chat/", payload, {
         headers: {
           Authorization: `Token ${Cookies.get("token")}`,

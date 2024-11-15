@@ -26,19 +26,19 @@ class UserMessageSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        request = self.context.get("request")
-        representation["type"] = "user"
-        if request and instance.image:
-            print(instance.image.url)
-            image_url = request.build_absolute_uri(instance.image.url)
-            representation["image"] = image_url.replace("/media/", "/api/v1/media/")
+        if representation.get("image"):
+            request = self.context.get("request")
+            if request:
+                image_url = request.build_absolute_uri(representation["image"])
+                representation["image"] = image_url.replace("/media/", "/api/v1/media/")
+
         return representation
 
 
 class ContentVariationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContentVariation
-        fields = ['id', 'content']
+        fields = ["id", "content"]
 
 
 class AssistantMessageSerializer(serializers.ModelSerializer):
@@ -85,12 +85,20 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
         user_message_list = UserMessageSerializer(user_messages, many=True).data
         for message in user_message_list:
             message["type"] = "user"
-            message["image"] = self.build_full_image_url(message["image"]) if message["image"] else None
+            message["image"] = (
+                self.build_full_image_url(message["image"])
+                if message["image"]
+                else None
+            )
 
         assistant_messages = AssistantMessage.objects.filter(conversation=obj)
-        assistant_message_list = AssistantMessageSerializer(assistant_messages, many=True).data
+        assistant_message_list = AssistantMessageSerializer(
+            assistant_messages, many=True
+        ).data
         for message in assistant_message_list:
             message["type"] = "assistant"
+            if message["generated_by"]["image"]:
+                message["generated_by"]["image"] = self.build_full_image_url(message["generated_by"]["image"])
 
         merged_messages = user_message_list + assistant_message_list
         merged_messages.sort(key=lambda x: x["created_at"])
@@ -101,5 +109,7 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if image_path and request:
             # return request.build_absolute_uri(f"{settings.MEDIA_URL}{image_path}")
-            return request.build_absolute_uri(image_path).replace("/media/", "/api/v1/media/")
+            return request.build_absolute_uri(image_path).replace(
+                "/media/", "/api/v1/media/"
+            )
         return None
