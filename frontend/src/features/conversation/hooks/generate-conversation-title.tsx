@@ -23,7 +23,20 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
 
       var prompt = "CONVERSATION:\n";
       data.messages.forEach((message) => {
-        prompt += `${message.type.toUpperCase()} MESSAGE: ${message.content}\n\n`;
+        if (message.type === "user") {
+          if ("content" in message) {
+            prompt += `${message.type.toUpperCase()} MESSAGE: ${
+              message.content
+            }\n\n`;
+          }
+        } else if (message.type === "assistant") {
+          if ("content_variations" in message) {
+            const lastIndex = message.content_variations.length - 1;
+            prompt += `${message.type.toUpperCase()} MESSAGE: ${
+              message.content_variations[lastIndex].content
+            }\n\n`;
+          }
+        }
       });
 
       const summaryPayload = {
@@ -41,7 +54,7 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
 
       const summaryResponse = await axios.post(
         "http://192.168.1.11:11434/api/chat",
-        summaryPayload,
+        summaryPayload
       );
       const summary = summaryResponse.data.message.content.replace(/"/g, "");
 
@@ -60,7 +73,7 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
 
       const response = await axios.post(
         "http://192.168.1.11:11434/api/chat",
-        payload,
+        payload
       );
       return response.data.message.content.replace(/"/g, "");
     } catch (err) {

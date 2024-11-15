@@ -55,7 +55,7 @@ export type GroupedConverations = {
 
 export type ConversationDetailMessage = Entity<
   | {
-      content: string;
+      content_variations: ContentVariation[];
       type: string;
       model: BaseModelEntity;
       provider: string;
