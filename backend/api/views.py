@@ -217,10 +217,9 @@ class ModelDetailWithInfoView(APIView):
             # Fetch model from the database using the primary key (pk)
             ollama_model = Model.objects.get(pk=pk)
             serializer = ModelSerializer(ollama_model)
-            if ollama_model.provider == "Ollama":
+            if ollama_model.provider == "ollama":
                 # Query the Ollama API for additional details
-                model_info = self.ollama_service.model(serializer.data["name"])
-
+                model_info = self.ollama_service.get_model(serializer.data["name"])
                 if model_info:
                     # Remove unnecessary fields from the Ollama response
                     del model_info["details"]
@@ -249,6 +248,10 @@ class ModelDetailWithInfoView(APIView):
                 {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
             )
         except requests.exceptions.RequestException as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

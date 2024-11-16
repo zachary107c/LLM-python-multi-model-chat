@@ -93,7 +93,7 @@ export function ChatInput({
   }, {} as Record<string, BaseModelEntity[]>);
 
   return (
-    <div className={`chat-input mb-4 flex flex-col w-full  ${isLoading ? "chat-input-border" : ""}`}>
+    <div className={`chat-input mb-4 flex flex-col w-full ${isLoading ? "chat-input-border" : ""}`}>
       <form onSubmit={handleSendMessage} className="flex justify-between">
         <Card
           className={`w-full`}

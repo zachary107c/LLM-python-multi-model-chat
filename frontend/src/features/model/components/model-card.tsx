@@ -7,7 +7,7 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ data }: ModelCardProps) {
-  return (
+  return data?.provider === "ollama" ? (
     <div className="p-1 w-full overflow-y-scroll no-scrollbar">
       <Card>
         <div className="mb-2">
@@ -35,7 +35,7 @@ export function ModelCard({ data }: ModelCardProps) {
             >
               <Box p="2" pr="8">
                 <Text as="p">
-                  <MarkdownRenderer markdown={data?.details.license || ""} />
+                  <MarkdownRenderer markdown={data?.details?.license || ""} />
                 </Text>
               </Box>
             </ScrollArea>
@@ -53,7 +53,7 @@ export function ModelCard({ data }: ModelCardProps) {
             >
               <Box p="2" pr="8">
                 <Text as="p">
-                  <MarkdownRenderer markdown={data?.details.template || ""} />
+                  <MarkdownRenderer markdown={data?.details?.template || ""} />
                 </Text>
               </Box>
             </ScrollArea>
@@ -71,7 +71,7 @@ export function ModelCard({ data }: ModelCardProps) {
             >
               <Box p="2" pr="8">
                 <Text as="p">
-                  <MarkdownRenderer markdown={data?.details.parameters || ""} />
+                  <MarkdownRenderer markdown={data?.details?.parameters || ""} />
                 </Text>
               </Box>
             </ScrollArea>
@@ -89,12 +89,38 @@ export function ModelCard({ data }: ModelCardProps) {
             >
               <Box p="2" pr="8">
                 <Text as="p">
-                  <MarkdownRenderer markdown={data?.details.modelfile || ""} />
+                  <MarkdownRenderer markdown={data?.details?.modelfile || ""} />
                 </Text>
               </Box>
             </ScrollArea>
           </div>
         </div>
+      </Card>
+    </div>
+  ) : (
+    <div className="p-1 w-full overflow-y-scroll no-scrollbar">
+      <Card>
+        <div className="mb-2">
+          <Badge
+            color={data?.color}
+            variant="surface"
+            className="w-full flex  justify-center items-center"
+          >
+            <Text size="4" weight="bold">
+              {data?.model}
+            </Text>
+          </Badge>
+        </div>
+        <img
+              src="construct.png"
+              alt=""
+              style={{
+                display: "block",
+                objectFit: "cover",
+                width: "100%",
+                height: 500,
+              }}
+            />
       </Card>
     </div>
   );

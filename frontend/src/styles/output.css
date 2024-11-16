@@ -1525,16 +1525,35 @@ video {
 
 .chat-input-border {
   border-radius: 8px;
-  background: linear-gradient(45deg,
+  background:
+    linear-gradient(45deg,
+      #8000ff,
+      #db00f8,
+      #007bff,
+      #a547fd,
+      #fa1790,
+      #fa6f1e);
+  background-size: cover, 200% 200%;
+  /* Cover the space with the texture, adjust gradient size */
+  animation: gradientMove 5s linear infinite;
+}
+
+/* Dark mode specific styles */
+
+.dark .chat-input-border {
+  border-radius: 8px;
+  background:
+    linear-gradient(45deg,
       #30005f4e,
       #45004e45,
       #00316659,
       #3f1b6163,
       #63093953,
       #0a2e5347);
-  background-size: 200% 200%;
+  /* Second layer: your dark mode gradient */
+  background-size: cover, 200% 200%;
+  /* Cover the space with the texture, adjust gradient size */
   animation: gradientMove 5s linear infinite;
-  /* mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%); */
 }
 
 .placeholder\:text-muted-foreground::-moz-placeholder {
@@ -1802,22 +1821,6 @@ video {
 .\[\&\>table_th\]\:border-gray-300>table th {
   --tw-border-opacity: 1;
   border-color: rgb(209 213 219 / var(--tw-border-opacity));
-}
-
-.\[\&\>table_th\]\:bg-primary\/20>table th {
-  background-color: hsl(var(--primary) / 0.2);
-}
-
-.\[\&\>table_th\]\:bg-primary\/80>table th {
-  background-color: hsl(var(--primary) / 0.8);
-}
-
-.\[\&\>table_th\]\:bg-primary\/50>table th {
-  background-color: hsl(var(--primary) / 0.5);
-}
-
-.\[\&\>table_th\]\:bg-secondary\/20>table th {
-  background-color: hsl(var(--secondary) / 0.2);
 }
 
 .\[\&\>table_th\]\:bg-secondary>table th {
