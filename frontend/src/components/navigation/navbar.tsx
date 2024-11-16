@@ -26,7 +26,7 @@ const ThemeToggleButton = () => {
       document.getElementById("body")!.classList.add("dark");
     } else {
       setTheme("light");
-      localStorage.setItem("theme", "");
+      localStorage.setItem("theme", "light");
       document.getElementById("body")!.classList.remove("dark");
     }
     theme === "light" ? setTheme("dark") : setTheme("light");
