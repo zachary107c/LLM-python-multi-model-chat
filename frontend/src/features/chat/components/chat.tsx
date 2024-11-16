@@ -164,6 +164,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
   };
 
   async function handleSendMessage(message: string) {
+    console.log("handle send messsage called!");
     if (message.trim().length > 0) {
       var currentChatId = chatId;
 
@@ -218,7 +219,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           content_variations: [(response as any).message.content],
           model: model?.id || -1,
           provider: "ollama",
-          generated_by: newUserMessage.id
+          generated_by: newUserMessage.id,
         },
       });
 
@@ -284,16 +285,17 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               return null;
             }
           })}
-          {isLoading && (
+          {/* {isLoading && (
             <div className="flex justify-start mb-4">
               <Panel title="LLM" justify="justify-start">
                 <ChatLoader />
               </Panel>
             </div>
-          )}
+          )} */}
           <div ref={ref} />
         </div>
         <ChatInput
+          isLoading={isLoading}
           onSendMessage={handleSendMessage}
           onModelChange={setModel}
           onImageDataChange={setImageData}

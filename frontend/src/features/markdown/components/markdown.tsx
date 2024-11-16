@@ -4,9 +4,9 @@ import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 import DOMPurify from "dompurify";
-import katex from 'katex';
-import 'katex/contrib/mhchem/mhchem.js';
-import 'katex/dist/katex.min.css';
+import katex from "katex";
+import "katex/contrib/mhchem/mhchem.js";
+import "katex/dist/katex.min.css";
 
 interface MarkdownRendererProps {
   markdown: string;
@@ -17,29 +17,29 @@ interface MarkdownRendererProps {
 const renderer = {
   text(text: string) {
     let result = text;
-    
+
     // Handle inline math with single $ delimiters
     result = result.replace(/\$([^\$]+)\$/g, (_, math) => {
       try {
         return katex.renderToString(math, { displayMode: false });
       } catch (error) {
-        console.error('KaTeX error:', error);
+        console.error("KaTeX error:", error);
         return math;
       }
     });
-    
+
     // Handle display math with double $$ delimiters
     result = result.replace(/\$\$([^\$]+)\$\$/g, (_, math) => {
       try {
         return katex.renderToString(math, { displayMode: true });
       } catch (error) {
-        console.error('KaTeX error:', error);
+        console.error("KaTeX error:", error);
         return math;
       }
     });
-    
+
     return result;
-  }
+  },
 };
 
 const markedInstance = new Marked(
@@ -59,14 +59,24 @@ markedInstance.setOptions({
 
 // Configure DOMPurify to allow KaTeX classes and attributes
 const purifyConfig = {
-  ADD_TAGS: ['math', 'semantics', 'mrow', 'mi', 'mn', 'mo', 'msup', 'mfrac', 'annotation'],
-  ADD_ATTR: ['xmlns', 'encoding'],
-  ADD_CLASS: ['katex', 'katex-display', 'katex-html']
+  ADD_TAGS: [
+    "math",
+    "semantics",
+    "mrow",
+    "mi",
+    "mn",
+    "mo",
+    "msup",
+    "mfrac",
+    "annotation",
+  ],
+  ADD_ATTR: ["xmlns", "encoding"],
+  ADD_CLASS: ["katex", "katex-display", "katex-html"],
 };
 
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   markdown,
-  className = ""
+  className = "",
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -83,6 +93,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     }
   }, [sanitizedHtml]);
 
+  // Return the component's JSX
   return (
     <div
       ref={containerRef}
@@ -102,7 +113,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         dark:[&>blockquote]:bg-gray-800
         [&>table]:w-full [&>table]:border-collapse [&>table]:my-4
         [&>table_th]:border [&>table_th]:border-gray-300 [&>table_th]:p-2 
-        [&>table_th]:bg-gray-50 dark:[&>table_th]:bg-gray-800
+        [&>table_th]:bg-secondary
         [&>table_td]:border [&>table_td]:border-gray-300 [&>table_td]:p-2
         [&>hr]:my-8 [&>hr]:border-gray-200 dark:[&>hr]:border-gray-700
         [&>img]:max-w-full [&>img]:rounded-lg [&>img]:my-4

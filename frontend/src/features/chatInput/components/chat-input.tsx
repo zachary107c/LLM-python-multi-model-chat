@@ -21,6 +21,7 @@ interface Props {
   selectedModel: BaseModelEntity | null;
   models: BaseModelEntity[] | undefined;
   modelsLoading: boolean;
+  isLoading: boolean;
 }
 
 export function ChatInput({
@@ -30,6 +31,7 @@ export function ChatInput({
   selectedModel,
   models,
   modelsLoading,
+  isLoading,
 }: Props) {
   const [newMessage, setNewMessage] = useState("");
   const [textAreaHeight, setTextAreaHeight] = useState(48);
@@ -91,10 +93,10 @@ export function ChatInput({
   }, {} as Record<string, BaseModelEntity[]>);
 
   return (
-    <div className="chat-input mb-4 flex flex-col w-full">
+    <div className={`chat-input mb-4 flex flex-col w-full  ${isLoading ? "chat-input-border" : ""}`}>
       <form onSubmit={handleSendMessage} className="flex justify-between">
         <Card
-          className="w-full"
+          className={`w-full`}
           style={
             {
               "--base-card-padding-top": "var(--space-1)",
@@ -104,9 +106,9 @@ export function ChatInput({
             } as any
           }
           size="1"
-          variant="surface"
+          variant="classic"
         >
-          <div className="flex justify-between items-center h-full">
+          <div className={`flex justify-between items-center h-full`}>
             <div className="flex flex-col w-full">
               <Textarea
                 className="outline-none border-none w-full py-3 px-1 rounded-l resize-none h-[48px] no-scrollbar"

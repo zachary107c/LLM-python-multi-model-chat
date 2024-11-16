@@ -2,7 +2,7 @@ import { BarLoader } from "react-spinners";
 
 export function ChatLoader() {
   return (
-    <div className="">
+    <div>
       <div className="mb-2 flex">
         <div className="mr-2">
           <BarLoader
