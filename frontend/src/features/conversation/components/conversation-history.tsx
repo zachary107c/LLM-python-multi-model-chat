@@ -16,6 +16,7 @@ import {
 export function ConversationHistory({ onSelectedIdChange }: any) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [expanded, setExpanded] = useState(true);
+  const [animating, setAnimating] = useState(false);
   const currentConversationId = searchParams.get("c");
   const { data: chats, isLoading } = useGetConversationsQuery();
   const createMutation = createConversationMutation();
@@ -30,7 +31,9 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
   );
 
   function handleSetExpanded(e: any) {
+    setAnimating(true);
     setExpanded(e);
+    setTimeout(() => setAnimating(false), 300); // Match transition duration
   }
 
   function handleSetSelected(conversationId: string) {
@@ -88,7 +91,7 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
 
   return (
     <div
-      className={`${expanded ? "w-[250px] max-w-[250px] h-full" : "h-full"}`}
+      className={`transition-all duration-300 ease-in-out h-full ${expanded ? "w-[250px] max-w-[250px]" : ""}`}
     >
       {!expanded && (
         <div className="overflow-y-scroll no-scrollbar h-full">

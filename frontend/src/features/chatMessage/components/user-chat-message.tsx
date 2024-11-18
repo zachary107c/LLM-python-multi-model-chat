@@ -27,7 +27,7 @@ export function UserChatMessage({
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        second: "numeric",
+        // second: "numeric",
       });
     });
   }
