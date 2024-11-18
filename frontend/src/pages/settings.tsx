@@ -56,7 +56,11 @@ function Toast({
           {type === "success" ? <CheckCircledIcon /> : <CrossCircledIcon />}
         </Callout.Icon>
         <Callout.Text size="1">{message}</Callout.Text>
-        <LocalButton onClick={onClose} variant="ghost-no-hover" className="m-1 p-0">
+        <LocalButton
+          onClick={onClose}
+          variant="ghost-no-hover"
+          className="m-1 p-0"
+        >
           <Cross2Icon />
         </LocalButton>
       </div>
@@ -186,19 +190,22 @@ function SettingsPage() {
         return;
       }
 
-      // Check file type
-      if (!file.type.startsWith("image/")) {
-        showToast("File must be an image", "error");
+      // Check file type - allow images and gifs
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedTypes.includes(file.type)) {
+        showToast("File must be an image (JPG, PNG) or GIF", "error");
         return;
       }
 
+      const reader = new FileReader();
+      reader.onload = () => {
+        const blobUrl = URL.createObjectURL(
+          new Blob([reader.result as ArrayBuffer], { type: file.type })
+        );
+        setPreviewUrl(blobUrl);
+      };
+      reader.readAsArrayBuffer(file);
       setSelectedFile(file);
-
-      // Create preview URL
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
@@ -219,7 +226,8 @@ function SettingsPage() {
 
     // Handle image upload only if a new file was selected
     if (selectedFile) {
-      formData.append("profile.image", selectedFile);
+      const blob = new Blob([selectedFile], { type: selectedFile.type });
+      formData.append("profile.image", blob, selectedFile.name);
     }
 
     // Append settings
@@ -244,7 +252,6 @@ function SettingsPage() {
         },
         onError: (error: any) => {
           let errorMessage = "Failed to update settings.";
-
           if (error.response?.data) {
             const responseErrors = error.response.data;
             const formattedErrors = Object.entries(responseErrors)
@@ -266,200 +273,202 @@ function SettingsPage() {
   };
 
   return (
-    <Box p="6" style={{ maxWidth: "64rem", margin: "0 auto" }}>
-      <Box
-        style={{
-          position: "fixed",
-          top: "1rem",
-          right: "1rem",
-          zIndex: 1000,
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.5rem",
-          maxWidth: "300px",
-        }}
-      >
-        {toasts.map((toast) => (
-          <Toast
-            key={toast.id}
-            message={toast.message}
-            type={toast.type}
-            progress={toast.progress}
-            onClose={() =>
-              setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-            }
-          />
-        ))}
-      </Box>
-      <Heading size="8" mb="6">
-        Settings
-      </Heading>
-      <Tabs.Root defaultValue="settings">
-        <Tabs.List>
-          <Tabs.Trigger value="settings">App Settings</Tabs.Trigger>
-          <Tabs.Trigger value="profile">Profile</Tabs.Trigger>
-        </Tabs.List>
-        <Box mt="4">
-          <Flex
-            direction="column"
-            gap="6"
-            maxWidth="600px"
-            style={{ width: "100%" }}
-          >
-            <Tabs.Content value="profile">
-              <Card>
-                <Heading size="6" mb="2">
-                  Profile Information
-                </Heading>
-                <Text color="gray" mb="4">
-                  Update your personal information here.
-                </Text>
-                <Flex align="center" gap="4" mb="4">
-                  <Avatar
-                    size="7"
-                    src={previewUrl || undefined}
-                    fallback="JD"
-                    radius="full"
-                  />
-                  <Button onClick={handleAvatarClick}>
-                    Change Avatar
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      style={{ display: "none" }}
-                      onChange={handleFileUpload}
-                      accept="image/*"
-                    />
-                  </Button>
-                </Flex>
-                <Flex direction="column" gap="4">
-                  <Box>
-                    <Text as="label" size="2" mb="1" weight="bold">
-                      Username
-                    </Text>
-                    <TextField.Root
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </Box>
-                  <Box>
-                    <Text as="label" size="2" mb="1" weight="bold">
-                      Email
-                    </Text>
-                    <TextField.Root
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </Box>
-                  <Box>
-                    <Text as="label" size="2" mb="1" weight="bold">
-                      Bio
-                    </Text>
-                    <TextArea
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                    />
-                  </Box>
-                  <Box>
-                    <Text as="label" size="2" mb="1" weight="bold">
-                      Preferred Model
-                    </Text>
-                    <Select.Root
-                      value={
-                        userSettingsLoading
-                          ? "Loading Models"
-                          : (settings.preferred_model &&
-                              settings.preferred_model.id.toString()) ||
-                            "Error"
-                      }
-                      onValueChange={(id) => {
-                        if (!userSettingsLoading) {
-                          const selectedModel = models?.find(
-                            (model) => model.id === Number(id)
-                          );
-
-                          // Ensure that we have access to the models array before trying to access its elements
-                          const newPreferredModel = selectedModel ||
-                            (models && models[0]) || {
-                              id: -1,
-                              name: "llama3.1",
-                              model: "llama3.1",
-                              liked: false,
-                              provider: "",
-                              color: "gray",
-                            };
-
-                          setSettings((prev) => ({
-                            ...prev,
-                            preferred_model: newPreferredModel,
-                          }));
-                        }
-                      }}
-                    >
-                      <Select.Trigger />
-                      <Select.Content>
-                        {models?.map((model) => (
-                          <Select.Item
-                            key={model.id}
-                            value={model.id.toString()}
-                          >
-                            {model.name}
-                          </Select.Item>
-                        ))}
-                      </Select.Content>
-                    </Select.Root>
-                  </Box>
-                </Flex>
-              </Card>
-            </Tabs.Content>
-            <Tabs.Content value="settings">
-              <Card>
-                <Heading size="6" mb="2">
-                  App Settings
-                </Heading>
-                <Text color="gray" mb="4">
-                  Customize your chat experience.
-                </Text>
-                <Flex direction="column" gap="4">
-                  <Flex justify="between" align="center">
-                    <Box>
-                      <Text as="label" size="2" weight="bold">
-                        Stream Chat Responses
-                      </Text>
-                      <Text size="1" color="gray">
-                        See responses as they're being generated
-                      </Text>
-                    </Box>
-                    <Switch
-                      checked={settings.stream_responses}
-                      onCheckedChange={handleStreamingToggled}
-                    />
-                  </Flex>
-                  <Flex justify="between" align="center">
-                    <Box>
-                      <Text as="label" size="2" weight="bold">
-                        Dark Mode
-                      </Text>
-                      <Text size="1" color="gray">
-                        Toggle dark mode on or off
-                      </Text>
-                    </Box>
-                    <Switch
-                      checked={settings.theme === "dark"}
-                      onCheckedChange={handleThemeChange}
-                    />
-                  </Flex>
-                  {/* Additional settings can be added here */}
-                </Flex>
-              </Card>
-            </Tabs.Content>
-          </Flex>
+    <div className="overflow-y-scroll no-scrollbar">
+      <Box p="6" style={{ maxWidth: "64rem" }}>
+        <Box
+          style={{
+            position: "fixed",
+            top: "1rem",
+            right: "1rem",
+            zIndex: 1000,
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+            maxWidth: "300px",
+          }}
+        >
+          {toasts.map((toast) => (
+            <Toast
+              key={toast.id}
+              message={toast.message}
+              type={toast.type}
+              progress={toast.progress}
+              onClose={() =>
+                setToasts((prev) => prev.filter((t) => t.id !== toast.id))
+              }
+            />
+          ))}
         </Box>
-      </Tabs.Root>
-      <Box mt="6">
-        <Button onClick={handleSave}>Save Changes</Button>
+        <Heading size="8" mb="6">
+          Settings
+        </Heading>
+        <Tabs.Root defaultValue="settings">
+          <Tabs.List>
+            <Tabs.Trigger value="settings">App Settings</Tabs.Trigger>
+            <Tabs.Trigger value="profile">Profile</Tabs.Trigger>
+          </Tabs.List>
+          <Box mt="4">
+            <Flex
+              direction="column"
+              gap="6"
+              maxWidth="600px"
+              style={{ width: "100%" }}
+            >
+              <Tabs.Content value="profile">
+                <Card>
+                  <Heading size="6" mb="2">
+                    Profile Information
+                  </Heading>
+                  <Text color="gray" mb="4">
+                    Update your personal information here.
+                  </Text>
+                  <Flex align="center" gap="4" mb="4">
+                    <Avatar
+                      size="7"
+                      src={previewUrl || undefined}
+                      fallback="JD"
+                      radius="medium"
+                    />
+                    <Button onClick={handleAvatarClick}>
+                      Change Avatar
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={handleFileUpload}
+                        accept="image/*"
+                      />
+                    </Button>
+                  </Flex>
+                  <Flex direction="column" gap="4">
+                    <Box>
+                      <Text as="label" size="2" mb="1" weight="bold">
+                        Username
+                      </Text>
+                      <TextField.Root
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </Box>
+                    <Box>
+                      <Text as="label" size="2" mb="1" weight="bold">
+                        Email
+                      </Text>
+                      <TextField.Root
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </Box>
+                    <Box>
+                      <Text as="label" size="2" mb="1" weight="bold">
+                        Bio
+                      </Text>
+                      <TextArea
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                      />
+                    </Box>
+                    <Box>
+                      <Text as="label" size="2" mb="1" weight="bold">
+                        Preferred Model
+                      </Text>
+                      <Select.Root
+                        value={
+                          userSettingsLoading
+                            ? "Loading Models"
+                            : (settings.preferred_model &&
+                                settings.preferred_model.id.toString()) ||
+                              "Error"
+                        }
+                        onValueChange={(id) => {
+                          if (!userSettingsLoading) {
+                            const selectedModel = models?.find(
+                              (model) => model.id === Number(id)
+                            );
+
+                            // Ensure that we have access to the models array before trying to access its elements
+                            const newPreferredModel = selectedModel ||
+                              (models && models[0]) || {
+                                id: -1,
+                                name: "llama3.1",
+                                model: "llama3.1",
+                                liked: false,
+                                provider: "",
+                                color: "gray",
+                              };
+
+                            setSettings((prev) => ({
+                              ...prev,
+                              preferred_model: newPreferredModel,
+                            }));
+                          }
+                        }}
+                      >
+                        <Select.Trigger />
+                        <Select.Content>
+                          {models?.map((model) => (
+                            <Select.Item
+                              key={model.id}
+                              value={model.id.toString()}
+                            >
+                              {model.name}
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+                  </Flex>
+                </Card>
+              </Tabs.Content>
+              <Tabs.Content value="settings">
+                <Card>
+                  <Heading size="6" mb="2">
+                    App Settings
+                  </Heading>
+                  <Text color="gray" mb="4">
+                    Customize your chat experience.
+                  </Text>
+                  <Flex direction="column" gap="4">
+                    <Flex justify="between" align="center">
+                      <Box>
+                        <Text as="label" size="2" weight="bold">
+                          Stream Chat Responses
+                        </Text>
+                        <Text size="1" color="gray">
+                          See responses as they're being generated
+                        </Text>
+                      </Box>
+                      <Switch
+                        checked={settings.stream_responses}
+                        onCheckedChange={handleStreamingToggled}
+                      />
+                    </Flex>
+                    <Flex justify="between" align="center">
+                      <Box>
+                        <Text as="label" size="2" weight="bold">
+                          Dark Mode
+                        </Text>
+                        <Text size="1" color="gray">
+                          Toggle dark mode on or off
+                        </Text>
+                      </Box>
+                      <Switch
+                        checked={settings.theme === "dark"}
+                        onCheckedChange={handleThemeChange}
+                      />
+                    </Flex>
+                    {/* Additional settings can be added here */}
+                  </Flex>
+                </Card>
+              </Tabs.Content>
+            </Flex>
+          </Box>
+        </Tabs.Root>
+        <Box mt="6">
+          <Button onClick={handleSave}>Save Changes</Button>
+        </Box>
       </Box>
-    </Box>
+    </div>
   );
 }
 

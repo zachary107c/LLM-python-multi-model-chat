@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Tooltip } from "@radix-ui/themes";
+import { Tooltip, Avatar } from "@radix-ui/themes";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { handleLogout } from "@/components/utils/handle-logout.ts";
@@ -47,10 +47,12 @@ export default function Navbar() {
                 {userSettingsLoading || !userSettings?.profile?.image ? (
                   <Settings size={20} strokeWidth={1.5} />
                 ) : (
-                  <img
+                  <Avatar
                     src={userSettings.profile.image}
+                    fallback="BS"
                     alt="Profile"
-                    className="w-5 h-5 rounded-full"
+                    radius="medium"
+                    size="2"
                   />
                 )}
               </Button>

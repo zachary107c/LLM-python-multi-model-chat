@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Flex, Card, Text } from "@radix-ui/themes";
+import { Flex, Card, Text, Badge } from "@radix-ui/themes";
 import {
   SlashIcon,
   ChevronRightIcon,
@@ -25,7 +25,7 @@ function localizeUTCDates(text: string) {
       day: "numeric",
       hour: "numeric",
       minute: "numeric",
-      second: "numeric",
+      // second: "numeric",
     });
   });
 }
@@ -114,7 +114,7 @@ export function AssistantChatMessage({
                     day: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
-                    second: "2-digit",
+                    // second: "2-digit",
                   }
                 )}
               </Text>
@@ -125,7 +125,9 @@ export function AssistantChatMessage({
               <div>
                 <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
                   <Text size="2">
-                    <MarkdownRenderer markdown={localizeUTCDates(displayContent) || ""} />
+                    <MarkdownRenderer
+                      markdown={localizeUTCDates(displayContent) || ""}
+                    />
                   </Text>
                 </div>
               </div>
@@ -161,8 +163,8 @@ export function AssistantChatMessage({
                 <LocalButton onClick={handlePrevious} variant="ghost-no-hover">
                   <ChevronLeftIcon />
                 </LocalButton>
-                <Text size="1">{currentVariationIndex + 1}</Text>
-                <LocalButton onClick={handleNext} variant="ghost">
+                <Text size="1" weight="light">{currentVariationIndex + 1}</Text>
+                <LocalButton onClick={handleNext} variant="ghost-no-hover">
                   <ChevronRightIcon />
                 </LocalButton>
               </div>

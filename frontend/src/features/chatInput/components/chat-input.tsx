@@ -16,7 +16,7 @@ import { Rocket, Folder, X } from "lucide-react";
 import { useUserSettings } from "@/components/userSettings/user-settings-provider";
 
 interface Props {
-  onSendMessage: (message: string, stream: boolean) => void;
+  onSendMessage: (message: string) => void;
   onModelChange: (model: BaseModelEntity) => void;
   onImageDataChange: (model: File | null) => void;
   selectedModel: BaseModelEntity | null;
