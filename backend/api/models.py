@@ -70,10 +70,22 @@ class UserMessage(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to="user_message_images/", null=True, blank=True, max_length=255)
+    image = models.ImageField(
+        upload_to="user_message_images/", null=True, blank=True, max_length=255
+    )
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    def soft_delete(self):
+        from django.utils import timezone
+
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save()
 
     def __str__(self):
         return f"User Message {self.id} - {self.conversation.user.username}"
+
 
 class ContentVariation(models.Model):
     # Model to store different content versions
@@ -82,6 +94,7 @@ class ContentVariation(models.Model):
 
     def __str__(self):
         return f"Content Variation {self.id}"
+
 
 class AssistantMessage(models.Model):
     id = models.AutoField(primary_key=True)
@@ -92,6 +105,15 @@ class AssistantMessage(models.Model):
     provider = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     liked = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    def soft_delete(self):
+        from django.utils import timezone
+
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save()
 
     def __str__(self):
         return f"Assistant Message {self.id} - {self.model}"

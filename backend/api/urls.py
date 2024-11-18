@@ -15,5 +15,6 @@ urlpatterns = [
     path("ollama/models/<int:pk>/", views.ModelDetailWithInfoView.as_view(), name="model-detail"),
     path("ollama/models/populate/", views.OllamaModelsPopulateAPIView.as_view(), name="model-populate"),
     path("chat/", views.ChatAPIView.as_view(), name="chat"),
+    path("chat/stream/", views.StreamChatAPIView.as_view(), name="chat-stream"),
     path("suggestions/", views.ThreeSuggestionsAPIView.as_view(), name="suggestions"),
 ]

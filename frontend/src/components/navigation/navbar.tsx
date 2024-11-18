@@ -1,77 +1,58 @@
-import { useState } from "react";
-import { Tooltip, Popover } from "@radix-ui/themes";
+import { useState, useEffect } from "react";
+import { Tooltip } from "@radix-ui/themes";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { handleLogout } from "@/components/utils/handle-logout.ts";
-import {
-  Settings,
-  MessageSquare,
-  User,
-  Ellipsis,
-  Sun,
-  MoonStar,
-  LogOut,
-  BrainCircuit,
-} from "lucide-react";
+import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-settings";
 
-const ThemeToggleButton = () => {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
-  const [animate, setAnimate] = useState(false);
-
-  const handleClick = () => {
-    setAnimate(true);
-    if (theme === "light") {
-      setTheme("dark");
-      localStorage.setItem("theme", "dark");
-      document.getElementById("body")!.classList.add("dark");
-    } else {
-      setTheme("light");
-      localStorage.setItem("theme", "light");
-      document.getElementById("body")!.classList.remove("dark");
-    }
-    theme === "light" ? setTheme("dark") : setTheme("light");
-    setTimeout(() => {
-      setAnimate(false);
-    }, 500);
-  };
-
-  return (
-    <Button variant="ghost" size="icon" onClick={handleClick}>
-      {theme === "light" ? (
-        <MoonStar
-          size={20}
-          strokeWidth={1.5}
-          className={`size-4 ${animate ? "animate-in spin-in-180" : ""}`}
-        />
-      ) : (
-        <Sun
-          size={20}
-          strokeWidth={1.5}
-          className={`size-4 ${animate ? "animate-out spin-out-180" : ""}`}
-        />
-      )}
-    </Button>
-  );
-};
+import { Settings, MessageSquare, LogOut, BrainCircuit } from "lucide-react";
 
 export default function Navbar() {
+  const location = useLocation();
   const [index, setIndex] = useState(1);
+  const { data: userSettings, isLoading: userSettingsLoading } =
+    useGetUserSettingsQuery();
+
+  useEffect(() => {
+    switch (location.pathname) {
+      case "/":
+        setIndex(1);
+        break;
+      case "/models":
+        setIndex(2);
+        break;
+      case "/settings":
+        setIndex(3);
+        break;
+      default:
+        setIndex(0); // Or handle other undefined paths
+        break;
+    }
+  }, [location.pathname]);
 
   return (
     <aside className="border-r border-[#7d7d7db3] bg-[#22222211]">
       <div className="flex flex-col m-2 items-center">
         <div className="mb-2">
-          <Tooltip content="Profile" side="right">
-            <Link to="/profile">
+          <Tooltip content="Settings" side="right">
+            <Link to="/settings">
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIndex(0)}
+                onClick={() => setIndex(3)}
                 className={
-                  index === 0 ? "bg-accent text-accent-foreground" : ""
+                  index === 3 ? "bg-accent text-accent-foreground" : ""
                 }
               >
-                <User size={20} strokeWidth={1.5} />
+                {userSettingsLoading || !userSettings?.profile?.image ? (
+                  <Settings size={20} strokeWidth={1.5} />
+                ) : (
+                  <img
+                    src={userSettings.profile.image}
+                    alt="Profile"
+                    className="w-5 h-5 rounded-full"
+                  />
+                )}
               </Button>
             </Link>
           </Tooltip>
@@ -109,45 +90,13 @@ export default function Navbar() {
           </Tooltip>
         </div>
         <div className="mb-2">
-          <Tooltip content="Settings" side="right">
-            <Link to="/settings">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIndex(3)}
-                className={
-                  index === 3 ? "bg-accent text-accent-foreground" : ""
-                }
-              >
-                <Settings size={20} strokeWidth={1.5} />
+          <div>
+            <Tooltip content="Logout" side="right">
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
+                <LogOut size={17} strokeWidth={1.5} />
               </Button>
-            </Link>
-          </Tooltip>
-        </div>
-        <div className="mb-2">
-          <Popover.Root>
-            <Popover.Trigger>
-              <Button variant="ghost" size="icon">
-                <Ellipsis size={20} strokeWidth={1.5} />
-              </Button>
-            </Popover.Trigger>
-            <Popover.Content side="right" size="1">
-              <div className="flex">
-                <div>
-                  <Tooltip content="Theme" side="right">
-                    <ThemeToggleButton />
-                  </Tooltip>
-                </div>
-                <div>
-                  <Tooltip content="Logout" side="right">
-                    <Button variant="ghost" size="icon" onClick={handleLogout}>
-                      <LogOut size={17} strokeWidth={1.5} />
-                    </Button>
-                  </Tooltip>
-                </div>
-              </div>
-            </Popover.Content>
-          </Popover.Root>
+            </Tooltip>
+          </div>
         </div>
       </div>
     </aside>
