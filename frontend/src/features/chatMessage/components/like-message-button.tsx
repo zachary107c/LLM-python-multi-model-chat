@@ -34,7 +34,8 @@ export function LikeMessageButton({
 
   return (
     <Button
-      variant="ghost"
+      variant={"ghost-no-hover"}
+      className="mx-1 px-1 py-0 my-0"
       size={"icon"}
       onClick={handleLikedMessage}
       aria-label={liked ? "Unlike" : "Like"}

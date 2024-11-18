@@ -17,6 +17,8 @@ export type UpdateConversationInput = z.infer<
 
 export const updateConversationMutation = () => {
   const queryClient = useQueryClient();
+  const token = Cookies.get("token");
+
   return useMutation({
     mutationFn: async ({
       data,
@@ -27,7 +29,7 @@ export const updateConversationMutation = () => {
         data.updates.title = data.updates.title.substring(0, 255);
       }
       return api.put(`/conversations/${data.conversationId}/`, data.updates, {
-        headers: { Authorization: `Token ${Cookies.get("token")}` },
+        headers: { Authorization: `Token ${token}` },
       });
     },
     onSuccess: () => {

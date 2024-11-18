@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @layer utilities {
-
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -74,7 +73,6 @@
     --chart-5: 340 75% 55%;
   }
 
-
   .hljs {
     border-radius: 10px;
     margin-top: 1rem;
@@ -108,9 +106,11 @@
 }
 
 .main-page {
-  background: radial-gradient(at 100% 0%,
+  background: radial-gradient(
+      at 100% 0%,
       rgba(0, 45, 245, 0.106) 0px,
-      transparent 50%),
+      transparent 50%
+    ),
     radial-gradient(at 93% 98%, hsla(237, 98%, 52%, 0) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(0, 17, 255, 0.095) 0px, transparent 50%);
 }
@@ -138,26 +138,26 @@
   right: -2px;
   bottom: -2px;
   z-index: -1;
-  background: linear-gradient(45deg,
-      #8000ff,
-      /* vivid purple */
-      #db00f8,
-      /* bright magenta */
-      #007bff,
-      /* vivid blue */
-      #a547fd,
-      /* blue violet */
-      #fa1790,
-      /* deep pink */
-      #fa6f1e
-      /* dodger blue */
-    );
+  background: linear-gradient(
+    45deg,
+    #8000ff,
+    /* vivid purple */ #db00f8,
+    /* bright magenta */ #007bff,
+    /* vivid blue */ #a547fd,
+    /* blue violet */ #fa1790,
+    /* deep pink */ #fa6f1e /* dodger blue */
+  );
   border-radius: inherit;
   background-size: 200% 200%;
   animation: chaotic-vivid-gradient 3s ease infinite;
   opacity: 0;
   transition: opacity 0.1s ease;
-  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
+  mask-image: radial-gradient(
+    circle at bottom right,
+    transparent 50%,
+    rgba(0, 0, 0, 0.8) 80%,
+    black 100%
+  );
 }
 
 .dark .rainbow-border::before {
@@ -168,26 +168,26 @@
   right: -2px;
   bottom: -2px;
   z-index: -1;
-  background: linear-gradient(45deg,
-      #30005f,
-      /* vivid purple */
-      #45004e,
-      /* bright magenta */
-      #003166,
-      /* vivid blue */
-      #3f1b61,
-      /* blue violet */
-      #630939,
-      /* deep pink */
-      #0a2f53
-      /* dodger blue */
-    );
+  background: linear-gradient(
+    45deg,
+    #30005f,
+    /* vivid purple */ #45004e,
+    /* bright magenta */ #003166,
+    /* vivid blue */ #3f1b61,
+    /* blue violet */ #630939,
+    /* deep pink */ #0a2f53 /* dodger blue */
+  );
   border-radius: inherit;
   background-size: 200% 200%;
   animation: chaotic-vivid-gradient 3s ease infinite;
   opacity: 0;
   transition: opacity 0.1s ease;
-  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
+  mask-image: radial-gradient(
+    circle at bottom right,
+    transparent 50%,
+    rgba(0, 0, 0, 0.8) 80%,
+    black 100%
+  );
 }
 
 .rainbow-border:hover::before {
@@ -231,7 +231,6 @@
 }
 
 @keyframes scrollText {
-
   0%,
   10% {
     transform: translateX(0);
@@ -265,26 +264,26 @@
   right: -2px;
   bottom: -2px;
   z-index: -1;
-  background: linear-gradient(45deg,
-      #8000ff,
-      /* vivid purple */
-      #db00f8,
-      /* bright magenta */
-      #007bff,
-      /* vivid blue */
-      #a547fd,
-      /* blue violet */
-      #fa1790,
-      /* deep pink */
-      #fa6f1e
-      /* dodger blue */
-    );
+  background: linear-gradient(
+    45deg,
+    #8000ff,
+    /* vivid purple */ #db00f8,
+    /* bright magenta */ #007bff,
+    /* vivid blue */ #a547fd,
+    /* blue violet */ #fa1790,
+    /* deep pink */ #fa6f1e /* dodger blue */
+  );
   border-radius: inherit;
   background-size: 200% 200%;
   animation: chaotic-vivid-gradient 3s ease infinite;
   opacity: 1;
   transition: opacity 0.1s ease;
-  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
+  mask-image: radial-gradient(
+    circle at bottom right,
+    transparent 50%,
+    rgba(0, 0, 0, 0.8) 80%,
+    black 100%
+  );
 }
 
 .dark .rainbow-border-always::before {
@@ -295,26 +294,26 @@
   right: -2px;
   bottom: -2px;
   z-index: -1;
-  background: linear-gradient(45deg,
-      #30005f,
-      /* vivid purple */
-      #45004e,
-      /* bright magenta */
-      #003166,
-      /* vivid blue */
-      #3f1b61,
-      /* blue violet */
-      #630939,
-      /* deep pink */
-      #0a2f53
-      /* dodger blue */
-    );
+  background: linear-gradient(
+    45deg,
+    #30005f,
+    /* vivid purple */ #45004e,
+    /* bright magenta */ #003166,
+    /* vivid blue */ #3f1b61,
+    /* blue violet */ #630939,
+    /* deep pink */ #0a2f53 /* dodger blue */
+  );
   border-radius: inherit;
   background-size: 200% 200%;
   animation: chaotic-vivid-gradient 3s ease infinite;
   opacity: 1;
   transition: opacity 0.1s ease;
-  mask-image: radial-gradient(circle at bottom right, transparent 50%, rgba(0, 0, 0, 0.8) 80%, black 100%);
+  mask-image: radial-gradient(
+    circle at bottom right,
+    transparent 50%,
+    rgba(0, 0, 0, 0.8) 80%,
+    black 100%
+  );
 }
 
 @keyframes chaotic-vivid-gradient {
@@ -360,48 +359,68 @@
   }
 }
 
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
 .chat-input-border {
   border-radius: 8px;
-  background:
-    linear-gradient(45deg,
-      #8000ff,
-      #db00f8,
-      #007bff,
-      #a547fd,
-      #fa1790,
-      #fa6f1e);
-  background-size: cover, 200% 200%;
-  /* Cover the space with the texture, adjust gradient size */
+  background: linear-gradient(
+    45deg,
+    #8000ff,
+    #db00f8,
+    #007bff,
+    #a547fd,
+    #fa1790,
+    #fa6f1e
+  );
+  background-size: 200% 200%; /* Adjust gradient size for animation */
   animation: gradientMove 5s linear infinite;
 }
 
 /* Dark mode specific styles */
 .dark .chat-input-border {
   border-radius: 8px;
-  background:
-    linear-gradient(45deg,
-      #30005f4e,
-      #45004e45,
-      #00316659,
-      #3f1b6163,
-      #63093953,
-      #0a2e5347);
-  /* Second layer: your dark mode gradient */
-  background-size: cover, 200% 200%;
-  /* Cover the space with the texture, adjust gradient size */
+  /* background: linear-gradient(45deg, #30005f4e, #45004e45, #00316659, #3f1b6163, #63093953, #0a2e5347); */
+  background: linear-gradient(
+    45deg,
+    #8000ff43,
+    #db00f845,
+    #007bff41,
+    #a547fd4e,
+    #fa17903d,
+    #fa6f1e41
+  );
+  background-size: 200% 200%; /* Adjust gradient size for animation */
   animation: gradientMove 5s linear infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }

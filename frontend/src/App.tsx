@@ -1,10 +1,6 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "@/components/navigation/navbar";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
-const queryClient = new QueryClient();
 
 function App() {
   useEffect(() => {
@@ -15,13 +11,10 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools />
-      <div className="main-page font-work-sans h-screen max-h-[100dvh] overflow-auto flex flex-row">
-        <Navbar />
-        <Outlet />
-      </div>
-    </QueryClientProvider>
+    <div className="main-page font-work-sans h-screen max-h-[100dvh] overflow-auto flex flex-row">
+      <Navbar />
+      <Outlet />
+    </div>
   );
 }
 

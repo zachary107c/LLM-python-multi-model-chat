@@ -5,6 +5,7 @@ import requests
 import datetime
 from io import StringIO
 from django.core.management import call_command
+from django.http import StreamingHttpResponse
 from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
@@ -17,10 +18,15 @@ from .serializers import (
     ConversationDetailSerializer,
     ModelSerializer,
 )
-from .services import OllamaService, OpenAIService, AzureOpenAIService, LLMServiceFactory
+from .services import (
+    OllamaService,
+    OpenAIService,
+    AzureOpenAIService,
+    LLMServiceFactory,
+)
 
 PROMPTS = {
-    "three_suggestions": "You are an expert suggestion generator.\nYou generate three random questions a user could potentially ask to LLM, helping the user get started with a conversation.\nFor each of the questions you generate, you also generate a bucket title this question / request falls under.\nSome bucket examples might be:\n- Programming Questions\n- Fun Facts\n- General Knowledge\n- Story Creation\n- Jokes and Humor\n- etc\n\nResponse with three questions and their corresponding bucket as a json payload. Make the questions detailed an unique.\n\nExample response format:\n{\n  \"suggestions\": [\n    {\n      \"bucket\": \"Programming Questions\",\n      \"question\": \"How do I reverse a string in Python?\"\n    },\n    {\n      \"bucket\": \"Fun Facts\",\n      \"question\": \"What are some interesting facts about the universe?\"\n    },\n    {\n      \"bucket\": \"Story Creation\",\n      \"question\": \"Can you help me write a short story about a time-traveling detective?\"\n    }\n  ]\n}\n\nOnly repond with the JSON payload surounded in triple back ticks ``` and nothing else."
+    "three_suggestions": 'You are an expert suggestion generator.\nYou generate three random questions a user could potentially ask to LLM, helping the user get started with a conversation.\nFor each of the questions you generate, you also generate a bucket title this question / request falls under.\nSome bucket examples might be:\n- Programming Questions\n- Fun Facts\n- General Knowledge\n- Story Creation\n- Jokes and Humor\n- etc\n\nResponse with three questions and their corresponding bucket as a json payload. Make the questions detailed an unique.\n\nExample response format:\n{\n  "suggestions": [\n    {\n      "bucket": "Programming Questions",\n      "question": "How do I reverse a string in Python?"\n    },\n    {\n      "bucket": "Fun Facts",\n      "question": "What are some interesting facts about the universe?"\n    },\n    {\n      "bucket": "Story Creation",\n      "question": "Can you help me write a short story about a time-traveling detective?"\n    }\n  ]\n}\n\nOnly repond with the JSON payload surounded in triple back ticks ``` and nothing else.'
 }
 
 
@@ -100,7 +106,10 @@ class UserListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserMessage.objects.filter(conversation__user=self.request.user)
+        return UserMessage.objects.filter(
+            conversation__user=self.request.user,
+            is_deleted=False,  # Only show non-deleted messages
+        )
 
     def get(self, request):
         messages = self.get_queryset()
@@ -114,15 +123,20 @@ class UserMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserMessage.objects.filter(conversation__user=self.request.user)
+        return UserMessage.objects.filter(
+            conversation__user=self.request.user
+        )
 
     def get_object(self):
         message = super().get_object()
-
         if message.conversation.user != self.request.user:
             raise PermissionDenied("You do not have permission to access this message.")
-
         return message
+
+    def destroy(self, request, *args, **kwargs):
+        message = self.get_object()
+        message.soft_delete()  # Use soft delete instead of hard delete
+        return Response(status=204)
 
 
 class AssistantListCreateView(generics.ListCreateAPIView):
@@ -131,7 +145,7 @@ class AssistantListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return AssistantMessage.objects.filter(conversation__user=self.request.user)
+        return AssistantMessage.objects.filter(conversation__user=self.request.user, is_delete=False)
 
     def post(self, request, *args, **kwargs):
         # Get the conversation and model from the request
@@ -139,7 +153,9 @@ class AssistantListCreateView(generics.ListCreateAPIView):
         model_id = request.data.get("model")
 
         # Retrieve the conversation and model instances
-        conversation = Conversation.objects.get(id=conversation_id, user=self.request.user)
+        conversation = Conversation.objects.get(
+            id=conversation_id, user=self.request.user
+        )
         model = Model.objects.get(id=model_id)
 
         # Retireve the user message used to generate this assistant message
@@ -151,7 +167,7 @@ class AssistantListCreateView(generics.ListCreateAPIView):
             model=model,
             provider=request.data.get("provider"),
             liked=request.data.get("liked", False),
-            generated_by=user_message
+            generated_by=user_message,
         )
 
         assistant_message.save()  # Save the AssistantMessage to generate an ID
@@ -195,6 +211,11 @@ class AssistantMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        message = self.get_object()
+        message.soft_delete()  # Use soft delete instead of hard delete
+        return Response(status=204)
 
 
 class ModelListCreateView(generics.ListCreateAPIView):
@@ -260,9 +281,7 @@ class ModelDetailWithInfoView(APIView):
     def put(self, request, pk):
         try:
             ollama_model = Model.objects.get(pk=pk)
-            serializer = ModelSerializer(
-                ollama_model, data=request.data, partial=True
-            )
+            serializer = ModelSerializer(ollama_model, data=request.data, partial=True)
 
             if serializer.is_valid():
                 serializer.save()
@@ -324,7 +343,7 @@ class BaseChatAPIView(APIView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.llm_service = None
-    
+
     def post(self, request):
         try:
             model = request.data.get("model")
@@ -340,19 +359,76 @@ class BaseChatAPIView(APIView):
             self.llm_service = LLMServiceFactory.get_service(provider)
 
             if not self.llm_service:
-                return Response({"error": f"'{provider}' is an invalid provider."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {"error": f"'{provider}' is an invalid provider."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
 
             chat_completion = self.llm_service.chat(model, messages)
 
             if chat_completion and "error" not in chat_completion:
                 return Response(chat_completion, status=status.HTTP_200_OK)
             elif chat_completion and "error" in chat_completion:
-                return Response(chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
             else:
                 return Response(
                     {"error": f"Failed to fetch response from {provider} API."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class BaseStreamingAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.llm_service = None
+
+    def post(self, request):
+        try:
+            model = request.data.get("model")
+            messages = request.data.get("messages")
+            provider = request.data.get("provider")
+
+            if not model or not messages or not provider:
+                return Response(
+                    {"error": "Model, messages, and provider are required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            self.llm_service = LLMServiceFactory.get_service(provider)
+
+            if not self.llm_service:
+                return Response(
+                    {"error": f"'{provider}' is an invalid provider."},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
+            def stream_response():
+                for chunk in self.llm_service.chat_stream(model, messages):
+                    if chunk and not isinstance(chunk, str):
+                        data = f"data: {json.dumps(chunk)}\n\n"
+                        yield data.encode("utf-8")
+
+            response = StreamingHttpResponse(
+                stream_response(), content_type="text/event-stream"
+            )
+
+            response["Cache-Control"] = "no-cache"
+            response["X-Accel-Buffering"] = "no"
+            response["Access-Control-Allow-Origin"] = "*"
+            response["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
+            response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+            response["Access-Control-Allow-Credentials"] = "true"
+
+            return response
+
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -375,24 +451,39 @@ class BaseThreeSuggestionsAPIView(APIView):
                 {"error": "Model and provider are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         prompt = PROMPTS.get("three_suggestions")
         self.llm_service = LLMServiceFactory.get_service(provider)
 
         if not self.llm_service:
-            return Response({"error": f"'{provider}' is an invalid provider."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        chat_completion = self.llm_service.chat(model=model, messages=[{"role": "user", "content": prompt}])
+            return Response(
+                {"error": f"'{provider}' is an invalid provider."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        chat_completion = self.llm_service.chat(
+            model=model, messages=[{"role": "user", "content": prompt}]
+        )
 
         if chat_completion and "error" not in chat_completion:
             try:
-                payload = json.loads(chat_completion["message"]["content"].replace("```json", "").replace("```", ""))
+                payload = json.loads(
+                    chat_completion["message"]["content"]
+                    .replace("```json", "")
+                    .replace("```", "")
+                )
                 return Response(payload, status=status.HTTP_200_OK)
             except Exception as e:
-                chat_completion["external_message"] = f"Failed to decode the json -> {e}"
-                return Response(chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                chat_completion["external_message"] = (
+                    f"Failed to decode the json -> {e}"
+                )
+                return Response(
+                    chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
         elif chat_completion and "error" in chat_completion:
-            return Response(chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         else:
             return Response(
                 {"error": f"Failed to fetch response from {provider} API."},
@@ -401,6 +492,10 @@ class BaseThreeSuggestionsAPIView(APIView):
 
 
 class ChatAPIView(BaseChatAPIView):
+    pass
+
+
+class StreamChatAPIView(BaseStreamingAPIView):
     pass
 
 

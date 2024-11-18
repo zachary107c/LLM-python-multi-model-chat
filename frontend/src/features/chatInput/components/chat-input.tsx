@@ -5,6 +5,7 @@ import {
   DropdownMenu,
   Skeleton,
   Badge,
+  Switch,
 } from "@radix-ui/themes";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useCallback } from "react";
@@ -12,10 +13,10 @@ import { BaseModelEntity } from "@/types/api";
 import { Button as LocalButton } from "@/components/ui/button";
 import { ImageUploadButton } from "@/features/imageUpload/components/image-upload-button";
 import { Rocket, Folder, X } from "lucide-react";
-import { Separator } from "@radix-ui/react-dropdown-menu";
+import { useUserSettings } from "@/components/userSettings/user-settings-provider";
 
 interface Props {
-  onSendMessage: (message: string, image: File | null) => void;
+  onSendMessage: (message: string, stream: boolean) => void;
   onModelChange: (model: BaseModelEntity) => void;
   onImageDataChange: (model: File | null) => void;
   selectedModel: BaseModelEntity | null;
@@ -38,9 +39,10 @@ export function ChatInput({
   const [imageName, setImageName] = useState<string | null>(null);
   const [imageData, setImageData] = useState<File | null>(null);
 
+
   const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSendMessage(newMessage, imageData);
+    onSendMessage(newMessage);
     setNewMessage("");
     setTextAreaHeight(48);
     handleClear();
@@ -51,7 +53,7 @@ export function ChatInput({
       setTextAreaHeight(Math.min(textAreaHeight + 24, 240)); // Limit expansion to 240px
     } else if (event.key === "Enter") {
       event.preventDefault();
-      onSendMessage(newMessage, imageData);
+      onSendMessage(newMessage);
       setNewMessage("");
       setTextAreaHeight(48);
       handleClear();
@@ -93,7 +95,11 @@ export function ChatInput({
   }, {} as Record<string, BaseModelEntity[]>);
 
   return (
-    <div className={`chat-input mb-4 flex flex-col w-full ${isLoading ? "chat-input-border" : ""}`}>
+    <div
+      className={`chat-input mb-4 flex flex-col w-full ${
+        isLoading ? "chat-input-border" : ""
+      }`}
+    >
       <form onSubmit={handleSendMessage} className="flex justify-between">
         <Card
           className={`w-full`}

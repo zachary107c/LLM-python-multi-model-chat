@@ -12,6 +12,8 @@ export type UserMessage = Entity<{
   content: string;
   image: string | null;
   type: string;
+  is_deleted: boolean;
+  deleted_at: string;
 }>;
 
 export type ContentVariation = {
@@ -27,6 +29,8 @@ export type AssistantMessage = Entity<{
   provider: string;
   liked: boolean;
   type: string;
+  is_deleted: boolean;
+  deleted_at: string;
 }>;
 
 export type Message = UserMessage | AssistantMessage;
@@ -55,17 +59,17 @@ export type GroupedConverations = {
 
 export type ConversationDetailMessage = Entity<
   | {
-      content_variations: ContentVariation[];
-      type: string;
-      model: BaseModelEntity;
-      provider: string;
-      liked: boolean;
-    }
+    content_variations: ContentVariation[];
+    type: string;
+    model: BaseModelEntity;
+    provider: string;
+    liked: boolean;
+  }
   | {
-      content: string;
-      type: string;
-      image: string | null;
-    }
+    content: string;
+    type: string;
+    image: string | null;
+  }
 >;
 
 export type ConversationDetail = {
@@ -83,32 +87,32 @@ export type BaseModelEntity = {
   liked: boolean;
   provider: string;
   color:
-    | "gray"
-    | "gold"
-    | "bronze"
-    | "brown"
-    | "yellow"
-    | "amber"
-    | "orange"
-    | "tomato"
-    | "red"
-    | "ruby"
-    | "crimson"
-    | "pink"
-    | "plum"
-    | "purple"
-    | "violet"
-    | "iris"
-    | "indigo"
-    | "blue"
-    | "cyan"
-    | "teal"
-    | "jade"
-    | "green"
-    | "grass"
-    | "lime"
-    | "mint"
-    | "sky";
+  | "gray"
+  | "gold"
+  | "bronze"
+  | "brown"
+  | "yellow"
+  | "amber"
+  | "orange"
+  | "tomato"
+  | "red"
+  | "ruby"
+  | "crimson"
+  | "pink"
+  | "plum"
+  | "purple"
+  | "violet"
+  | "iris"
+  | "indigo"
+  | "blue"
+  | "cyan"
+  | "teal"
+  | "jade"
+  | "green"
+  | "grass"
+  | "lime"
+  | "mint"
+  | "sky";
 };
 
 export type ModelEntity<T> = {
@@ -135,15 +139,21 @@ export type GenerateConversationTitle = {
 export type Profile = {
   image: string;
   bio: string;
-  preferred_model: BaseModelEntity;
 };
 
-export type UserProfile = {
+export type Settings = {
+  preferred_model: BaseModelEntity;
+  stream_responses: boolean;
+  theme: string;
+}
+
+export type UserSettings = {
   username: string;
   email: string;
   first_name: string;
   last_name: string;
   profile: Profile;
+  settings: Settings;
 };
 
 export type Suggestion = {
@@ -159,3 +169,14 @@ export type Provider = {
   id: number;
   name: string;
 }
+
+export type UserSettingsUpdatePayload = {
+  username?: string;
+  email?: string;
+  profile?: { image?: string; bio?: string };
+  settings?: {
+    preferred_model: number
+    stream_responses?: boolean;
+    theme?: string;
+  };
+};

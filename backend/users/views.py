@@ -4,8 +4,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from .serializers import RegisterSerializer, UserSerializer, AuthSerializer
+from .serializers import RegisterSerializer, UserSerializer, AuthSerializer, UserProfileSerializer, UserSettingsSerializer
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+from .models import Profile, Settings
 from knox.views import (
     LoginView as KnoxLoginView,
     LogoutView as KnoxLogoutView,
@@ -63,3 +65,22 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+    
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
+
+    def get_object(self):
+        # Get the current user's profile
+        return get_object_or_404(Profile, user=self.request.user)
+    
+
+class UserSettingsView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSettingsSerializer
+
+    def get_object(self):
+        # Get the current user's settings
+        return get_object_or_404(Settings, user=self.request.user)
+

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
+import { env } from "@/config/env";
 import Cookies from "js-cookie";
 import useScrollToEnd from "@/features/chat/hooks/use-scroll-to-end";
-import { ChatLoader } from "@/features/chatLoader/components/chat-loader";
-import Panel from "@/components/ui/panel";
+// import { ChatLoader } from "@/features/chatLoader/components/chat-loader";
+// import Panel from "@/components/ui/panel";
 import { ChatInput } from "@/features/chatInput/components/chat-input";
 import { createUserMessage } from "@/features/chatMessage/api/create-user-message";
 import { createAssistantMessage } from "@/features/chatMessage/api/create-assistant-message";
@@ -28,6 +29,7 @@ import { Welcome } from "@/features/welcome/components/welcome";
 import { WelcomeLoading } from "@/features/welcome/components/welcome-loading";
 import { useGetSuggestionsQuery } from "../api/get-three-suggestions";
 import { useSearchParams } from "react-router-dom";
+import { useUserSettings } from "@/components/userSettings/user-settings-provider";
 
 interface ChatProps {
   chatId: string;
@@ -43,6 +45,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
   const [imageData, setImageData] = useState<File | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [_, setSearchParams] = useSearchParams();
+  const { userSettings, setUserSettings } = useUserSettings();
 
   const updateMutation = updateConversationMutation();
   const createMutation = createConversationMutation();
@@ -72,6 +75,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             liked: message.liked,
             conversation: message.conversation,
             image: message.image,
+            is_deleted: message.is_deleted,
+            deleted_at: message.deleted_at,
           } as UserMessage;
         } else {
           return {
@@ -84,6 +89,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             generated_by: message.generated_by,
             liked: message.liked,
             conversation: message.conversation,
+            is_deleted: message.is_deleted,
+            deleted_at: message.deleted_at,
           } as AssistantMessage;
         }
       });
@@ -99,7 +106,13 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
 
   useEffect(() => {
     if (models && models.length > 0 && !model) {
-      const preferredModel = models.find((m) => m.name === "llama3.1:latest");
+      const preferredModel = models.find(
+        (m) =>
+          m.name ===
+          ((userSettings.settings.preferred_model &&
+            userSettings.settings.preferred_model.name) ||
+            "llama3.1:latest")
+      );
       setModel(preferredModel ? preferredModel : models[0]);
     }
   }, [models, model]);
@@ -164,9 +177,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
   };
 
   async function handleSendMessage(message: string) {
-    console.log("handle send messsage called!");
     if (message.trim().length > 0) {
-      var currentChatId = chatId;
+      let currentChatId = chatId;
 
       if (!chatId) {
         currentChatId = await handleCreateNewConversation(message);
@@ -179,11 +191,13 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           image: imageData,
         },
       });
-      if (messages.length == 0) {
+
+      if (messages.length === 0) {
         await updateMutation.mutateAsync({
           data: { conversationId: currentChatId, updates: { title: message } },
         });
       }
+
       const newUserMessage: UserMessage = {
         id: userPostData.id,
         created_at: userPostData.created_at,
@@ -191,12 +205,15 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
         conversation: userPostData.conversation,
         image: userPostData.image,
         type: "user",
+        is_deleted: userPostData.is_deleted,
+        deleted_at: userPostData.deleted_at,
       };
 
       setMessages((messages) => [...messages, newUserMessage]);
       setIsLoading(true);
-      var image_data = await toDataURL(userPostData.image);
-      var payload = {
+
+      const image_data = await toDataURL(userPostData.image);
+      const payload = {
         model: model?.name,
         provider: model?.provider,
         messages: [
@@ -207,35 +224,164 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           },
         ],
       };
-      const response = await api.post("/chat/", payload, {
-        headers: {
-          Authorization: `Token ${Cookies.get("token")}`,
-        },
-      });
-      setIsLoading(false);
-      const assistantPostData = await createAssistantMessage({
-        data: {
-          conversation: currentChatId,
-          content_variations: [(response as any).message.content],
-          model: model?.id || -1,
-          provider: "ollama",
-          generated_by: newUserMessage.id,
-        },
-      });
 
-      const newAssistantMessage: AssistantMessage = {
-        id: assistantPostData.id,
-        created_at: assistantPostData.created_at,
-        content_variations: assistantPostData.content_variations,
-        generated_by: newUserMessage,
-        conversation: assistantPostData.conversation,
-        model: assistantPostData.model,
-        provider: assistantPostData.provider,
-        liked: assistantPostData.liked,
-        type: "assistant",
-      };
+      try {
+        if (userSettings.settings?.stream_responses || false) {
+          const response = await fetch(`${env.BACKEND_API_URL}chat/stream/`, {
+            method: "POST",
+            headers: {
+              Authorization: `Token ${Cookies.get("token")}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+            credentials: "include",
+          });
 
-      setMessages((messages) => [...messages, newAssistantMessage]);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          let accumulatedContent = "";
+
+          const stream = new ReadableStream({
+            start(controller) {
+              const reader = response.body?.getReader();
+              return pump();
+
+              function pump(): any {
+                return reader?.read().then(({ done, value }) => {
+                  if (done) {
+                    controller.close();
+                    return;
+                  }
+
+                  const decoded = new TextDecoder().decode(value);
+                  const lines = decoded.split("\n");
+
+                  for (const line of lines) {
+                    if (line.trim()) {
+                      try {
+                        const jsonStr = line.slice(6); // Remove "data: " prefix
+                        const data = JSON.parse(jsonStr);
+
+                        if (data.message?.content) {
+                          accumulatedContent += data.message.content;
+
+                          const tempAssistantMessage: AssistantMessage = {
+                            id: "temp",
+                            created_at: new Date().toISOString(),
+                            content_variations: [
+                              { id: -1, content: accumulatedContent },
+                            ],
+                            generated_by: newUserMessage,
+                            conversation: currentChatId,
+                            model: model || {
+                              id: -1,
+                              name: "",
+                              model: "",
+                              liked: false,
+                              provider: "",
+                              color: "gray",
+                            },
+                            provider: model?.provider || "",
+                            liked: false,
+                            type: "assistant",
+                            is_deleted: false,
+                            deleted_at: ""
+                          };
+
+                          setMessages((messages) => {
+                            const lastMessage = messages[messages.length - 1];
+                            if (lastMessage?.id === "temp") {
+                              return [
+                                ...messages.slice(0, -1),
+                                tempAssistantMessage,
+                              ];
+                            }
+                            return [...messages, tempAssistantMessage];
+                          });
+                        }
+                      } catch (e) {
+                        console.error("Error parsing chunk:", e);
+                      }
+                    }
+                  }
+                  return pump();
+                });
+              }
+            },
+          });
+
+          await new Response(stream).text();
+
+          const assistantPostData = await createAssistantMessage({
+            data: {
+              conversation: currentChatId,
+              content_variations: [accumulatedContent],
+              model: model?.id || -1,
+              provider: model?.provider || "ollama",
+              generated_by: newUserMessage.id,
+            },
+          });
+
+          const finalAssistantMessage: AssistantMessage = {
+            id: assistantPostData.id,
+            created_at: assistantPostData.created_at,
+            content_variations: assistantPostData.content_variations,
+            generated_by: newUserMessage,
+            conversation: assistantPostData.conversation,
+            model: assistantPostData.model,
+            provider: assistantPostData.provider,
+            liked: assistantPostData.liked,
+            type: "assistant",
+            is_deleted: assistantPostData.is_deleted,
+            deleted_at: assistantPostData.deleted_at,
+          };
+
+          setMessages((messages) => {
+            if (messages[messages.length - 1]?.id === "temp") {
+              return [...messages.slice(0, -1), finalAssistantMessage];
+            }
+            return [...messages, finalAssistantMessage];
+          });
+        } else {
+          const response = await api.post("/chat/", payload, {
+            headers: {
+              Authorization: `Token ${Cookies.get("token")}`,
+            },
+          });
+
+          const assistantPostData = await createAssistantMessage({
+            data: {
+              conversation: currentChatId,
+              content_variations: [(response as any).message.content],
+              model: model?.id || -1,
+              provider: "ollama",
+              generated_by: newUserMessage.id,
+            },
+          });
+
+          const newAssistantMessage: AssistantMessage = {
+            id: assistantPostData.id,
+            created_at: assistantPostData.created_at,
+            content_variations: assistantPostData.content_variations,
+            generated_by: newUserMessage,
+            conversation: assistantPostData.conversation,
+            model: assistantPostData.model,
+            provider: assistantPostData.provider,
+            liked: assistantPostData.liked,
+            type: "assistant",
+            is_deleted: assistantPostData.is_deleted,
+            deleted_at: assistantPostData.deleted_at,
+          };
+
+          setMessages((messages) => [...messages, newAssistantMessage]);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   }
 
@@ -272,12 +418,15 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           {messages.map((message) => {
             if (isUserMessage(message)) {
               return (
-                <UserChatMessage key={message.id} userMessageData={message} />
+                <UserChatMessage
+                  key={"user-" + message.id}
+                  userMessageData={message}
+                />
               );
             } else if (isAssistantMessage(message)) {
               return (
                 <AssistantChatMessage
-                  key={message.id}
+                  key={"assistant-" + message.id}
                   assistantMessageData={message}
                 />
               );
@@ -285,13 +434,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               return null;
             }
           })}
-          {/* {isLoading && (
-            <div className="flex justify-start mb-4">
-              <Panel title="LLM" justify="justify-start">
-                <ChatLoader />
-              </Panel>
-            </div>
-          )} */}
+
           <div ref={ref} />
         </div>
         <ChatInput
