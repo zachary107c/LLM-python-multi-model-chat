@@ -25,7 +25,6 @@ class OllamaService(LLMService):
     """
     A service class for interacting with an Ollama API.
     """
-
     def __init__(self, endpoint: str = None, client: Client = None):
         """
         Initializes the OllamaService.
@@ -65,7 +64,11 @@ class OllamaService(LLMService):
             }
 
         try:
-            response = self.client.chat(model=model, messages=messages, stream=False)
+            response = self.client.chat(
+                model=model,
+                messages=messages,
+                stream=False,
+            )
             return response
         except (RequestError, ResponseError) as e:
             self.logger.error(f"API request failed: {e}")
@@ -236,10 +239,7 @@ class OpenAIService(LLMService):
 
         try:
             stream = self.client.chat.completions.create(
-                model=model,
-                messages=messages,
-                stream=True,
-                **kwargs
+                model=model, messages=messages, stream=True, **kwargs
             )
 
             for chunk in stream:
@@ -247,7 +247,7 @@ class OpenAIService(LLMService):
                     yield {
                         "message": {
                             "content": chunk.choices[0].delta.content,
-                            "role": "assistant"
+                            "role": "assistant",
                         }
                     }
 
@@ -349,10 +349,7 @@ class AzureOpenAIService(LLMService):
 
         try:
             stream = self.client.chat.completions.create(
-                model=model,
-                messages=messages,
-                stream=True,
-                **kwargs
+                model=model, messages=messages, stream=True, **kwargs
             )
 
             for chunk in stream:
@@ -360,7 +357,7 @@ class AzureOpenAIService(LLMService):
                     yield {
                         "message": {
                             "content": chunk.choices[0].delta.content,
-                            "role": "assistant"
+                            "role": "assistant",
                         }
                     }
 

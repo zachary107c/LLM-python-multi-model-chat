@@ -10,17 +10,19 @@ import {
   Button,
   TextField,
   TextArea,
-  Select,
+  DropdownMenu,
   Switch,
   Callout,
   Progress,
+  Skeleton,
 } from "@radix-ui/themes";
 import { withUserSettings } from "@/components/userSettings/user-settings-provider";
 import { useUpdateUserSettingsMutation } from "@/components/userSettings/api/update-user-settings";
 import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-settings";
 import { useGetModelsQuery } from "@/features/model/api/get-models";
-import { Settings, UserSettingsUpdatePayload } from "@/types/api";
+import { BaseModelEntity, ModelDetail, Settings, UserSettingsUpdatePayload } from "@/types/api";
 import { ToastContainer, toast } from "react-toastify";
+import { ModelSelect } from "@/features/model/components/model-select";
 import "react-toastify/dist/ReactToastify.css";
 import {
   CheckCircledIcon,
@@ -149,6 +151,25 @@ function SettingsPage() {
       prev.map((toast) => (toast.id === id ? { ...toast, timeoutId } : toast))
     );
   };
+
+  function handleModelChange(model: BaseModelEntity) {
+    if (!userSettingsLoading) {
+      const newPreferredModel = model ||
+        (models && models[0]) || {
+          id: -1,
+          name: "llama3.1",
+          model: "llama3.1",
+          liked: false,
+          provider: "",
+          color: "gray",
+        };
+
+      setSettings((prev) => ({
+        ...prev,
+        preferred_model: newPreferredModel,
+      }));
+    }
+  }
 
   useEffect(() => {
     if (userSettings) {
@@ -314,6 +335,49 @@ function SettingsPage() {
               maxWidth="600px"
               style={{ width: "100%" }}
             >
+              <Tabs.Content value="settings" className="w-full">
+                <Card className="w-full">
+                  <Heading size="6" mb="">
+                    App Settings
+                  </Heading>
+                  <div className="mb-4">
+                    <Text color="gray">Customize your chat experience.</Text>
+                  </div>
+                  <Flex direction="column" gap="4">
+                    <Flex direction="column" align="start">
+                      <Text as="label" size="2" weight="bold">
+                        Stream Chat Responses
+                      </Text>
+                      <div className="flex justify-between items-start gap-2">
+                        <Text size="1" color="gray">
+                          See responses as they're being generated
+                        </Text>
+                        <Switch
+                          checked={settings.stream_responses}
+                          onCheckedChange={handleStreamingToggled}
+                        />
+                      </div>
+                    </Flex>
+                    <Flex justify="between" align="center">
+                      <div className="flex flex-col w-full">
+                        <Text as="label" size="2" weight="bold">
+                          Dark Mode
+                        </Text>
+                        <div className="flex justify-between items-center w-full">
+                          <Text size="1" color="gray">
+                            Toggle dark mode on or off
+                          </Text>
+                          <Switch
+                            checked={settings.theme === "dark"}
+                            onCheckedChange={handleThemeChange}
+                          />
+                        </div>
+                      </div>
+                    </Flex>
+                    {/* Additional settings can be added here */}
+                  </Flex>
+                </Card>
+              </Tabs.Content>
               <Tabs.Content value="profile">
                 <Card>
                   <Heading size="6" mb="2">
@@ -364,100 +428,27 @@ function SettingsPage() {
                         Bio
                       </Text>
                       <TextArea
-                        value={bio}
+                        value={bio || ""}
                         onChange={(e) => setBio(e.target.value)}
                       />
                     </Box>
                     <Box>
-                      <Text as="label" size="2" mb="1" weight="bold">
-                        Preferred Model
-                      </Text>
-                      <Select.Root
-                        value={
-                          userSettingsLoading
-                            ? "Loading Models"
-                            : (settings.preferred_model &&
-                                settings.preferred_model.id.toString()) ||
-                              "Error"
-                        }
-                        onValueChange={(id) => {
-                          if (!userSettingsLoading) {
-                            const selectedModel = models?.find(
-                              (model) => model.id === Number(id)
-                            );
-
-                            // Ensure that we have access to the models array before trying to access its elements
-                            const newPreferredModel = selectedModel ||
-                              (models && models[0]) || {
-                                id: -1,
-                                name: "llama3.1",
-                                model: "llama3.1",
-                                liked: false,
-                                provider: "",
-                                color: "gray",
-                              };
-
-                            setSettings((prev) => ({
-                              ...prev,
-                              preferred_model: newPreferredModel,
-                            }));
+                      <div className="flex flex-col ">
+                        <Text as="label" size="2" mb="1" weight="bold">
+                          Preferred Model
+                        </Text>
+                        <ModelSelect
+                          selectedModel={
+                            userSettingsLoading
+                              ? null
+                              : settings.preferred_model
                           }
-                        }}
-                      >
-                        <Select.Trigger />
-                        <Select.Content>
-                          {models?.map((model) => (
-                            <Select.Item
-                              key={model.id}
-                              value={model.id.toString()}
-                            >
-                              {model.name}
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Root>
+                          models={models}
+                          modelsLoading={modelsLoading}
+                          onModelChange={handleModelChange}
+                        />
+                      </div>
                     </Box>
-                  </Flex>
-                </Card>
-              </Tabs.Content>
-              <Tabs.Content value="settings">
-                <Card>
-                  <Heading size="6" mb="2">
-                    App Settings
-                  </Heading>
-                  <Text color="gray" mb="4">
-                    Customize your chat experience.
-                  </Text>
-                  <Flex direction="column" gap="4">
-                    <Flex justify="between" align="center">
-                      <Box>
-                        <Text as="label" size="2" weight="bold">
-                          Stream Chat Responses
-                        </Text>
-                        <Text size="1" color="gray">
-                          See responses as they're being generated
-                        </Text>
-                      </Box>
-                      <Switch
-                        checked={settings.stream_responses}
-                        onCheckedChange={handleStreamingToggled}
-                      />
-                    </Flex>
-                    <Flex justify="between" align="center">
-                      <Box>
-                        <Text as="label" size="2" weight="bold">
-                          Dark Mode
-                        </Text>
-                        <Text size="1" color="gray">
-                          Toggle dark mode on or off
-                        </Text>
-                      </Box>
-                      <Switch
-                        checked={settings.theme === "dark"}
-                        onCheckedChange={handleThemeChange}
-                      />
-                    </Flex>
-                    {/* Additional settings can be added here */}
                   </Flex>
                 </Card>
               </Tabs.Content>

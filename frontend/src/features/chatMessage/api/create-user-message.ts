@@ -9,11 +9,9 @@ export const createUserMessageInputSchema = z.object({
   image: z.instanceof(File).nullable().optional(),
 });
 
-export type CreateUserMessageInput = z.infer<
-  typeof createUserMessageInputSchema
->;
+export type CreateUserMessageInput = z.infer<typeof createUserMessageInputSchema>;
 
-export const createUserMessage = ({
+export const createUserMessage = async ({
   data,
 }: {
   data: CreateUserMessageInput;
@@ -25,14 +23,13 @@ export const createUserMessage = ({
   formData.append("content", data.content);
 
   // Append the file only if it exists
-  if (data.image) {
-    formData.append("image", data.image);
+  if (data.image instanceof File) {
+    formData.append("image", data.image, data.image.name);
   }
 
   return api.post(`/messages/user/`, formData, {
     headers: {
       Authorization: `Token ${Cookies.get("token")}`,
-      // No need to explicitly set 'Content-Type', it will be set automatically
     },
   });
 };

@@ -264,6 +264,10 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         const jsonStr = line.slice(6); // Remove "data: " prefix
                         const data = JSON.parse(jsonStr);
 
+                        if (data.message && data.message.error) {
+                          throw new Error(data.message.error);
+                        }
+
                         if (data.message?.content) {
                           accumulatedContent += data.message.content;
 
@@ -287,7 +291,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                             liked: false,
                             type: "assistant",
                             is_deleted: false,
-                            deleted_at: ""
+                            deleted_at: "",
                           };
 
                           setMessages((messages) => {

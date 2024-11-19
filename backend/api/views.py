@@ -6,6 +6,7 @@ import datetime
 from io import StringIO
 from django.core.management import call_command
 from django.http import StreamingHttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
@@ -108,8 +109,24 @@ class UserListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return UserMessage.objects.filter(
             conversation__user=self.request.user,
-            is_deleted=False,  # Only show non-deleted messages
+            is_deleted=False,
         )
+
+    def perform_create(self, serializer):
+        # Get the file from request.FILES
+        image = self.request.FILES.get("image")
+        conversation_id = self.request.data.get("conversation")
+
+        # Get the conversation and verify ownership
+        conversation = get_object_or_404(
+            Conversation, id=conversation_id, user=self.request.user
+        )
+
+        # Save with the image if present
+        if image:
+            serializer.save(conversation=conversation, image=image)
+        else:
+            serializer.save(conversation=conversation)
 
     def get(self, request):
         messages = self.get_queryset()
@@ -123,9 +140,7 @@ class UserMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserMessage.objects.filter(
-            conversation__user=self.request.user
-        )
+        return UserMessage.objects.filter(conversation__user=self.request.user)
 
     def get_object(self):
         message = super().get_object()
@@ -145,7 +160,9 @@ class AssistantListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return AssistantMessage.objects.filter(conversation__user=self.request.user, is_delete=False)
+        return AssistantMessage.objects.filter(
+            conversation__user=self.request.user, is_delete=False
+        )
 
     def post(self, request, *args, **kwargs):
         # Get the conversation and model from the request
@@ -413,6 +430,11 @@ class BaseStreamingAPIView(APIView):
             def stream_response():
                 for chunk in self.llm_service.chat_stream(model, messages):
                     if chunk and not isinstance(chunk, str):
+                        if "error" in chunk:
+                            return Response(
+                                {"message": chunk},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            )
                         data = f"data: {json.dumps(chunk)}\n\n"
                         yield data.encode("utf-8")
 
