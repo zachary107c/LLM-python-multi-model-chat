@@ -72,7 +72,7 @@ export function ChatInput({
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        const base64Data = reader.result as string;
+        // const base64Data = reader.result as string;
         // Create blob URL for preview
         const blobUrl = URL.createObjectURL(file);
         setPreviewUrl(blobUrl);

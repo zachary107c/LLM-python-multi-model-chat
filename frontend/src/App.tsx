@@ -11,7 +11,7 @@ function App() {
   }, []);
 
   return (
-    <div className="main-page font-work-sans h-screen max-h-[100dvh] overflow-auto flex flex-row">
+    <div className="main-page h-screen max-h-[100dvh] overflow-auto flex flex-row">
       <Navbar />
       <Outlet />
     </div>

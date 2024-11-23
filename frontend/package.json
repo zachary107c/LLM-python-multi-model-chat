@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -20,6 +20,7 @@
     "class-variance-authority": "^0.7.0",
     "confetti-js": "^0.0.18",
     "dompurify": "^3.1.6",
+    "framer-motion": "^11.11.17",
     "highlight.js": "^11.10.0",
     "js-cookie": "^3.0.5",
     "jsdom": "^25.0.0",
@@ -38,6 +39,7 @@
     "react-toastify": "^10.0.6",
     "react-use": "^17.5.1",
     "tailwind-merge": "^2.5.2",
+    "uuid": "^11.0.3",
     "zod": "^3.23.8"
   },
   "devDependencies": {

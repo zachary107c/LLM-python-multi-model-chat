@@ -4,7 +4,7 @@ import { DeleteMessageModal } from "./delete-message-modal";
 import { UserMessage } from "@/types/api";
 import { ImageExpandModal } from "./image-expander-modal";
 import MarkdownRenderer from "@/features/markdown/components/markdown";
-import { UndoDeleteMessageButton } from "./undo-delete-user-message-button";
+import { UndoDeleteUserMessageButton } from "./undo-delete-user-message-button";
 
 export function UserChatMessage({
   userMessageData,
@@ -16,9 +16,7 @@ export function UserChatMessage({
   });
 
   function localizeUTCDates(text: string) {
-    // Regular expression to match ISO 8601 UTC datetime format
     const utcDatePattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z/g;
-
     return text.replace(utcDatePattern, (match) => {
       const date = new Date(match);
       return date.toLocaleString(navigator.language, {
@@ -27,7 +25,6 @@ export function UserChatMessage({
         day: "numeric",
         hour: "numeric",
         minute: "numeric",
-        // second: "numeric",
       });
     });
   }
@@ -51,15 +48,15 @@ export function UserChatMessage({
         </Card>
       </div>
       {userMessageData.is_deleted ? (
-        // <div className="flex justify-end">
-        //   <Flex gap="0" align="center">
-        //     <UndoDeleteMessageButton
-        //       messageId={userMessageData.id}
-        //       conversationId={userMessageData.conversation}
-        //     />
-        //   </Flex>
-        // </div>
-        <></>
+        userMessageData.recoverable ?
+        <div className="flex justify-end">
+          <Flex gap="0" align="center">
+            <UndoDeleteUserMessageButton
+              messageId={userMessageData.id}
+              conversationId={userMessageData.conversation}
+            />
+          </Flex>
+        </div> : <></>
       ) : (
         <div className="flex justify-end">
           <Flex gap="0" align="center">

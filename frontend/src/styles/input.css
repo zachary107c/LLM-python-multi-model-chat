@@ -19,6 +19,7 @@
 
 @layer base {
   :root {
+    --erm-font: "Funnel Display", sans-serif;
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -104,6 +105,19 @@
     background: #ffffff00;
   }
 }
+
+/* .radix-themes {
+  --default-font-family: var(--erm-font);
+  --heading-font-family: var(--erm-font);
+  --code-font-family: var(--erm-font);
+  --strong-font-family: var(--erm-font);
+  --em-font-family: var(--erm-font);
+  --quote-font-family: var(--erm-font);
+}
+
+* {
+  font-family: var(--erm-font);;
+} */
 
 .main-page {
   background: radial-gradient(
@@ -423,5 +437,50 @@
   to {
     transform: translateX(100%);
     opacity: 0;
+  }
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.highlighterides-character {
+  animation: highlightride 1s infinite linear;
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #cccccc 10%,
+    #ffffff 10%
+  );
+}
+
+@keyframes highlightride {
+  0% {
+    background-position: -20px 0;
+  }
+  50% {
+    background-position: 120px 0;
+  }
+  100% {
+    background-position: -20px 0;
+  }
+}
+
+/* ... existing styles ... */
+
+.welcome-card-white-bounce {
+  animation: bounce-wave 1s infinite linear;
+}
+
+@keyframes bounce-wave {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }

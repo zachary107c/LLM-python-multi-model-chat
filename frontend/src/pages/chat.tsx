@@ -19,7 +19,7 @@ export default function ChatPage() {
   }, [searchParams]);
 
   return (
-    <div className="w-full h-screen flex overflow-hidden">
+    <div className=" w-full h-screen flex overflow-hidden">
       <ConversationHistory onSelectedIdChange={handleSelectedChatId} />
       <div className="w-full h-full flex flex-col justify-between">
         <Chat chatId={selectedChatId} onCreateNewChat={handleSelectedChatId} />

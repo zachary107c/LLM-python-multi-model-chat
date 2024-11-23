@@ -1,6 +1,10 @@
 import uuid
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
+
 
 
 class Model(models.Model):
@@ -77,11 +81,24 @@ class UserMessage(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     def soft_delete(self):
-        from django.utils import timezone
-
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.save()
+
+    def recover(self):
+        if self.is_deleted and self.recoverable:
+            self.is_deleted = False
+            self.deleted_at = None
+            self.save()
+
+    @property
+    def recoverable(self):
+        if not self.is_deleted:
+            return False
+        if self.deleted_at is None:
+            return False
+        time_since_deletion = timezone.now() - self.deleted_at
+        return time_since_deletion < timedelta(hours=settings.RECOVERY_HOURS or 24)
 
     def __str__(self):
         return f"User Message {self.id} - {self.conversation.user.username}"
@@ -109,11 +126,24 @@ class AssistantMessage(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     def soft_delete(self):
-        from django.utils import timezone
-
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.save()
+
+    def recover(self):
+        if self.is_deleted and self.recoverable:  # Only recover if it is recoverable
+            self.is_deleted = False
+            self.deleted_at = None
+            self.save()
+
+    @property
+    def recoverable(self):
+        if not self.is_deleted:
+            return False
+        if self.deleted_at is None:
+            return False
+        time_since_deletion = timezone.now() - self.deleted_at
+        return time_since_deletion < timedelta(hours=settings.RECOVERY_HOURS or 24)
 
     def __str__(self):
         return f"Assistant Message {self.id} - {self.model}"

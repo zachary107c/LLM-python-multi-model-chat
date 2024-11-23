@@ -19,6 +19,7 @@ export default {
       },
       fontFamily: {
         "work-sans": ["Work Sans"],
+        "font-erm": ["Funnel Display", "sans-serif"]
       },
       colors: {
         border: "hsl(var(--border))",

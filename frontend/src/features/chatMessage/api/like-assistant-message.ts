@@ -34,9 +34,9 @@ export const likeAssistantMessageMutation = ({
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["conversation", conversationId],
-      });
+      // queryClient.invalidateQueries({
+      //   queryKey: ["conversation", conversationId],
+      // });
     },
   });
 };

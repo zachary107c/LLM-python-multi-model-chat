@@ -14,6 +14,7 @@ export type UserMessage = Entity<{
   type: string;
   is_deleted: boolean;
   deleted_at: string;
+  recoverable: string;
 }>;
 
 export type ContentVariation = {
@@ -31,6 +32,7 @@ export type AssistantMessage = Entity<{
   type: string;
   is_deleted: boolean;
   deleted_at: string;
+  recoverable: boolean;
 }>;
 
 export type Message = UserMessage | AssistantMessage;
@@ -158,6 +160,7 @@ export type UserSettings = {
 
 export type Suggestion = {
   bucket: string;
+  summary: string;
   question: string;
 };
 

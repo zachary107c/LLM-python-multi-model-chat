@@ -13,12 +13,11 @@ export const useUpdateUserSettingsMutation = () => {
     }: {
       data: FormData;
     }): Promise<UserSettings> => {
+      console.log(data);
       return api.patch(`/user/`, data, {
         headers: { 
           Authorization: `Token ${token}`,
-          // Don't set Content-Type - axios will automatically set it with the correct boundary
         },
-        // Need to disable axios's automatic JSON transformation
         transformRequest: (data) => data,
       });
     },

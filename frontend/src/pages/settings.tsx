@@ -20,7 +20,12 @@ import { withUserSettings } from "@/components/userSettings/user-settings-provid
 import { useUpdateUserSettingsMutation } from "@/components/userSettings/api/update-user-settings";
 import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-settings";
 import { useGetModelsQuery } from "@/features/model/api/get-models";
-import { BaseModelEntity, ModelDetail, Settings, UserSettingsUpdatePayload } from "@/types/api";
+import {
+  BaseModelEntity,
+  ModelDetail,
+  Settings,
+  UserSettingsUpdatePayload,
+} from "@/types/api";
 import { ToastContainer, toast } from "react-toastify";
 import { ModelSelect } from "@/features/model/components/model-select";
 import "react-toastify/dist/ReactToastify.css";
@@ -30,6 +35,9 @@ import {
   Cross2Icon,
 } from "@radix-ui/react-icons";
 import { Button as LocalButton } from "@/components/ui/button";
+import { api } from "@/lib/api-client";
+import Cookies from "js-cookie";
+import { v4 as uuidv4 } from "uuid";
 
 function Toast({
   message,
@@ -74,7 +82,7 @@ function Toast({
 function SettingsPage() {
   const [toasts, setToasts] = useState<
     Array<{
-      id: number;
+      id: string;
       message: string;
       type: "success" | "error";
       progress: number;
@@ -96,7 +104,7 @@ function SettingsPage() {
       color: "gray",
     },
     stream_responses: true,
-    theme: "dark",
+    theme: "dark"
   };
 
   const [username, setUsername] = useState(userSettings?.username || "johndoe");
@@ -107,11 +115,22 @@ function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(initialSettings);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [modelDetails, setModelDetails] = useState([]);
+
+  useEffect(() => {
+    if (modelDetails.length > 0) {
+      const timer = setTimeout(() => {
+        setModelDetails([]); // Clear models after 5 seconds
+      }, 10000);
+
+      return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+  }, [modelDetails]);
 
   const showToast = (message: string, type: "success" | "error") => {
     const TOAST_DURATION = 5000; // 5 seconds
     const UPDATE_INTERVAL = 10; // Update progress every 10ms
-    const id = Date.now();
+    const id = uuidv4();
 
     // Initialize toast with 100% progress
     const newToast = {
@@ -293,9 +312,39 @@ function SettingsPage() {
     );
   };
 
+  const handleRecoveryHoursChange = (event: any) => {
+    const newHours = parseInt(event.target.value, 10);
+    console.log(newHours);
+    if (!isNaN(newHours)) {
+      // Update settings with the new recovery hour value
+      setSettings((prev) => ({
+        ...prev,
+        recovery_hours: newHours,
+      }));
+
+      // Optionally, you might want to save the updated settings back to the server or local storage
+    }
+  };
+
+  async function handleUpdateModels() {
+    try {
+      const response = await api.post("/models/populate/", undefined, {
+        headers: { Authorization: `Token ${Cookies.get("token")}` },
+      });
+      setModelDetails(response.data);
+    } catch (error) {
+      console.error("Error updating models:", error);
+      showToast("Failed to update models", "error");
+    }
+  }
+
   return (
-    <div className="overflow-y-scroll no-scrollbar">
-      <Box p="6" style={{ maxWidth: "64rem" }}>
+    <div className=" overflow-y-scroll no-scrollbar">
+      <Box
+        p="6"
+        style={{ maxWidth: "64rem" }}
+        className="overflow-y-scroll no-scrollbar"
+      >
         <Box
           style={{
             position: "fixed",
@@ -327,6 +376,7 @@ function SettingsPage() {
           <Tabs.List>
             <Tabs.Trigger value="settings">App Settings</Tabs.Trigger>
             <Tabs.Trigger value="profile">Profile</Tabs.Trigger>
+            <Tabs.Trigger value="admin">Admin</Tabs.Trigger>
           </Tabs.List>
           <Box mt="4">
             <Flex
@@ -374,7 +424,6 @@ function SettingsPage() {
                         </div>
                       </div>
                     </Flex>
-                    {/* Additional settings can be added here */}
                   </Flex>
                 </Card>
               </Tabs.Content>
@@ -452,11 +501,57 @@ function SettingsPage() {
                   </Flex>
                 </Card>
               </Tabs.Content>
+              <Tabs.Content value="admin">
+                <Card>
+                  <Heading size="6" mb="2">
+                    Admin Stuff
+                  </Heading>
+                  <Text color="gray" mb="4">
+                    Admin related features.
+                  </Text>
+                  <Flex align="center" gap="4" mb="4">
+                    <Button
+                      onClick={async () => {
+                        try {
+                          await handleUpdateModels();
+                        } catch (error) {
+                          console.error("Error syncing models:", error);
+                        }
+                      }}
+                    >
+                      Sync Models
+                    </Button>
+                    <Flex
+                      direction="column"
+                      overflowY="scroll"
+                      className="no-scrollbar h-64"
+                    >
+                      {modelDetails.map(
+                        (
+                          group: { message: string; success: boolean },
+                          index
+                        ) => (
+                          <Card key={index} mb="2" size="5">
+                            <Text
+                              color={group.success ? "green" : "red"}
+                              className="h-full flex align-middle justify-start items-center text-left"
+                            >
+                              {group.message}
+                            </Text>
+                          </Card>
+                        )
+                      )}
+                    </Flex>
+                  </Flex>
+                </Card>
+              </Tabs.Content>
             </Flex>
           </Box>
         </Tabs.Root>
-        <Box mt="6">
-          <Button onClick={handleSave}>Save Changes</Button>
+        <Box mt="4">
+          <Button onClick={handleSave} variant="surface">
+            Save Changes
+          </Button>
         </Box>
       </Box>
     </div>

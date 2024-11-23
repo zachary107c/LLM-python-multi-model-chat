@@ -27,7 +27,9 @@ from .services import (
 )
 
 PROMPTS = {
-    "three_suggestions": 'You are an expert suggestion generator.\nYou generate three random questions a user could potentially ask to LLM, helping the user get started with a conversation.\nFor each of the questions you generate, you also generate a bucket title this question / request falls under.\nSome bucket examples might be:\n- Programming Questions\n- Fun Facts\n- General Knowledge\n- Story Creation\n- Jokes and Humor\n- etc\n\nResponse with three questions and their corresponding bucket as a json payload. Make the questions detailed an unique.\n\nExample response format:\n{\n  "suggestions": [\n    {\n      "bucket": "Programming Questions",\n      "question": "How do I reverse a string in Python?"\n    },\n    {\n      "bucket": "Fun Facts",\n      "question": "What are some interesting facts about the universe?"\n    },\n    {\n      "bucket": "Story Creation",\n      "question": "Can you help me write a short story about a time-traveling detective?"\n    }\n  ]\n}\n\nOnly repond with the JSON payload surounded in triple back ticks ``` and nothing else.'
+    "three_suggestions": open(
+        os.path.join(os.getcwd(), "api", "prompts", "three_suggestions.txt")
+    ).read()
 }
 
 
@@ -323,7 +325,7 @@ class ModelDetailWithInfoView(APIView):
             )
 
 
-class OllamaModelsPopulateAPIView(APIView):
+class ModelsPopulateAPIView(APIView):
     """
     View to handle chat requests with the Ollama API.
     """
@@ -337,19 +339,22 @@ class OllamaModelsPopulateAPIView(APIView):
     def post(self, request):
         try:
             output = StringIO()
-            call_command("populate_ollama_models", stdout=output)
+            response = []
+            response += json.loads(call_command("populate_ollama_models", stdout=output))
+            response += json.loads(call_command("populate_openai_models", stdout=output))
 
             return Response(
                 {
-                    "message": "Successfully re-populated Ollama models!",
+                    "message": "Successfully re-populated provider models!",
                     "details": output.getvalue(),
+                    "data": response
                 },
                 status=status.HTTP_200_OK,
             )
 
         except requests.exceptions.RequestException as e:
             return Response(
-                {"error": str(e), "message": "Failed to re-populate Ollama models!"},
+                {"error": str(e), "message": "Failed to re-populate provider models!"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -463,18 +468,44 @@ class BaseThreeSuggestionsAPIView(APIView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.llm_service = None
+        self.buckets = [
+            "Programming Questions",
+            "Fun Facts",
+            "General Knowledge",
+            "Story Creation",
+            "Jokes and Humor",
+            "Career Advice",
+            "Language Learning",
+            "Scientific Explanations",
+            "Mental Health & Wellness",
+            "Creative Writing",
+            "DIY & Home Projects",
+            "Music & Art",
+            "Historical Events",
+            "Travel Tips",
+            "Technology Trends",
+            "Life Skills",
+        ]
 
     def post(self, request):
         model = request.data.get("model")
         provider = request.data.get("provider")
+        count = request.data.get("count")
 
-        if not model or not provider:
+        if model is None or provider is None or count is None:
             return Response(
-                {"error": "Model and provider are required."},
+                {"error": "Model, provider, and count are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        prompt = PROMPTS.get("three_suggestions")
+        if not isinstance(count, int):
+            return Response(
+                {"error": "Parameter count must be a number."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        base_prompt = PROMPTS.get("three_suggestions")
+
         self.llm_service = LLMServiceFactory.get_service(provider)
 
         if not self.llm_service:
@@ -483,34 +514,48 @@ class BaseThreeSuggestionsAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        chat_completion = self.llm_service.chat(
-            model=model, messages=[{"role": "user", "content": prompt}]
-        )
+        suggestions = []
+        available_buckets = self.buckets[:]
+        used_buckets = []
 
-        if chat_completion and "error" not in chat_completion:
+        for _ in range(count):
             try:
-                payload = json.loads(
+                prompt = base_prompt.replace(
+                    "${buckets}", "- " + "\n- ".join(available_buckets) + "\n"
+                ).replace(
+                    "${suggestions}", ("\n- " + "\n- ".join([suggestion["summary"] for suggestion in suggestions]) if suggestions else "No suggetions generated yet")
+                )
+
+                chat_completion = self.llm_service.chat(
+                    model=model, messages=[{"role": "user", "content": prompt}]
+                )
+
+                suggestion = json.loads(
                     chat_completion["message"]["content"]
                     .replace("```json", "")
                     .replace("```", "")
                 )
-                return Response(payload, status=status.HTTP_200_OK)
+
+                if (
+                    "bucket" in suggestion
+                    and "summary" in suggestion
+                    and "question" in suggestion
+                ):
+                    suggestions.append(suggestion)
             except Exception as e:
-                chat_completion["external_message"] = (
-                    f"Failed to decode the json -> {e}"
-                )
-                return Response(
-                    chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-        elif chat_completion and "error" in chat_completion:
+                print(f"three suggestions error: {e}")
+
+        try:
+            payload = {"suggestions": suggestions}
+            return Response(payload, status=status.HTTP_200_OK)
+        except Exception as e:
+            chat_completion["external_message"] = (
+                f"Failed to decode the json -> {e}"
+            )
             return Response(
                 chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        else:
-            return Response(
-                {"error": f"Failed to fetch response from {provider} API."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+
 
 
 class ChatAPIView(BaseChatAPIView):

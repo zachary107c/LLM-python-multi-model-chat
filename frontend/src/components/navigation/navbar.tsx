@@ -49,10 +49,11 @@ export default function Navbar() {
                 ) : (
                   <Avatar
                     src={userSettings.profile.image}
-                    fallback="BS"
+                    fallback={userSettings.username.slice(0, 2).toUpperCase()}
                     alt="Profile"
                     radius="medium"
                     size="2"
+                    variant="soft"
                   />
                 )}
               </Button>

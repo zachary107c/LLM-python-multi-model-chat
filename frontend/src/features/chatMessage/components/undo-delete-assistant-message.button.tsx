@@ -1,20 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { ResetIcon } from "@radix-ui/react-icons";
-import { undoDeleteUserMessageMutation } from "../api/undo-delete-message";
+import { undoDeleteAssistantMessageMutation } from "../api/undo-delete-message";
 import { Tooltip } from "@radix-ui/themes";
 
-export function UndoDeleteUserMessageButton({
+export function UndoDeleteAssistantMessageButton({
   messageId,
   conversationId,
 }: {
   messageId: string;
   conversationId: string;
 }) {
-  const undoMutation = undoDeleteUserMessageMutation({
+  const undoMutation = undoDeleteAssistantMessageMutation({
     conversationId: conversationId,
   });
 
-  async function handleUndoDeleteUserMessage() {
+  async function handleUndoDeleteAssistantMessage() {
     try {
       const response = await undoMutation.mutateAsync({
         data: { messageId: messageId },
@@ -30,7 +30,7 @@ export function UndoDeleteUserMessageButton({
         variant={"ghost-no-hover"}
         className="mx-1 px-1 py-0 my-0"
         size={"icon"}
-        onClick={handleUndoDeleteUserMessage}
+        onClick={handleUndoDeleteAssistantMessage}
         aria-label="Redo"
       >
         <ResetIcon />

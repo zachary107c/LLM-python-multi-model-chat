@@ -12,6 +12,7 @@ import { AssistantMessage } from "@/types/api";
 import MarkdownRenderer from "@/features/markdown/components/markdown";
 import GenerateNewMessageButton from "./generate-new-message-button";
 import { Button as LocalButton } from "@/components/ui/button";
+import { UndoDeleteAssistantMessageButton } from "./undo-delete-assistant-message.button";
 
 function localizeUTCDates(text: string) {
   // Regular expression to match ISO 8601 UTC datetime format
@@ -121,23 +122,38 @@ export function AssistantChatMessage({
             </div>
           </div>
           <div className="flex justify-start">
-            <Card className="w-fit flex flex-col">
-              <div>
-                <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
-                  <Text size="2">
-                    <MarkdownRenderer
-                      markdown={localizeUTCDates(displayContent) || ""}
-                    />
-                  </Text>
+            {displayContent ? (
+              <Card className="w-fit flex flex-col">
+                <div>
+                  <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
+                    <Text size="2">
+                      <MarkdownRenderer
+                        markdown={localizeUTCDates(displayContent) || ""}
+                      />
+                    </Text>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>
       <div className="flex justify-start">
         {assistantMessageData.is_deleted ? (
-          <></>
+          assistantMessageData.recoverable ? (
+            <div className="flex justify-end">
+              <Flex gap="0" align="center">
+                <UndoDeleteAssistantMessageButton
+                  messageId={assistantMessageData.id}
+                  conversationId={assistantMessageData.conversation}
+                />
+              </Flex>
+            </div>
+          ) : (
+            <></>
+          )
         ) : (
           <Flex gap="0" align="center">
             <DeleteMessageModal
@@ -163,7 +179,9 @@ export function AssistantChatMessage({
                 <LocalButton onClick={handlePrevious} variant="ghost-no-hover">
                   <ChevronLeftIcon />
                 </LocalButton>
-                <Text size="1" weight="light">{currentVariationIndex + 1}</Text>
+                <Text size="1" weight="light">
+                  {currentVariationIndex + 1}
+                </Text>
                 <LocalButton onClick={handleNext} variant="ghost-no-hover">
                   <ChevronRightIcon />
                 </LocalButton>

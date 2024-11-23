@@ -43,7 +43,7 @@ export function ModelSelect({
         {groupedModels &&
           Object.keys(groupedModels).map((provider) => (
             <DropdownMenu.Group key={provider}>
-              <Badge variant="soft" className="w-full" color="gray">
+              <Badge variant="soft" className="w-full font-erm" color="gray">
                 <Text size="2" weight="bold">
                   {provider}
                 </Text>
