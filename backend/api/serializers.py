@@ -92,7 +92,6 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "user", "created_at", "updated_at"]
 
     def get_messages(self, obj):
-        # Get all user messages including deleted ones
         user_messages = UserMessage.objects.filter(conversation=obj)
         user_message_list = UserMessageSerializer(user_messages, many=True).data
         for message in user_message_list:

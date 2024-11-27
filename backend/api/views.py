@@ -255,9 +255,9 @@ class ModelDetailWithInfoView(APIView):
     def get(self, request, pk):
         try:
             # Fetch model from the database using the primary key (pk)
-            ollama_model = Model.objects.get(pk=pk)
-            serializer = ModelSerializer(ollama_model)
-            if ollama_model.provider == "ollama":
+            model = Model.objects.get(pk=pk)
+            serializer = ModelSerializer(model)
+            if model.provider == "ollama":
                 # Query the Ollama API for additional details
                 model_info = self.ollama_service.get_model(serializer.data["name"])
                 if model_info:

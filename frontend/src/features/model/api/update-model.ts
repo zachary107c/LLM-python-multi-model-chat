@@ -25,7 +25,7 @@ export const updateModelMutation = () => {
     MutationContext
   >({
     mutationFn: async ({ data }) => {
-      return api.put(`/ollama/models/${data.modelId}/`, data.updates, {
+      return api.put(`/models/${data.modelId}/`, data.updates, {
         headers: { Authorization: `Token ${Cookies.get("token")}` },
       });
     },

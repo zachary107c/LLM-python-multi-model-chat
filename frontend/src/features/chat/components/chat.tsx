@@ -195,9 +195,11 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
   async function handleSendMessage(message: string) {
     if (message.trim().length > 0) {
       let currentChatId = chatId;
+      let shouldAddMessageManually = true;
 
       if (!chatId) {
         currentChatId = await handleCreateNewConversation(message);
+        shouldAddMessageManually = false; // Don't manually add message for new conversations
       }
 
       const userPostData = await createUserMessage({
@@ -223,10 +225,13 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
         type: "user",
         is_deleted: userPostData.is_deleted,
         deleted_at: userPostData.deleted_at,
-        recoverable: userPostData.recoverable
+        recoverable: userPostData.recoverable,
       };
 
-      setMessages((messages) => [...messages, newUserMessage]);
+      if (shouldAddMessageManually) {
+        setMessages((messages) => [...messages, newUserMessage]);
+      }
+
       setIsLoading(true);
 
       const image_data = await toDataURL(userPostData.image);
@@ -249,7 +254,9 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           let text_part = { type: "text", text: message };
           let image_part = {
             type: "image_url",
-            image_url: { url: `data:${image_data.type};base64,${image_data.base64}` },
+            image_url: {
+              url: `data:${image_data.type};base64,${image_data.base64}`,
+            },
           };
           payload.messages[0].content = [text_part, image_part];
         }
@@ -373,7 +380,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             type: "assistant",
             is_deleted: assistantPostData.is_deleted,
             deleted_at: assistantPostData.deleted_at,
-            recoverable: assistantPostData.recoverable
+            recoverable: assistantPostData.recoverable,
           };
 
           setMessages((messages) => {
@@ -411,10 +418,11 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             type: "assistant",
             is_deleted: assistantPostData.is_deleted,
             deleted_at: assistantPostData.deleted_at,
-            recoverable: assistantPostData.recoverable
+            recoverable: assistantPostData.recoverable,
           };
 
           setMessages((messages) => [...messages, newAssistantMessage]);
+          console.log(messages);
         }
       } catch (error) {
         console.error(error);
@@ -473,7 +481,6 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               return null;
             }
           })}
-
           <div ref={ref} />
         </div>
         <ChatInput

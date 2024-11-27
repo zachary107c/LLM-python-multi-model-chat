@@ -150,4 +150,4 @@ CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5173", "http://localhost:5173", "http:
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:5173", "http://localhost:5173", "http://localhost:3001"]
 CSRF_COOKIE_HTTPONLY = False
 
-RECOVERY_HOURS = 6
+RECOVERY_HOURS = 24

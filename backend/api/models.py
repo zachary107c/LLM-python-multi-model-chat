@@ -1,3 +1,4 @@
+import os
 import uuid
 from datetime import timedelta
 from django.utils import timezone
@@ -131,7 +132,7 @@ class AssistantMessage(models.Model):
         self.save()
 
     def recover(self):
-        if self.is_deleted and self.recoverable:  # Only recover if it is recoverable
+        if self.is_deleted and self.recoverable:
             self.is_deleted = False
             self.deleted_at = None
             self.save()

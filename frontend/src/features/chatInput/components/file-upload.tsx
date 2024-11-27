@@ -63,17 +63,16 @@ export function FileUpload({
       {imageName && (
         <div>
           <Badge radius="full" variant="surface" color="gray" className="ml-2">
-            <div className="w-full flex justify-between items-center px-2">
+            <div className="w-full flex justify-between items-center ml-2">
               <Text weight="light" size="1">
                 {imageName}
               </Text>
               <Button
                 size="tiny"
                 variant="ghost-no-hover"
-                className="h-6"
                 onClick={handleOuterClear}
               >
-                <X size={10} />
+                <X size={10} className=""/>
               </Button>
             </div>
           </Badge>
