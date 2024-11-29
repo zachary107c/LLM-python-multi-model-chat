@@ -164,3 +164,4 @@ media/profile_pics/*.*
 !media/profile_pics/default/*.*
 media/user_message_images/*
 tools/*
+!tools/.gitkeep
