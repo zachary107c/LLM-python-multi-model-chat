@@ -218,6 +218,7 @@ const GenerateNewMessageButton: React.FC<{
       const payload = {
         model: assistantMessage.model?.name,
         provider: assistantMessage.model?.provider,
+        conversation: assistantMessage.conversation,
         messages: [
           {
             role: "user",

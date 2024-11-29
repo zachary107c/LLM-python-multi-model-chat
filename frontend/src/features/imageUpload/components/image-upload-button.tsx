@@ -15,7 +15,7 @@ interface ImageUploadButtonProps {
 export function ImageUploadButton({
   fileName,
   onFileChange,
-  acceptedFileTypes = "image/jpeg,image/png,image/gif,image/webp",
+  acceptedFileTypes = "image/jpeg,image/png,image/gif,image/webp,image/heic",
   previewUrl,
   showPreview = false,
 }: ImageUploadButtonProps) {
@@ -28,15 +28,16 @@ export function ImageUploadButton({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      
-      // Validate file type
       const validTypes = acceptedFileTypes.split(',');
-      if (!validTypes.includes(file.type)) {
-        alert(`Please upload a valid image file (${validTypes.join(', ')})`);
+
+      const fileTypeValid = file.type && validTypes.includes(file.type);
+      const fileNameValid = validTypes.some(type => file.name.toLowerCase().endsWith(type.split('/').pop()!));
+
+      if (!fileTypeValid && !fileNameValid) {
+        alert(`Please upload a valid image file (${validTypes.join(', ')}). You provided ${file.type || file.name}`);
         return;
       }
 
-      // Validate file size (optional, adjust the size limit as needed)
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {
         alert('File size exceeds 10MB limit');

@@ -5,19 +5,28 @@ import requests
 import datetime
 from io import StringIO
 from django.core.management import call_command
+from django.core.files.storage import default_storage
 from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation
+from .models import (
+    Conversation,
+    UserMessage,
+    AssistantMessage,
+    Model,
+    ContentVariation,
+    Tool,
+)
 from .serializers import (
     ConversationSerializer,
     UserMessageSerializer,
     AssistantMessageSerializer,
     ConversationDetailSerializer,
     ModelSerializer,
+    ToolSerializer,
 )
 from .services import (
     OllamaService,
@@ -25,6 +34,7 @@ from .services import (
     AzureOpenAIService,
     LLMServiceFactory,
 )
+from users.models import Settings
 
 PROMPTS = {
     "three_suggestions": open(
@@ -340,14 +350,18 @@ class ModelsPopulateAPIView(APIView):
         try:
             output = StringIO()
             response = []
-            response += json.loads(call_command("populate_ollama_models", stdout=output))
-            response += json.loads(call_command("populate_openai_models", stdout=output))
+            response += json.loads(
+                call_command("populate_ollama_models", stdout=output)
+            )
+            response += json.loads(
+                call_command("populate_openai_models", stdout=output)
+            )
 
             return Response(
                 {
                     "message": "Successfully re-populated provider models!",
                     "details": output.getvalue(),
-                    "data": response
+                    "data": response,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -368,6 +382,7 @@ class BaseChatAPIView(APIView):
 
     def post(self, request):
         try:
+            user_settings = Settings.objects.get(user=request.user)
             model = request.data.get("model")
             messages = request.data.get("messages")
             provider = request.data.get("provider")
@@ -377,6 +392,25 @@ class BaseChatAPIView(APIView):
                     {"error": "Model, messages, and provider are required"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            # If user settings allow message history, add conversation history
+            if user_settings.use_message_history:
+                message_history_count = user_settings.message_history_count
+                conversation_id = request.data.get("conversation_id")
+                conversation = Conversation.objects.filter(
+                    id=conversation_id, user=request.user
+                ).first()
+
+                if conversation:
+                    past_messages = UserMessage.objects.filter(
+                        conversation=conversation
+                    ).order_by("-created_at")[:message_history_count]
+                    # Serialize past messages and prepend them to the messages
+                    past_message_list = [
+                        {"role": "user", "content": msg.content}
+                        for msg in past_messages
+                    ]
+                    messages = past_message_list + messages
 
             self.llm_service = LLMServiceFactory.get_service(provider)
 
@@ -399,6 +433,11 @@ class BaseChatAPIView(APIView):
                     {"error": f"Failed to fetch response from {provider} API."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+        except Settings.DoesNotExist:
+            return Response(
+                {"error": "User settings not found."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -414,15 +453,49 @@ class BaseStreamingAPIView(APIView):
 
     def post(self, request):
         try:
+            user_settings = Settings.objects.get(user=request.user)
             model = request.data.get("model")
-            messages = request.data.get("messages")
             provider = request.data.get("provider")
+            messages = request.data.get("messages")
+            conversation_id = request.data.get("conversation")
 
-            if not model or not messages or not provider:
+            if not model or not provider or not messages:
                 return Response(
-                    {"error": "Model, messages, and provider are required"},
+                    {"error": "Model, provider, and messages are required"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            if user_settings.use_message_history and conversation_id:
+                conversation = Conversation.objects.filter(
+                    id=conversation_id, user=request.user
+                ).first()
+
+                if not conversation:
+                    return Response(
+                        {"error": "Conversation not found"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+
+                serializer = ConversationDetailSerializer(conversation)
+                serialized_data = serializer.data
+                old_messages = serialized_data.get("messages", [])
+                message_history_count = user_settings.message_history_count
+                old_messages = old_messages[-message_history_count:-1]
+                for idx in range(len(old_messages)):
+                    role = old_messages[idx]["type"]
+                    if role == "user":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content"],
+                        }
+                    elif role == "assistant":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content_variations"][-1][
+                                "content"
+                            ],
+                        }
+                messages = old_messages + messages
 
             self.llm_service = LLMServiceFactory.get_service(provider)
 
@@ -456,6 +529,11 @@ class BaseStreamingAPIView(APIView):
 
             return response
 
+        except Settings.DoesNotExist:
+            return Response(
+                {"error": "User settings not found."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -523,7 +601,15 @@ class BaseThreeSuggestionsAPIView(APIView):
                 prompt = base_prompt.replace(
                     "${buckets}", "- " + "\n- ".join(available_buckets) + "\n"
                 ).replace(
-                    "${suggestions}", ("\n- " + "\n- ".join([suggestion["summary"] for suggestion in suggestions]) if suggestions else "No suggetions generated yet")
+                    "${suggestions}",
+                    (
+                        "\n- "
+                        + "\n- ".join(
+                            [suggestion["summary"] for suggestion in suggestions]
+                        )
+                        if suggestions
+                        else "No suggetions generated yet"
+                    ),
                 )
 
                 chat_completion = self.llm_service.chat(
@@ -549,13 +635,10 @@ class BaseThreeSuggestionsAPIView(APIView):
             payload = {"suggestions": suggestions}
             return Response(payload, status=status.HTTP_200_OK)
         except Exception as e:
-            chat_completion["external_message"] = (
-                f"Failed to decode the json -> {e}"
-            )
+            chat_completion["external_message"] = f"Failed to decode the json -> {e}"
             return Response(
                 chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
 
 
 class ChatAPIView(BaseChatAPIView):
@@ -568,3 +651,56 @@ class StreamChatAPIView(BaseStreamingAPIView):
 
 class ThreeSuggestionsAPIView(BaseThreeSuggestionsAPIView):
     pass
+
+
+class ToolFileMixin:
+    """Mixin to handle saving and deleting script files."""
+
+    def save_script_to_file(self, tool):
+        script_file_path = os.path.join(os.getcwd(), "api", "tools", f"{tool.id}.py")
+        with open(script_file_path, "w") as file:
+            file.write(tool.script.replace("\r", ""))
+
+    def delete_script_file(self, tool):
+        script_file_path = os.path.join(os.getcwd(), "api", "tools", f"{tool.id}.py")
+        if os.path.exists(script_file_path):
+            os.remove(script_file_path)
+
+
+class ToolsListCreateView(ToolFileMixin, generics.ListCreateAPIView):
+    serializer_class = ToolSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Tool.objects.filter(user=self.request.user)
+
+    def get(self, request):
+        tools = self.get_queryset()
+        serializer = self.get_serializer(tools, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        tool = serializer.save(user=self.request.user)
+        self.save_script_to_file(tool)
+
+
+class ToolsDetailView(ToolFileMixin, generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ToolSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Tool.objects.filter(user=self.request.user)
+
+    def get_object(self):
+        tool = super().get_object()
+        if tool.user != self.request.user:
+            raise PermissionDenied("You do not have permission to access this tool.")
+        return tool
+
+    def perform_update(self, serializer):
+        tool = serializer.save(user=self.request.user)
+        self.save_script_to_file(tool)
+
+    def perform_destroy(self, instance):
+        self.delete_script_file(instance)
+        super().perform_destroy(instance)

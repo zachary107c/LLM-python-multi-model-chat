@@ -238,6 +238,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
       const payload = {
         model: model?.name,
         provider: model?.provider,
+        conversation: currentChatId,
         messages: [
           {
             role: "user",

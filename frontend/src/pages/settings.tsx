@@ -104,7 +104,9 @@ function SettingsPage() {
       color: "gray",
     },
     stream_responses: true,
-    theme: "dark"
+    theme: "dark",
+    use_message_history: true,
+    message_history_count: 5
   };
 
   const [username, setUsername] = useState(userSettings?.username || "johndoe");
@@ -116,6 +118,7 @@ function SettingsPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [modelDetails, setModelDetails] = useState([]);
+
 
   useEffect(() => {
     if (modelDetails.length > 0) {
@@ -148,12 +151,12 @@ function SettingsPage() {
         prev.map((toast) =>
           toast.id === id
             ? {
-                ...toast,
-                progress: Math.max(
-                  0,
-                  toast.progress - (UPDATE_INTERVAL / TOAST_DURATION) * 100
-                ),
-              }
+              ...toast,
+              progress: Math.max(
+                0,
+                toast.progress - (UPDATE_INTERVAL / TOAST_DURATION) * 100
+              ),
+            }
             : toast
         )
       );
@@ -175,13 +178,13 @@ function SettingsPage() {
     if (!userSettingsLoading) {
       const newPreferredModel = model ||
         (models && models[0]) || {
-          id: -1,
-          name: "llama3.1",
-          model: "llama3.1",
-          liked: false,
-          provider: "",
-          color: "gray",
-        };
+        id: -1,
+        name: "llama3.1",
+        model: "llama3.1",
+        liked: false,
+        provider: "",
+        color: "gray",
+      };
 
       setSettings((prev) => ({
         ...prev,
@@ -212,6 +215,13 @@ function SettingsPage() {
     setSettings((prev) => ({
       ...prev,
       stream_responses: !prev.stream_responses,
+    }));
+  }
+
+  function handleUseMessageHistoryToggled() {
+    setSettings((prev) => ({
+      ...prev,
+      use_message_history: !prev.use_message_history,
     }));
   }
 
@@ -280,6 +290,8 @@ function SettingsPage() {
       settings.stream_responses.toString()
     );
     formData.append("settings.theme", settings.theme);
+    formData.append("settings.use_message_history", settings.use_message_history.toString());
+    formData.append("settings.messaage_history_count", settings.message_history_count.toString());
 
     updateUserSettings.mutate(
       {
@@ -310,20 +322,6 @@ function SettingsPage() {
         },
       }
     );
-  };
-
-  const handleRecoveryHoursChange = (event: any) => {
-    const newHours = parseInt(event.target.value, 10);
-    console.log(newHours);
-    if (!isNaN(newHours)) {
-      // Update settings with the new recovery hour value
-      setSettings((prev) => ({
-        ...prev,
-        recovery_hours: newHours,
-      }));
-
-      // Optionally, you might want to save the updated settings back to the server or local storage
-    }
   };
 
   async function handleUpdateModels() {
@@ -422,6 +420,41 @@ function SettingsPage() {
                             onCheckedChange={handleThemeChange}
                           />
                         </div>
+                      </div>
+                    </Flex>
+                    <Flex justify="between" align="center">
+                      <div className="flex flex-col w-full">
+                        <Text as="label" size="2" weight="bold">
+                          Message History
+                        </Text>
+                        <div className="flex justify-between items-center w-full">
+                          <Text size="1" color="gray">
+                            Utilize message history for context
+                          </Text>
+                          <Switch
+                            checked={settings.use_message_history}
+                            onCheckedChange={handleUseMessageHistoryToggled}
+                          />
+                        </div>
+                        {settings.use_message_history && (
+                          <Flex align="center" mt="2">
+                            <Text size="1" mr="2">
+                              History Count:
+                            </Text>
+                            <TextField.Root
+                              type="number"
+                              value={settings.message_history_count}
+                              onChange={(e) =>
+                                setSettings((prev) => ({
+                                  ...prev,
+                                  message_history_count: Number(e.target.value),
+                                }))
+                              }
+                              min="1"
+                              max="100"
+                            />
+                          </Flex>
+                        )}
                       </div>
                     </Flex>
                   </Flex>

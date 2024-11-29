@@ -13,6 +13,7 @@ import CreateAccountPage from "./pages/create-account.tsx";
 import ProtectedRoute from "@/components/navigation/protected-route";
 import ProfilePage from "./pages/profile.tsx";
 import SettingsPage from "./pages/settings.tsx";
+import ToolsPage from "./pages/tools.tsx";
 import { UserSettingsProvider } from "./components/userSettings/user-settings-provider.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -76,10 +77,20 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/tools"
+                element={
+                  <ProtectedRoute>
+                    <UserSettingsProvider>
+                      <ToolsPage />
+                    </UserSettingsProvider>
+                  </ProtectedRoute>
+                }
+              />
             </Route>
           </Routes>
         </BrowserRouter>
       </React.StrictMode>{" "}
     </Theme>
-  </QueryClientProvider>
+  </QueryClientProvider >
 );

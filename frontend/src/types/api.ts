@@ -147,6 +147,8 @@ export type Settings = {
   preferred_model: BaseModelEntity;
   stream_responses: boolean;
   theme: string;
+  use_message_history: boolean;
+  message_history_count: number;
 }
 
 export type UserSettings = {
@@ -183,3 +185,11 @@ export type UserSettingsUpdatePayload = {
     theme?: string;
   };
 };
+
+export type Tool = Entity<{
+  updated_at: string;
+  name: string;
+  description: string;
+  script: string;
+  user: string;
+}>;

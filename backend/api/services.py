@@ -1,10 +1,12 @@
 import os
 import openai
 import logging
-from typing import List, Dict
+import asyncio
+from typing import List, Dict, Callable
 from abc import ABC, abstractmethod
 from openai import OpenAI, AzureOpenAI
 from ollama import Client, RequestError, ResponseError
+from .tool_manager import ToolManager
 
 
 class LLMService(ABC):
@@ -41,8 +43,10 @@ class OllamaService(LLMService):
             self.client = None
 
         self.logger = logging.getLogger(__name__)
+        self.tool_manager = ToolManager(tools_dir=os.path.join(os.getcwd(), "api", "tools"))
+        self.tool_manager.load_tools()
 
-    def chat(self, model: str, messages: List[Dict[str, str]]) -> Dict:
+    def chat(self, model: str, messages: List[Dict[str, str]], use_tools: bool = False) -> Dict:
         """
         Sends a message through the Ollama API.
 
@@ -64,17 +68,29 @@ class OllamaService(LLMService):
             }
 
         try:
-            response = self.client.chat(
-                model=model,
-                messages=messages,
-                stream=False,
-            )
-            return response
+            if use_tools:
+                tools = self.tool_manager.get_tools()
+                if tools:
+                    response = self.client.chat(
+                        model=model,
+                        messages=messages,
+                        stream=False,
+                        tools=tools
+                    )
+                    
+                    return response
+                else:
+                    response = self.client.chat(
+                        model=model,
+                        messages=messages,
+                        stream=False,
+                    )
+                    return response
         except (RequestError, ResponseError) as e:
             self.logger.error(f"API request failed: {e}")
             return {"error": str(e)}
 
-    def chat_stream(self, model: str, messages: List[Dict[str, str]]) -> Dict:
+    def chat_stream(self, model: str, messages: List[Dict[str, str]]):
         """
         Sends a message through the Ollama API with streaming enabled.
 

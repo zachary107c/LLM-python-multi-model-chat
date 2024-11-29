@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 import pytz
 from rest_framework import serializers
-from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation
+from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation, Tool
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -173,3 +173,11 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
                 "/media/", "/api/v1/media/"
             )
         return None
+
+
+class ToolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tool
+        fields = "__all__"
+        read_only_fields = ["id", "user", "created_at", "updated_at"]
+

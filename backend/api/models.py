@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 
-
 class Model(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=False)
@@ -148,3 +147,16 @@ class AssistantMessage(models.Model):
 
     def __str__(self):
         return f"Assistant Message {self.id} - {self.model}"
+
+
+class Tool(models.Model):
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    user = models.ForeignKey(User, related_name="tools", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True, default="")
+    script = models.TextField(unique=True)
+
+    def __str__(self):
+        return self.name

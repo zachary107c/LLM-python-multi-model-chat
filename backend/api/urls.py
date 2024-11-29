@@ -17,4 +17,6 @@ urlpatterns = [
     path("chat/", views.ChatAPIView.as_view(), name="chat"),
     path("chat/stream/", views.StreamChatAPIView.as_view(), name="chat-stream"),
     path("suggestions/", views.ThreeSuggestionsAPIView.as_view(), name="suggestions"),
+    path("tools/", views.ToolsListCreateView.as_view(), name="tools"),
+    path("tools/<str:pk>/", views.ToolsDetailView.as_view(), name="tools-detail")
 ]

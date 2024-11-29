@@ -31,9 +31,9 @@ export function FileUpload({
     }
 
     // Check file type
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic"];
     if (!allowedTypes.includes(file.type)) {
-      alert("File must be an image (JPG, PNG, WebP) or GIF");
+      alert("File must be an image (JPG, PNG, WebP, HEIC) or GIF");
       return;
     }
 
