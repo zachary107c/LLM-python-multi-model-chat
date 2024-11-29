@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from openai import OpenAI, AzureOpenAI
 from ollama import Client, RequestError, ResponseError
 from .tool_manager import ToolManager
+from .models import Tool
 
 
 class LLMService(ABC):
@@ -27,6 +28,7 @@ class OllamaService(LLMService):
     """
     A service class for interacting with an Ollama API.
     """
+
     def __init__(self, endpoint: str = None, client: Client = None):
         """
         Initializes the OllamaService.
@@ -43,10 +45,40 @@ class OllamaService(LLMService):
             self.client = None
 
         self.logger = logging.getLogger(__name__)
-        self.tool_manager = ToolManager(tools_dir=os.path.join(os.getcwd(), "api", "tools"))
+        self.tool_manager = ToolManager(
+            tools_dir=os.path.join(os.getcwd(), "api", "tools")
+        )
         self.tool_manager.load_tools()
 
-    def chat(self, model: str, messages: List[Dict[str, str]], use_tools: bool = False) -> Dict:
+    async def process_tool_calls(self, response):
+        called_tools = set()
+        tool_call_results = ""
+        for tool in response.message.tool_calls or []:
+            print(f"have a tool to call: {tool} with args {tool.function.arguments}")
+            entry = (tool.function.name, str(tool.function.arguments).lower())
+            if entry in called_tools:
+                continue
+            called_tools.add(entry)
+            try:
+                result = await self.tool_manager.run_tool(
+                    tool.function.name, **tool.function.arguments
+                )
+                print(f"got response from tool call: {result}")
+                tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: {result}\n\n"
+            except Exception as e:
+                print(f"ERROR!: {e}")
+                tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: Error Occurred {e}, no result\n\n"
+        print(f"tool call results: {tool_call_results}")
+        return tool_call_results
+
+    def chat(
+        self,
+        model: str,
+        messages: List[Dict[str, str]],
+        use_tools: bool,
+        user_tools: List[str],
+        **kwargs,
+    ) -> Dict:
         """
         Sends a message through the Ollama API.
 
@@ -69,16 +101,39 @@ class OllamaService(LLMService):
 
         try:
             if use_tools:
-                tools = self.tool_manager.get_tools()
+                print("we are using tools")
+                print(f"got valid user tools of: {user_tools}")
+                tools = self.tool_manager.get_tools(user_tool_ids=user_tools)
+                print(f"these are the available tools: {tools}")
                 if tools:
                     response = self.client.chat(
                         model=model,
                         messages=messages,
                         stream=False,
-                        tools=tools
+                        tools=tools.values(),
                     )
-                    
-                    return response
+
+                    data = asyncio.run(self.process_tool_calls(response=response))
+
+                    if data:
+                        messages.append(
+                            {
+                                "role": "user",
+                                "content": f"Utilize the following information from a tool call you just performed to answer the user's question. Don't reference the fact that you used a tool.\n\nDATA:\n{data}",
+                            }
+                        )
+                        response = self.client.chat(
+                            model=model,
+                            messages=messages
+                        )
+                        
+                        return response
+                    else:
+                        response = self.client.chat(
+                            model=model, messages=messages
+                        )
+                        
+                        return response
                 else:
                     response = self.client.chat(
                         model=model,
@@ -86,8 +141,16 @@ class OllamaService(LLMService):
                         stream=False,
                     )
                     return response
+            else:
+                response = self.client.chat(
+                    model=model,
+                    messages=messages,
+                    stream=False,
+                )
+
+                return response
         except (RequestError, ResponseError) as e:
-            self.logger.error(f"API request failed: {e}")
+            print(f"API request failed: {e}")
             return {"error": str(e)}
 
     def chat_stream(self, model: str, messages: List[Dict[str, str]]):

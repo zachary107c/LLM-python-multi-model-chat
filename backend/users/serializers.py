@@ -99,7 +99,7 @@ class UserSettingsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Settings
-        fields = ("preferred_model", "stream_responses", "theme", "use_message_history", "message_history_count")
+        fields = ("preferred_model", "stream_responses", "theme", "use_message_history", "message_history_count", "use_tools")
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -120,6 +120,7 @@ class UserSettingsSerializer(serializers.ModelSerializer):
         instance.theme = validated_data.get("theme", instance.theme)
         instance.use_message_history = validated_data.get("use_message_history", instance.use_message_history)
         instance.message_history_count = validated_data.get("message_history_count", instance.message_history_count)
+        instance.use_tools = validated_data.get("use_tools", instance.use_tools)
         instance.save()
         return instance
 

@@ -4,8 +4,9 @@ import inspect
 import asyncio
 from typing import Callable, Dict, Any
 
+
 class ToolManager:
-    def __init__(self, tools_dir: str = "tools"):
+    def __init__(self, tools_dir: str):
         self.tools_dir = tools_dir
         self.tools = {}
 
@@ -26,7 +27,8 @@ class ToolManager:
         # Find all callable functions in the module
         for name, func in inspect.getmembers(module, inspect.isfunction):
             if self._is_valid_tool(func):
-                self.tools[name] = func
+                self.tools[name] = {"id": module_name, "function": func}
+
 
     def _is_valid_tool(self, func: Callable) -> bool:
         """Validates if a function is a valid tool."""
@@ -37,9 +39,13 @@ class ToolManager:
         """Determines if a function is asynchronous."""
         return inspect.iscoroutinefunction(func)
 
-    def get_tools(self) -> Dict[str, Callable]:
+    def get_tools(self, user_tool_ids) -> Dict[str, Callable]:
         """Returns the loaded tools."""
-        return self.tools
+        tools = {}
+        for name, tool in self.tools.items():
+            if tool["id"] in user_tool_ids:
+                tools[name] = tool["function"]
+        return tools
 
     async def run_tool(self, tool_name: str, **kwargs) -> Any:
         """
@@ -52,7 +58,7 @@ class ToolManager:
         Returns:
             Any: The result of the tool execution.
         """
-        tool = self.tools.get(tool_name)
+        tool = self.tools.get(tool_name)["function"]
         if not tool:
             raise ValueError(f"Tool '{tool_name}' not found.")
 

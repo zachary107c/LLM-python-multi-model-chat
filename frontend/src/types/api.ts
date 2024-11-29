@@ -149,6 +149,7 @@ export type Settings = {
   theme: string;
   use_message_history: boolean;
   message_history_count: number;
+  use_tools: boolean;
 }
 
 export type UserSettings = {
@@ -183,6 +184,9 @@ export type UserSettingsUpdatePayload = {
     preferred_model: number
     stream_responses?: boolean;
     theme?: string;
+    use_message_history?: boolean;
+    message_history_count?: number;
+    use_tools?: boolean;
   };
 };
 

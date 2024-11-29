@@ -10,11 +10,9 @@ import {
   Button,
   TextField,
   TextArea,
-  DropdownMenu,
   Switch,
   Callout,
   Progress,
-  Skeleton,
 } from "@radix-ui/themes";
 import { withUserSettings } from "@/components/userSettings/user-settings-provider";
 import { useUpdateUserSettingsMutation } from "@/components/userSettings/api/update-user-settings";
@@ -22,11 +20,8 @@ import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-
 import { useGetModelsQuery } from "@/features/model/api/get-models";
 import {
   BaseModelEntity,
-  ModelDetail,
   Settings,
-  UserSettingsUpdatePayload,
 } from "@/types/api";
-import { ToastContainer, toast } from "react-toastify";
 import { ModelSelect } from "@/features/model/components/model-select";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -106,7 +101,8 @@ function SettingsPage() {
     stream_responses: true,
     theme: "dark",
     use_message_history: true,
-    message_history_count: 5
+    message_history_count: 5,
+    use_tools: false
   };
 
   const [username, setUsername] = useState(userSettings?.username || "johndoe");
@@ -218,12 +214,30 @@ function SettingsPage() {
     }));
   }
 
+  function handleUseToolsToggled() {
+    setSettings((prev) => ({
+      ...prev,
+      use_tools: !prev.use_tools,
+    }));
+  }
+
   function handleUseMessageHistoryToggled() {
     setSettings((prev) => ({
       ...prev,
       use_message_history: !prev.use_message_history,
     }));
   }
+
+  function handleSetMessageHistoryCount(count: string) {
+    const parsedCount = Number(count);
+    if (!isNaN(parsedCount)) {
+      setSettings((prev) => ({
+        ...prev,
+        message_history_count: parsedCount,
+      }));
+    }
+  }
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -267,6 +281,7 @@ function SettingsPage() {
   };
 
   const handleSave = () => {
+    console.log(settings);
     const formData = new FormData();
 
     // Append basic fields
@@ -291,8 +306,10 @@ function SettingsPage() {
     );
     formData.append("settings.theme", settings.theme);
     formData.append("settings.use_message_history", settings.use_message_history.toString());
-    formData.append("settings.messaage_history_count", settings.message_history_count.toString());
+    formData.append("settings.message_history_count", settings.message_history_count.toString());
+    formData.append("settings.use_tools", settings.use_tools.toString());
 
+    console.log("mutating the use settings!");
     updateUserSettings.mutate(
       {
         data: formData,
@@ -444,17 +461,28 @@ function SettingsPage() {
                             <TextField.Root
                               type="number"
                               value={settings.message_history_count}
-                              onChange={(e) =>
-                                setSettings((prev) => ({
-                                  ...prev,
-                                  message_history_count: Number(e.target.value),
-                                }))
-                              }
+                              onChange={(e) => handleSetMessageHistoryCount(e.target.value)}
                               min="1"
-                              max="100"
+                              max="10"
                             />
                           </Flex>
                         )}
+                      </div>
+                    </Flex>
+                    <Flex justify="between" align="center">
+                      <div className="flex flex-col w-full">
+                        <Text as="label" size="2" weight="bold">
+                          Use Tools
+                        </Text>
+                        <div className="flex justify-between items-center w-full">
+                          <Text size="1" color="gray">
+                            Enable the LLM to utilize your tools
+                          </Text>
+                          <Switch
+                            checked={settings.use_tools}
+                            onCheckedChange={handleUseToolsToggled}
+                          />
+                        </div>
                       </div>
                     </Flex>
                   </Flex>

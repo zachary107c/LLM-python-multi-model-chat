@@ -92,6 +92,7 @@ class Settings(models.Model):
     )
     use_message_history = models.BooleanField(default=True)
     message_history_count = models.IntegerField(default=5)
+    use_tools = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Settings for {self.user.username}"

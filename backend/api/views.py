@@ -35,6 +35,7 @@ from .services import (
     LLMServiceFactory,
 )
 from users.models import Settings
+from users.serializers import UserSerializer
 
 PROMPTS = {
     "three_suggestions": open(
@@ -383,9 +384,11 @@ class BaseChatAPIView(APIView):
     def post(self, request):
         try:
             user_settings = Settings.objects.get(user=request.user)
+            user_tools = [str(tool.id) for tool in Tool.objects.filter(user=request.user)]
             model = request.data.get("model")
             messages = request.data.get("messages")
             provider = request.data.get("provider")
+            conversation_id = request.data.get("conversation")
 
             if not model or not messages or not provider:
                 return Response(
@@ -393,25 +396,39 @@ class BaseChatAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # If user settings allow message history, add conversation history
-            if user_settings.use_message_history:
-                message_history_count = user_settings.message_history_count
-                conversation_id = request.data.get("conversation_id")
+            if user_settings.use_message_history and conversation_id:
                 conversation = Conversation.objects.filter(
                     id=conversation_id, user=request.user
                 ).first()
 
-                if conversation:
-                    past_messages = UserMessage.objects.filter(
-                        conversation=conversation
-                    ).order_by("-created_at")[:message_history_count]
-                    # Serialize past messages and prepend them to the messages
-                    past_message_list = [
-                        {"role": "user", "content": msg.content}
-                        for msg in past_messages
-                    ]
-                    messages = past_message_list + messages
+                if not conversation:
+                    return Response(
+                        {"error": "Conversation not found"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
 
+                serializer = ConversationDetailSerializer(conversation)
+                serialized_data = serializer.data
+                old_messages = serialized_data.get("messages", [])
+                old_messages = [message for message in old_messages if not message["is_deleted"]]
+                message_history_count = user_settings.message_history_count
+                old_messages = old_messages[-message_history_count:-1]
+                for idx in range(len(old_messages)):
+                    role = old_messages[idx]["type"]
+                    if role == "user":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content"],
+                        }
+                    elif role == "assistant":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content_variations"][-1][
+                                "content"
+                            ],
+                        }
+                messages = old_messages + messages
+            
             self.llm_service = LLMServiceFactory.get_service(provider)
 
             if not self.llm_service:
@@ -420,7 +437,7 @@ class BaseChatAPIView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-            chat_completion = self.llm_service.chat(model, messages)
+            chat_completion = self.llm_service.chat(model, messages, user_settings.use_tools, user_tools)
 
             if chat_completion and "error" not in chat_completion:
                 return Response(chat_completion, status=status.HTTP_200_OK)
@@ -513,7 +530,8 @@ class BaseStreamingAPIView(APIView):
                                 {"message": chunk},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             )
-                        data = f"data: {json.dumps(chunk)}\n\n"
+                        print(chunk)
+                        data = f"data: {json.dumps(chunk.dict())}\n\n"
                         yield data.encode("utf-8")
 
             response = StreamingHttpResponse(
