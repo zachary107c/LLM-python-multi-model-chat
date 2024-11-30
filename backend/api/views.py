@@ -270,11 +270,11 @@ class ModelDetailWithInfoView(APIView):
             serializer = ModelSerializer(model)
             if model.provider == "ollama":
                 # Query the Ollama API for additional details
-                model_info = self.ollama_service.get_model(serializer.data["name"])
+                model_info = self.ollama_service.get_model(serializer.data["name"]).dict()
                 if model_info:
                     # Remove unnecessary fields from the Ollama response
                     del model_info["details"]
-                    del model_info["model_info"]
+                    del model_info["modelinfo"]
 
                     # Combine the database model data with the Ollama service response
                     combined_data = {
@@ -299,10 +299,12 @@ class ModelDetailWithInfoView(APIView):
                 {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
             )
         except requests.exceptions.RequestException as e:
+            print(f"requests.exception.RequestException: {e}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         except Exception as e:
+            print(f"Exception: {e}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
@@ -389,6 +391,7 @@ class BaseChatAPIView(APIView):
             messages = request.data.get("messages")
             provider = request.data.get("provider")
             conversation_id = request.data.get("conversation")
+            use_tools = True if request.data.get("useTools") else False
 
             if not model or not messages or not provider:
                 return Response(
@@ -437,7 +440,8 @@ class BaseChatAPIView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-            chat_completion = self.llm_service.chat(model, messages, user_settings.use_tools, user_tools)
+            # chat_completion = self.llm_service.chat(model=model, messages=messages, use_tools=user_settings.use_tools, user_tools=user_tools)
+            chat_completion = self.llm_service.chat(model=model, messages=messages, use_tools=use_tools, user_tools=user_tools)
 
             if chat_completion and "error" not in chat_completion:
                 return Response(chat_completion, status=status.HTTP_200_OK)
@@ -471,10 +475,12 @@ class BaseStreamingAPIView(APIView):
     def post(self, request):
         try:
             user_settings = Settings.objects.get(user=request.user)
+            user_tools = [str(tool.id) for tool in Tool.objects.filter(user=request.user)]
             model = request.data.get("model")
             provider = request.data.get("provider")
             messages = request.data.get("messages")
             conversation_id = request.data.get("conversation")
+            use_tools = True if request.data.get("useTools") else False
 
             if not model or not provider or not messages:
                 return Response(
@@ -523,14 +529,13 @@ class BaseStreamingAPIView(APIView):
                 )
 
             def stream_response():
-                for chunk in self.llm_service.chat_stream(model, messages):
+                for chunk in self.llm_service.chat_stream(model=model, messages=messages, use_tools=use_tools, user_tools=user_tools):
                     if chunk and not isinstance(chunk, str):
                         if "error" in chunk:
                             return Response(
                                 {"message": chunk},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             )
-                        print(chunk)
                         data = f"data: {json.dumps(chunk.dict())}\n\n"
                         yield data.encode("utf-8")
 

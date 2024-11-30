@@ -4,6 +4,9 @@ import { Tool } from "@/types/api";
 import MarkdownRenderer from "@/features/markdown/components/markdown";
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { updateToolMutation } from "../api/update-tool";
+import { useToast } from "@/components/ui/toast/toast-provider";
+import { DeleteToolModal } from "./delete-tool-modal";
+
 
 interface ToolCardProps {
     data: Tool | undefined;
@@ -17,6 +20,8 @@ export function ToolCard({ data }: ToolCardProps) {
     const [isEditingDescription, setIsEditingDescription] = useState<boolean>(false);
     const monacoInstance = useMonaco();
     const updateMutation = updateToolMutation();
+    const { addToast } = useToast();
+
 
     async function handleUpdate() {
         if (data) {
@@ -50,15 +55,22 @@ export function ToolCard({ data }: ToolCardProps) {
     }
 
     const editorOptions = {
-        minimap: { enabled: false },
-        scrollBeyondLastLine: false,
-        automaticLayout: true,
+        minimap: { enabled: true },
         fontSize: 14,
-        roundedSelection: false,
-        overviewRulerLanes: 0,
+        padding: { top: 16 },
+        scrollBeyondLastLine: false,
+        lineNumbers: 'on',
+        renderLineHighlight: 'all',
         hideCursorInOverviewRuler: true,
+        scrollbar: {
+            vertical: 'visible',
+            horizontal: 'visible',
+            verticalScrollbarSize: 3,
+            horizontalScrollbarSize: 3,
+        },
         overviewRulerBorder: false,
-    };
+    }
+
 
     return (
         <div className="p-1 w-full h-full overflow-auto">
@@ -132,9 +144,10 @@ export function ToolCard({ data }: ToolCardProps) {
                         theme="vs-dark"
                         options={editorOptions}
                         loading={<div className="text-sm text-zinc-400">Loading editor...</div>}
+                        className="rounded-lg"
                     />
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-start">
                     <Button
                         variant="surface"
                         color="green"

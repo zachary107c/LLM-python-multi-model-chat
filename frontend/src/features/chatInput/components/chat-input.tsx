@@ -1,4 +1,4 @@
-import { Text, Button, Card } from "@radix-ui/themes";
+import { Text, Button, Card, Switch } from "@radix-ui/themes";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useCallback, useEffect } from "react";
 import { BaseModelEntity } from "@/types/api";
@@ -8,7 +8,7 @@ import { ModelSelect } from "@/features/model/components/model-select";
 import { FileUpload } from "./file-upload";
 
 interface Props {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, useTools: boolean) => void;
   onModelChange: (model: BaseModelEntity) => void;
   onImageDataChange: (model: File | null) => void;
   selectedModel: BaseModelEntity | null;
@@ -31,10 +31,11 @@ export function ChatInput({
   const [imageName, setImageName] = useState<string | null>(null);
   const [_, setImageData] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [useTools, setUseTools] = useState(false);
 
   const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSendMessage(newMessage);
+    onSendMessage(newMessage, useTools);
     setNewMessage("");
     setTextAreaHeight(48);
     handleClear();
@@ -53,7 +54,7 @@ export function ChatInput({
       setTextAreaHeight(Math.min(textAreaHeight + 24, 240)); // Limit expansion to 240px
     } else if (event.key === "Enter") {
       event.preventDefault();
-      onSendMessage(newMessage);
+      onSendMessage(newMessage, useTools);
       setNewMessage("");
       setTextAreaHeight(48);
       handleClear();
@@ -66,6 +67,10 @@ export function ChatInput({
 
   function handleModelChange(model: BaseModelEntity) {
     onModelChange(model);
+  }
+
+  function handleUseToolsToggled() {
+    setUseTools(!useTools);
   }
 
   const handleFileChange = useCallback((file: File | null) => {
@@ -94,9 +99,8 @@ export function ChatInput({
 
   return (
     <div
-      className={`chat-input mb-4 flex flex-col w-full ${
-        isLoading ? "chat-input-border" : ""
-      }`}
+      className={`chat-input mb-4 flex flex-col w-full ${isLoading ? "chat-input-border" : ""
+        }`}
     >
       <form onSubmit={handleSendMessage} className="flex justify-between">
         <Card
@@ -131,6 +135,16 @@ export function ChatInput({
                       modelsLoading={modelsLoading}
                       onModelChange={handleModelChange}
                     />
+                    <div className="ml-2 flex items-center">
+                      <Text size="1" color="gray" className="mr-1">
+                        Use Tools
+                      </Text>
+                      <Switch
+                        checked={useTools}
+                        onCheckedChange={handleUseToolsToggled}
+                        size="1"
+                      />
+                    </div>
                     <div className="ml-2">
                       <LocalButton variant="ghost-no-hover" className="m-1 p-0">
                         <Folder size={15} strokeWidth={1.5} />

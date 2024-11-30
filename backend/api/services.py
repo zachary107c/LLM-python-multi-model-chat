@@ -12,7 +12,14 @@ from .models import Tool
 
 class LLMService(ABC):
     @abstractmethod
-    def chat(self, model: str, messages: List[Dict[str, str]], **kwargs) -> Dict:
+    def chat(
+        self,
+        model: str,
+        messages: List[Dict[str, str]],
+        use_tools: bool = False,
+        user_tools: List[str] | None = None,
+        **kwargs,
+    ) -> Dict:
         pass
 
     @abstractmethod
@@ -53,8 +60,11 @@ class OllamaService(LLMService):
     async def process_tool_calls(self, response):
         called_tools = set()
         tool_call_results = ""
+        print("We are executing the following tools:")
+        for tool in response.message.tool_calls:
+            print(f"\t- {tool}")
         for tool in response.message.tool_calls or []:
-            print(f"have a tool to call: {tool} with args {tool.function.arguments}")
+            # print(f"have a tool to call: {tool} with args {tool.function.arguments}")
             entry = (tool.function.name, str(tool.function.arguments).lower())
             if entry in called_tools:
                 continue
@@ -63,20 +73,20 @@ class OllamaService(LLMService):
                 result = await self.tool_manager.run_tool(
                     tool.function.name, **tool.function.arguments
                 )
-                print(f"got response from tool call: {result}")
+                # print(f"got response from tool call: {result}")
                 tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: {result}\n\n"
             except Exception as e:
-                print(f"ERROR!: {e}")
+                # print(f"ERROR!: {e}")
                 tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: Error Occurred {e}, no result\n\n"
-        print(f"tool call results: {tool_call_results}")
+        # print(f"tool call results: {tool_call_results}")
         return tool_call_results
 
     def chat(
         self,
         model: str,
         messages: List[Dict[str, str]],
-        use_tools: bool,
-        user_tools: List[str],
+        use_tools: bool = False,
+        user_tools: List[str] | None = None,
         **kwargs,
     ) -> Dict:
         """
@@ -100,9 +110,9 @@ class OllamaService(LLMService):
             }
 
         try:
-            if use_tools:
-                print("we are using tools")
-                print(f"got valid user tools of: {user_tools}")
+            if use_tools and user_tools:
+                # print("we are using tools")
+                # print(f"got valid user tools of: {user_tools}")
                 tools = self.tool_manager.get_tools(user_tool_ids=user_tools)
                 print(f"these are the available tools: {tools}")
                 if tools:
@@ -122,17 +132,12 @@ class OllamaService(LLMService):
                                 "content": f"Utilize the following information from a tool call you just performed to answer the user's question. Don't reference the fact that you used a tool.\n\nDATA:\n{data}",
                             }
                         )
-                        response = self.client.chat(
-                            model=model,
-                            messages=messages
-                        )
-                        
+                        response = self.client.chat(model=model, messages=messages)
+
                         return response
                     else:
-                        response = self.client.chat(
-                            model=model, messages=messages
-                        )
-                        
+                        response = self.client.chat(model=model, messages=messages)
+
                         return response
                 else:
                     response = self.client.chat(
@@ -153,7 +158,14 @@ class OllamaService(LLMService):
             print(f"API request failed: {e}")
             return {"error": str(e)}
 
-    def chat_stream(self, model: str, messages: List[Dict[str, str]]):
+    def chat_stream(
+        self,
+        model: str,
+        messages: List[Dict[str, str]],
+        use_tools: bool = False,
+        user_tools: List[str] | None = None,
+        **kwargs,
+    ):
         """
         Sends a message through the Ollama API with streaming enabled.
 
@@ -175,12 +187,47 @@ class OllamaService(LLMService):
             return
 
         try:
-            for response in self.client.chat(
-                model=model, messages=messages, stream=True
-            ):
-                yield response
+            if use_tools and user_tools:
+                tools = self.tool_manager.get_tools(user_tool_ids=user_tools)
+                print(f"these are the available tools: {tools}")
+                if tools:
+                    response = self.client.chat(
+                        model=model,
+                        messages=messages,
+                        stream=False,
+                        tools=tools.values(),
+                    )
+
+                    data = asyncio.run(self.process_tool_calls(response=response))
+
+                    if data:
+                        messages.append(
+                            {
+                                "role": "user",
+                                "content": f"Utilize the following information from a tool call you just performed to answer the user's question. Don't reference the fact that you used a tool.\n\nDATA:\n{data}",
+                            }
+                        )
+                        for response in self.client.chat(
+                            model=model, messages=messages, stream=True
+                        ):
+                            yield response
+                    else:
+                        for response in self.client.chat(
+                            model=model, messages=messages, stream=True
+                        ):
+                            yield response
+                else:
+                    for response in self.client.chat(
+                        model=model, messages=messages, stream=True
+                    ):
+                        yield response
+            else:
+                for response in self.client.chat(
+                    model=model, messages=messages, stream=True
+                ):
+                    yield response
         except (RequestError, ResponseError) as e:
-            self.logger.error(f"API request failed: {e}")
+            print(f"API request failed: {e}")
             yield {"error": str(e)}
 
     def get_models(self) -> List[Dict]:
@@ -264,7 +311,7 @@ class OpenAIService(LLMService):
             from openai.types.chat import ChatCompletion
 
             response: ChatCompletion = self.client.chat.completions.create(
-                model=model, messages=messages, **kwargs
+                model=model, messages=messages
             )
 
             response_json = response.model_dump()
@@ -277,27 +324,7 @@ class OpenAIService(LLMService):
             self.logger.error(f"OpenAI API request failed: {e}")
             return {"error": str(e)}
 
-    def get_models(self) -> Dict:
-        if not self.client:
-            return {
-                "error": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."
-            }
-
-        model_list = self.client.models.list()
-
-        print("Model list:", model_list)
-
-        return []
-
-    def get_model(self) -> Dict:
-        if not self.client:
-            return {
-                "error": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."
-            }
-
-        return {}
-
-    def chat_stream(self, model: str, messages: List[Dict[str, str]], **kwargs) -> Dict:
+    def chat_stream(self, model: str, messages: List[Dict[str, str]], **kwargs):
         """
         Sends a chat completion request to the OpenAI API with streaming enabled.
 
@@ -318,7 +345,7 @@ class OpenAIService(LLMService):
 
         try:
             stream = self.client.chat.completions.create(
-                model=model, messages=messages, stream=True, **kwargs
+                model=model, messages=messages, stream=True
             )
 
             for chunk in stream:
@@ -333,6 +360,26 @@ class OpenAIService(LLMService):
         except Exception as e:
             self.logger.error(f"OpenAI API streaming request failed: {e}")
             yield {"error": str(e)}
+
+    def get_models(self) -> Dict:
+        if not self.client:
+            return {
+                "error": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."
+            }
+
+        model_list = self.client.models.list()
+
+        print("Model list:", model_list)
+
+        return []
+
+    def get_model(self) -> Dict:
+        if not self.client:
+            return {
+                "error": "OpenAI Service is not initialized. Please ensure the .env has the OPENAI_API_KEY variable set."
+            }
+
+        return {}
 
 
 class AzureOpenAIService(LLMService):

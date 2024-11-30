@@ -30,6 +30,7 @@ import { WelcomeLoading } from "@/features/welcome/components/welcome-loading";
 import { useGetSuggestionsQuery } from "../../welcome/api/get-three-suggestions";
 import { useSearchParams } from "react-router-dom";
 import { useUserSettings } from "@/components/userSettings/user-settings-provider";
+import { useToast } from "@/components/ui/toast/toast-provider";
 
 interface ChatProps {
   chatId: string;
@@ -37,6 +38,7 @@ interface ChatProps {
 }
 
 export function Chat({ chatId, onCreateNewChat }: ChatProps) {
+  const { addToast } = useToast();
   const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>(
     []
   );
@@ -138,6 +140,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
 
   useEffect(() => {
     if (error) {
+      addToast('Failed to get conversation!', "error");
       setSearchParams({});
     }
   }, [error]);
@@ -192,7 +195,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     });
   };
 
-  async function handleSendMessage(message: string) {
+  async function handleSendMessage(message: string, useTools: boolean) {
     if (message.trim().length > 0) {
       let currentChatId = chatId;
       let shouldAddMessageManually = true;
@@ -239,6 +242,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
         model: model?.name,
         provider: model?.provider,
         conversation: currentChatId,
+        useTools: useTools,
         messages: [
           {
             role: "user",

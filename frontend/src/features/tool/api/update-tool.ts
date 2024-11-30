@@ -3,6 +3,8 @@ import { z } from "zod";
 import { api } from "@/lib/api-client";
 import { Tool } from "@/types/api";
 import Cookies from "js-cookie";
+import { useToast } from "@/components/ui/toast/toast-provider";
+
 
 export const updateToolInputSchema = z.object({
   toolId: z.string(),
@@ -18,6 +20,7 @@ export type UpdateToolInput = z.infer<typeof updateToolInputSchema>;
 type MutationContext = { toolId: string };
 
 export const updateToolMutation = () => {
+  const { addToast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation<
@@ -36,11 +39,14 @@ export const updateToolMutation = () => {
       return { toolId: data.toolId };
     },
     onSuccess: (_, __, context) => {
+      addToast("Successfully updated tool!", "success")
       if (context) {
         queryClient.invalidateQueries({ queryKey: ["tool", context.toolId] });
+        queryClient.invalidateQueries({ queryKey: ["tools"] });
       }
     },
     onError: (_, __, context) => {
+      addToast("Failed to update tool!", "error");
       if (context) {
         queryClient.invalidateQueries({ queryKey: ["tool", context.toolId] });
       }

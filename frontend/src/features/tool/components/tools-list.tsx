@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Popover } from "@radix-ui/themes";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { Tool } from "@/types/api";
-import { Trash2 } from "lucide-react";
+import { DeleteToolModal } from "./delete-tool-modal";
 
 export function ToolList({
   tools,
@@ -47,20 +47,7 @@ export function ToolList({
                 </Button>
               </Popover.Trigger>
               <Popover.Content side="bottom">
-                <div className="flex flex-col items-start">
-                  {/* <PinConversationButton
-                    conversationId={chat.id}
-                    isLiked={chat.liked}
-                  />
-                  <UpdateConversationModal
-                    conversationId={chat.id}
-                    currentTitle={chat.title}
-                  />
-                  <MagicTitleButton conversationId={chat.id} />
-                  <Separator size="4" /> */}
-                  {/* <DeleteConversationModal conversationId={chat.id} /> */}
-                  <Trash2 size={15} />
-                </div>
+                <DeleteToolModal toolId={tool.id}/>
               </Popover.Content>
             </Popover.Root>
           </div>

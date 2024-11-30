@@ -17,6 +17,7 @@ import ToolsPage from "./pages/tools.tsx";
 import { UserSettingsProvider } from "./components/userSettings/user-settings-provider.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ToastProvider } from "./components/ui/toast/toast-provider.tsx";
 
 const queryClient = new QueryClient();
 
@@ -24,73 +25,75 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <ReactQueryDevtools />
     <Theme grayColor="slate" accentColor="gray" panelBackground="translucent">
-      <React.StrictMode>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<CreateAccountPage />} />
-            <Route
-              path="/"
-              element={
-                <UserSettingsProvider>
-                  <App />
-                </UserSettingsProvider>
-              }
-            >
+      <ToastProvider>
+        <React.StrictMode>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<CreateAccountPage />} />
               <Route
-                index
+                path="/"
                 element={
-                  <ProtectedRoute>
-                    <UserSettingsProvider>
-                      <ChatPage />
-                    </UserSettingsProvider>
-                  </ProtectedRoute>
+                  <UserSettingsProvider>
+                    <App />
+                  </UserSettingsProvider>
                 }
-              />
-              <Route
-                path="/models"
-                element={
-                  <ProtectedRoute>
-                    <UserSettingsProvider>
-                      <ModelsPage />
-                    </UserSettingsProvider>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <UserSettingsProvider>
-                      <ProfilePage />
-                    </UserSettingsProvider>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <ProtectedRoute>
-                    <UserSettingsProvider>
-                      <SettingsPage />
-                    </UserSettingsProvider>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/tools"
-                element={
-                  <ProtectedRoute>
-                    <UserSettingsProvider>
-                      <ToolsPage />
-                    </UserSettingsProvider>
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </React.StrictMode>{" "}
+              >
+                <Route
+                  index
+                  element={
+                    <ProtectedRoute>
+                      <UserSettingsProvider>
+                        <ChatPage />
+                      </UserSettingsProvider>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/models"
+                  element={
+                    <ProtectedRoute>
+                      <UserSettingsProvider>
+                        <ModelsPage />
+                      </UserSettingsProvider>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <UserSettingsProvider>
+                        <ProfilePage />
+                      </UserSettingsProvider>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <ProtectedRoute>
+                      <UserSettingsProvider>
+                        <SettingsPage />
+                      </UserSettingsProvider>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/tools"
+                  element={
+                    <ProtectedRoute>
+                      <UserSettingsProvider>
+                        <ToolsPage />
+                      </UserSettingsProvider>
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </React.StrictMode>{" "}
+      </ToastProvider>
     </Theme>
   </QueryClientProvider >
 );

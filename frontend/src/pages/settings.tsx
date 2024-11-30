@@ -11,8 +11,6 @@ import {
   TextField,
   TextArea,
   Switch,
-  Callout,
-  Progress,
 } from "@radix-ui/themes";
 import { withUserSettings } from "@/components/userSettings/user-settings-provider";
 import { useUpdateUserSettingsMutation } from "@/components/userSettings/api/update-user-settings";
@@ -24,71 +22,16 @@ import {
 } from "@/types/api";
 import { ModelSelect } from "@/features/model/components/model-select";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  CheckCircledIcon,
-  CrossCircledIcon,
-  Cross2Icon,
-} from "@radix-ui/react-icons";
-import { Button as LocalButton } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
 import Cookies from "js-cookie";
-import { v4 as uuidv4 } from "uuid";
+import { useToast } from "@/components/ui/toast/toast-provider";
 
-function Toast({
-  message,
-  type,
-  progress,
-  onClose,
-}: {
-  message: string;
-  type: "success" | "error";
-  progress: number;
-  onClose: () => void;
-}) {
-  return (
-    <Callout.Root
-      color={type === "success" ? "green" : "red"}
-      role="alert"
-      style={{
-        animation: "slideIn 0.3s ease-out, slideOut 0.3s ease-in forwards",
-        animationDelay: "0s, 4.7s",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div className="flex items-center justify-between w-full">
-        <Callout.Icon className="mr-1">
-          {type === "success" ? <CheckCircledIcon /> : <CrossCircledIcon />}
-        </Callout.Icon>
-        <Callout.Text size="1">{message}</Callout.Text>
-        <LocalButton
-          onClick={onClose}
-          variant="ghost-no-hover"
-          className="m-1 p-0"
-        >
-          <Cross2Icon />
-        </LocalButton>
-      </div>
-      <Progress value={progress} />
-    </Callout.Root>
-  );
-}
 
 function SettingsPage() {
-  const [toasts, setToasts] = useState<
-    Array<{
-      id: string;
-      message: string;
-      type: "success" | "error";
-      progress: number;
-      timeoutId?: ReturnType<typeof setTimeout>;
-    }>
-  >([]);
+  const { addToast } = useToast();
   const { data: userSettings, isLoading: userSettingsLoading } =
     useGetUserSettingsQuery();
   const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
-  const updateUserSettings = useUpdateUserSettingsMutation();
-
   const initialSettings: Settings = userSettings?.settings || {
     preferred_model: {
       id: 1,
@@ -104,7 +47,6 @@ function SettingsPage() {
     message_history_count: 5,
     use_tools: false
   };
-
   const [username, setUsername] = useState(userSettings?.username || "johndoe");
   const [email, setEmail] = useState(userSettings?.email || "john@example.com");
   const [bio, setBio] = useState(
@@ -114,6 +56,7 @@ function SettingsPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [modelDetails, setModelDetails] = useState([]);
+  const updateUserSettings = useUpdateUserSettingsMutation();
 
 
   useEffect(() => {
@@ -125,50 +68,6 @@ function SettingsPage() {
       return () => clearTimeout(timer); // Cleanup timer on unmount
     }
   }, [modelDetails]);
-
-  const showToast = (message: string, type: "success" | "error") => {
-    const TOAST_DURATION = 5000; // 5 seconds
-    const UPDATE_INTERVAL = 10; // Update progress every 10ms
-    const id = uuidv4();
-
-    // Initialize toast with 100% progress
-    const newToast = {
-      id,
-      message,
-      type,
-      progress: 100,
-    };
-
-    setToasts((prev) => [...prev, newToast]);
-
-    // Create interval to update progress
-    const intervalId = setInterval(() => {
-      setToasts((prev) =>
-        prev.map((toast) =>
-          toast.id === id
-            ? {
-              ...toast,
-              progress: Math.max(
-                0,
-                toast.progress - (UPDATE_INTERVAL / TOAST_DURATION) * 100
-              ),
-            }
-            : toast
-        )
-      );
-    }, UPDATE_INTERVAL);
-
-    // Remove toast after duration
-    const timeoutId = setTimeout(() => {
-      clearInterval(intervalId);
-      setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, TOAST_DURATION);
-
-    // Store timeout ID to clear if needed
-    setToasts((prev) =>
-      prev.map((toast) => (toast.id === id ? { ...toast, timeoutId } : toast))
-    );
-  };
 
   function handleModelChange(model: BaseModelEntity) {
     if (!userSettingsLoading) {
@@ -250,14 +149,14 @@ function SettingsPage() {
     if (file) {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        showToast("Image must be less than 5MB", "error");
+        addToast("Image must be less than 5MB", "error");
         return;
       }
 
       // Check file type - allow images and gifs
       const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!allowedTypes.includes(file.type)) {
-        showToast("File must be an image (JPG, PNG) or GIF", "error");
+        addToast("File must be an image (JPG, PNG) or GIF", "error");
         return;
       }
 
@@ -309,14 +208,13 @@ function SettingsPage() {
     formData.append("settings.message_history_count", settings.message_history_count.toString());
     formData.append("settings.use_tools", settings.use_tools.toString());
 
-    console.log("mutating the use settings!");
     updateUserSettings.mutate(
       {
         data: formData,
       },
       {
         onSuccess: () => {
-          showToast("Settings updated successfully!", "success");
+          addToast("Settings updated successfully!", "success");
           setSelectedFile(null);
         },
         onError: (error: any) => {
@@ -335,7 +233,7 @@ function SettingsPage() {
             errorMessage = formattedErrors || errorMessage;
           }
 
-          showToast(errorMessage, "error");
+          addToast(errorMessage, "error");
         },
       }
     );
@@ -349,7 +247,7 @@ function SettingsPage() {
       setModelDetails(response.data);
     } catch (error) {
       console.error("Error updating models:", error);
-      showToast("Failed to update models", "error");
+      addToast("Failed to update models", "error");
     }
   }
 
@@ -360,30 +258,6 @@ function SettingsPage() {
         style={{ maxWidth: "64rem" }}
         className="overflow-y-scroll no-scrollbar"
       >
-        <Box
-          style={{
-            position: "fixed",
-            top: "1rem",
-            right: "1rem",
-            zIndex: 1000,
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-            maxWidth: "300px",
-          }}
-        >
-          {toasts.map((toast) => (
-            <Toast
-              key={toast.id}
-              message={toast.message}
-              type={toast.type}
-              progress={toast.progress}
-              onClose={() =>
-                setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-              }
-            />
-          ))}
-        </Box>
         <Heading size="8" mb="6">
           Settings
         </Heading>
