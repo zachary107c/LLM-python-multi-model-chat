@@ -198,6 +198,7 @@ class AssistantListCreateView(generics.ListCreateAPIView):
             provider=request.data.get("provider"),
             liked=request.data.get("liked", False),
             generated_by=user_message,
+            tools_used=request.data.get("tools_used", [])
         )
 
         assistant_message.save()  # Save the AssistantMessage to generate an ID

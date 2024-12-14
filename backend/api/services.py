@@ -41,10 +41,10 @@ class OllamaService(LLMService):
         Initializes the OllamaService.
 
         Args:
-            endpoint (str, optional): The host URL for the Ollama API. Defaults to the environment variable OLLAMA_HOST.
+            endpoint (str, optional): The host URL for the Ollama API. Defaults to the environment variable OLLAMA_ENDPOINT.
             client (Client, optional): An instance of the Client class. If not provided, a new Client will be created using the specified endpoint.
         """
-        self.endpoint = endpoint or os.getenv("OLLAMA_HOST", "http://localhost:11434")
+        self.endpoint = endpoint or os.getenv("OLLAMA_ENDPOINT", "http://localhost:11434")
 
         if self.endpoint:
             self.client = client or Client(self.endpoint)
@@ -102,7 +102,7 @@ class OllamaService(LLMService):
 
         if not self.client:
             return {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
             }
 
         try:
@@ -127,24 +127,24 @@ class OllamaService(LLMService):
                             }
                         )
                         response = self.client.chat(model=model, messages=messages).model_dump()
-                        response["called_tools"] = called_tools
+                        response["tools_used"] = called_tools
                     else:
                         response = self.client.chat(model=model, messages=messages).model_dump()
-                        response["called_tools"] = None
+                        response["tools_used"] = None
                 else:
                     response = self.client.chat(
                         model=model,
                         messages=messages,
                         stream=False,
                     ).model_dump()
-                    response["called_tools"] = None
+                    response["tools_used"] = None
             else:
                 response = self.client.chat(
                     model=model,
                     messages=messages,
                     stream=False,
                 ).model_dump()
-                response["called_tools"] = None
+                response["tools_used"] = None
 
             return response
         except (RequestError, ResponseError) as e:
@@ -175,7 +175,7 @@ class OllamaService(LLMService):
         """
         if not self.client:
             yield {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
             }
             return
 
@@ -206,28 +206,28 @@ class OllamaService(LLMService):
                             model=model, messages=messages, stream=True
                         ):
                             response = response.model_dump()
-                            response["called_tools"] = called_tools
+                            response["tools_used"] = called_tools
                             yield response
                     else:
                         for response in self.client.chat(
                             model=model, messages=messages, stream=True
                         ):
                             response = response.model_dump()
-                            response["called_tools"] = None
+                            response["tools_used"] = None
                             yield response
                 else:
                     for response in self.client.chat(
                         model=model, messages=messages, stream=True
                     ):
                         response = response.model_dump()
-                        response["called_tools"] = None
+                        response["tools_used"] = None
                         yield response
             else:
                 for response in self.client.chat(
                     model=model, messages=messages, stream=True
                 ):
                     response = response.model_dump()
-                    response["called_tools"] = None
+                    response["tools_used"] = None
                     yield response
         except (RequestError, ResponseError) as e:
             print(f"API request failed: {e}")
@@ -246,7 +246,7 @@ class OllamaService(LLMService):
 
         if not self.client:
             return {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
             }
 
         try:
@@ -259,7 +259,7 @@ class OllamaService(LLMService):
     def get_model(self, model_name: str) -> Dict:
         if not self.client:
             return {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
             }
 
         try:

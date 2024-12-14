@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { api } from "@/lib/api-client";
-import { AssistantMessage } from "@/types/api";
+import { AssistantMessage, UsedTool } from "@/types/api";
 import Cookies from "js-cookie";
 
 export const createAssistantMessageInputSchema = z.object({
@@ -9,6 +9,7 @@ export const createAssistantMessageInputSchema = z.object({
   generated_by: z.string(),
   model: z.number(),
   provider: z.string(),
+  tools_used: z.any()
 });
 
 export type CreateAssistantMessageInput = z.infer<

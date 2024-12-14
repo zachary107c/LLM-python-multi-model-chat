@@ -124,6 +124,7 @@ class AssistantMessage(models.Model):
     liked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
+    tools_used = models.JSONField(null=True, default=None)
 
     def soft_delete(self):
         self.is_deleted = True

@@ -9,14 +9,14 @@ services:
         - DJANGO_SUPERUSER_USERNAME=ethan
         - DJANGO_SUPERUSER_PASSWORD=ethan
         - DJANGO_SUPERUSER_EMAIL=ethanlchristensen@outlook.com
-        - OLLAMA_HOST=http://host.docker.internal:11434
+        - OLLAMA_ENDPOINT=http://host.docker.internal:11434
     ports:
       - "8000:8000"
     environment:
       - DJANGO_SUPERUSER_USERNAME=ethan
       - DJANGO_SUPERUSER_PASSWORD=ethan
       - DJANGO_SUPERUSER_EMAIL=ethanlchristensen@outlook.com
-      - OLLAMA_HOST=http://host.docker.internal:11434
+      - OLLAMA_ENDPOINT=http://host.docker.internal:11434
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

@@ -95,6 +95,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             is_deleted: message.is_deleted,
             deleted_at: message.deleted_at,
             recoverable: message.recoverable,
+            tools_used: message.tools_used,
           } as AssistantMessage;
         }
       });
@@ -337,6 +338,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                             is_deleted: false,
                             deleted_at: "",
                             recoverable: false,
+                            tools_used: []
                           };
 
                           setMessages((messages) => {
@@ -370,6 +372,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               model: model?.id || -1,
               provider: model?.provider || "ollama",
               generated_by: newUserMessage.id,
+              tools_used: (response as any).tools_used
             },
           });
 
@@ -386,6 +389,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             is_deleted: assistantPostData.is_deleted,
             deleted_at: assistantPostData.deleted_at,
             recoverable: assistantPostData.recoverable,
+            tools_used: assistantPostData.tools_used,
           };
 
           setMessages((messages) => {
@@ -408,6 +412,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               model: model?.id || -1,
               provider: "ollama",
               generated_by: newUserMessage.id,
+              tools_used: (response as any).tools_used
             },
           });
 
@@ -424,10 +429,10 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             is_deleted: assistantPostData.is_deleted,
             deleted_at: assistantPostData.deleted_at,
             recoverable: assistantPostData.recoverable,
+            tools_used: assistantPostData.tools_used,
           };
 
           setMessages((messages) => [...messages, newAssistantMessage]);
-          console.log(messages);
         }
       } catch (error) {
         console.error(error);

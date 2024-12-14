@@ -22,6 +22,11 @@ export type ContentVariation = {
   content: string;
 }
 
+export type UsedTool = {
+  name: string;
+  arguments: any;
+}
+
 export type AssistantMessage = Entity<{
   conversation: string;
   content_variations: ContentVariation[];
@@ -33,6 +38,7 @@ export type AssistantMessage = Entity<{
   is_deleted: boolean;
   deleted_at: string;
   recoverable: boolean;
+  tools_used: UsedTool[] | null;
 }>;
 
 export type Message = UserMessage | AssistantMessage;

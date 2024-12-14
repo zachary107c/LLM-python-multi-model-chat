@@ -13,16 +13,16 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         responses = []
 
-        OLLAMA_HOST = os.getenv("OLLAMA_HOST")
+        OLLAMA_ENDPOINT = os.getenv("OLLAMA_ENDPOINT")
 
-        print(OLLAMA_HOST)
+        print(OLLAMA_ENDPOINT)
 
-        if not OLLAMA_HOST:
-            self.stderr.write(self.style.WARNING("No ollama endpoint provided. Did you forget to set the OLLAMA_HOST variable in the .env?"))
-            responses.append({"message": "No ollama endpoint provided. Did you forget to set the OLLAMA_HOST variable in the .env?", "success": False})
+        if not OLLAMA_ENDPOINT:
+            self.stderr.write(self.style.WARNING("No ollama endpoint provided. Did you forget to set the OLLAMA_ENDPOINT variable in the .env?"))
+            responses.append({"message": "No ollama endpoint provided. Did you forget to set the OLLAMA_ENDPOINT variable in the .env?", "success": False})
             return responses
 
-        api_url = f"{OLLAMA_HOST}/api/tags"
+        api_url = f"{OLLAMA_ENDPOINT}/api/tags"
 
         try:
             response = requests.get(api_url)
