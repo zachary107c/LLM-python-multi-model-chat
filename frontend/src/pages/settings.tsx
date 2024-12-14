@@ -180,7 +180,6 @@ function SettingsPage() {
   };
 
   const handleSave = () => {
-    console.log(settings);
     const formData = new FormData();
 
     // Append basic fields
@@ -197,7 +196,7 @@ function SettingsPage() {
     // Append settings
     formData.append(
       "settings.preferred_model",
-      settings.preferred_model.id.toString()
+      settings.preferred_model?.id.toString() || ""
     );
     formData.append(
       "settings.stream_responses",

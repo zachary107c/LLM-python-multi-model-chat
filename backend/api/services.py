@@ -41,10 +41,10 @@ class OllamaService(LLMService):
         Initializes the OllamaService.
 
         Args:
-            endpoint (str, optional): The host URL for the Ollama API. Defaults to the environment variable OLLAMA_ENDPOINT.
+            endpoint (str, optional): The host URL for the Ollama API. Defaults to the environment variable OLLAMA_HOST.
             client (Client, optional): An instance of the Client class. If not provided, a new Client will be created using the specified endpoint.
         """
-        self.endpoint = endpoint or os.getenv("OLLAMA_ENDPOINT")
+        self.endpoint = endpoint or os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
         if self.endpoint:
             self.client = client or Client(self.endpoint)
@@ -55,31 +55,27 @@ class OllamaService(LLMService):
         self.tool_manager = ToolManager(
             tools_dir=os.path.join(os.getcwd(), "api", "tools")
         )
-        self.tool_manager.load_tools()
 
     async def process_tool_calls(self, response):
-        called_tools = set()
+        seen_called_tools = set()
+        called_tools = []
         tool_call_results = ""
-        print("We are executing the following tools:")
-        for tool in response.message.tool_calls:
-            print(f"\t- {tool}")
         for tool in response.message.tool_calls or []:
-            # print(f"have a tool to call: {tool} with args {tool.function.arguments}")
             entry = (tool.function.name, str(tool.function.arguments).lower())
-            if entry in called_tools:
+            if entry in seen_called_tools:
                 continue
-            called_tools.add(entry)
+            seen_called_tools.add(entry)
+            called_tools.append(tool.function.dict())
             try:
                 result = await self.tool_manager.run_tool(
                     tool.function.name, **tool.function.arguments
                 )
-                # print(f"got response from tool call: {result}")
                 tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: {result}\n\n"
             except Exception as e:
-                # print(f"ERROR!: {e}")
+                print(f"\t  error: {e}")
                 tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: Error Occurred {e}, no result\n\n"
-        # print(f"tool call results: {tool_call_results}")
-        return tool_call_results
+
+        return tool_call_results, called_tools
 
     def chat(
         self,
@@ -106,15 +102,13 @@ class OllamaService(LLMService):
 
         if not self.client:
             return {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
             }
 
         try:
             if use_tools and user_tools:
-                # print("we are using tools")
-                # print(f"got valid user tools of: {user_tools}")
+                self.tool_manager.load_tools(valid_tools=user_tools)
                 tools = self.tool_manager.get_tools(user_tool_ids=user_tools)
-                print(f"these are the available tools: {tools}")
                 if tools:
                     response = self.client.chat(
                         model=model,
@@ -123,37 +117,36 @@ class OllamaService(LLMService):
                         tools=tools.values(),
                     )
 
-                    data = asyncio.run(self.process_tool_calls(response=response))
+                    data, called_tools = asyncio.run(self.process_tool_calls(response=response))
 
                     if data:
                         messages.append(
                             {
                                 "role": "user",
-                                "content": f"Utilize the following information from a tool call you just performed to answer the user's question. Don't reference the fact that you used a tool.\n\nDATA:\n{data}",
+                                "content": f"Utilize the following information from a tool call you just performed to answer the user's question. Don't reference the fact that you used a tool. If there are any errors, feel free to let the user know about the error.\n\nDATA:\n{data}",
                             }
                         )
-                        response = self.client.chat(model=model, messages=messages)
-
-                        return response
+                        response = self.client.chat(model=model, messages=messages).model_dump()
+                        response["called_tools"] = called_tools
                     else:
-                        response = self.client.chat(model=model, messages=messages)
-
-                        return response
+                        response = self.client.chat(model=model, messages=messages).model_dump()
+                        response["called_tools"] = None
                 else:
                     response = self.client.chat(
                         model=model,
                         messages=messages,
                         stream=False,
-                    )
-                    return response
+                    ).model_dump()
+                    response["called_tools"] = None
             else:
                 response = self.client.chat(
                     model=model,
                     messages=messages,
                     stream=False,
-                )
+                ).model_dump()
+                response["called_tools"] = None
 
-                return response
+            return response
         except (RequestError, ResponseError) as e:
             print(f"API request failed: {e}")
             return {"error": str(e)}
@@ -182,14 +175,14 @@ class OllamaService(LLMService):
         """
         if not self.client:
             yield {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
             }
             return
 
         try:
             if use_tools and user_tools:
+                self.tool_manager.load_tools(valid_tools=user_tools)
                 tools = self.tool_manager.get_tools(user_tool_ids=user_tools)
-                print(f"these are the available tools: {tools}")
                 if tools:
                     response = self.client.chat(
                         model=model,
@@ -198,7 +191,9 @@ class OllamaService(LLMService):
                         tools=tools.values(),
                     )
 
-                    data = asyncio.run(self.process_tool_calls(response=response))
+                    data, called_tools = asyncio.run(self.process_tool_calls(response=response))
+
+                    print(f"Called Tools: {called_tools}")
 
                     if data:
                         messages.append(
@@ -210,21 +205,29 @@ class OllamaService(LLMService):
                         for response in self.client.chat(
                             model=model, messages=messages, stream=True
                         ):
+                            response = response.model_dump()
+                            response["called_tools"] = called_tools
                             yield response
                     else:
                         for response in self.client.chat(
                             model=model, messages=messages, stream=True
                         ):
+                            response = response.model_dump()
+                            response["called_tools"] = None
                             yield response
                 else:
                     for response in self.client.chat(
                         model=model, messages=messages, stream=True
                     ):
+                        response = response.model_dump()
+                        response["called_tools"] = None
                         yield response
             else:
                 for response in self.client.chat(
                     model=model, messages=messages, stream=True
                 ):
+                    response = response.model_dump()
+                    response["called_tools"] = None
                     yield response
         except (RequestError, ResponseError) as e:
             print(f"API request failed: {e}")
@@ -243,7 +246,7 @@ class OllamaService(LLMService):
 
         if not self.client:
             return {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
             }
 
         try:
@@ -256,7 +259,7 @@ class OllamaService(LLMService):
     def get_model(self, model_name: str) -> Dict:
         if not self.client:
             return {
-                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_ENDPOINT variable set."
+                "error": "Ollama Service is not initialized. Please ensure the .env has the OLLAMA_HOST variable set."
             }
 
         try:

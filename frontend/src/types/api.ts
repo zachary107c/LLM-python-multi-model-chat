@@ -144,7 +144,7 @@ export type Profile = {
 };
 
 export type Settings = {
-  preferred_model: BaseModelEntity;
+  preferred_model: BaseModelEntity | null;
   stream_responses: boolean;
   theme: string;
   use_message_history: boolean;

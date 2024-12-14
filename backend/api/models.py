@@ -9,7 +9,7 @@ from django.conf import settings
 
 class Model(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255, unique=False)
+    name = models.CharField(max_length=255, unique=True)
     model = models.CharField(max_length=255, unique=False)
     liked = models.BooleanField(default=False)
     provider = models.CharField(max_length=255, unique=False)

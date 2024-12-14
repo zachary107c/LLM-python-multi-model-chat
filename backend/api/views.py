@@ -536,7 +536,11 @@ class BaseStreamingAPIView(APIView):
                                 {"message": chunk},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             )
-                        data = f"data: {json.dumps(chunk.dict())}\n\n"
+                        if provider == "ollama":
+                            data = f"data: {json.dumps(chunk)}\n\n"
+                        else:
+                            data = f"data: {json.dumps(chunk)}\n\n"
+                        
                         yield data.encode("utf-8")
 
             response = StreamingHttpResponse(

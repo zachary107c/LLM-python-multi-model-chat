@@ -2,7 +2,7 @@ import os
 import importlib.util
 import inspect
 import asyncio
-from typing import Callable, Dict, Any
+from typing import Callable, Dict, Any, List
 
 
 class ToolManager:
@@ -10,13 +10,17 @@ class ToolManager:
         self.tools_dir = tools_dir
         self.tools = {}
 
-    def load_tools(self):
+    def load_tools(self, valid_tools: List[str] = None):
         """Dynamically loads all tools from the tools directory."""
         for file_name in os.listdir(self.tools_dir):
             if file_name.endswith(".py"):
                 module_name = file_name[:-3]
-                module_path = os.path.join(self.tools_dir, file_name)
-                self._load_tool(module_name, module_path)
+                if module_name in valid_tools:
+                    try:
+                        module_path = os.path.join(self.tools_dir, file_name)
+                        self._load_tool(module_name, module_path)
+                    except Exception as e:
+                        print(f"Failed to load tool!: {e}")
 
     def _load_tool(self, module_name: str, module_path: str):
         """Loads a single tool module."""
@@ -46,7 +50,6 @@ class ToolManager:
             if tool["id"] in user_tool_ids:
                 tools[name] = tool["function"]
         return tools
-
     async def run_tool(self, tool_name: str, **kwargs) -> Any:
         """
         Executes a tool by name, handling async or sync calls.

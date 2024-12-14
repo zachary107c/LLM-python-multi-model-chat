@@ -146,8 +146,28 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 CSRF_COOKIE_SAMESITE = "Strict"
 SESSION_COOKIE_SAMESITE = "Strict"
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:5173", "http://localhost:5173", "http://localhost:3001"]
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:5173", "http://localhost:5173", "http://localhost:3001"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+    "http://localhost:3001",
+    "http://localhost:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3000",
+    "http://localhost",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+    "http://localhost:3001",
+    "http://localhost:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3000",
+    "http://localhost",
+]
 CSRF_COOKIE_HTTPONLY = False
 
 RECOVERY_HOURS = 24
