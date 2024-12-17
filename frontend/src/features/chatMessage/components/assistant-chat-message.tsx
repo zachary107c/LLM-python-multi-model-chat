@@ -189,8 +189,8 @@ export function AssistantChatMessage({
             )}
             {assistantMessageData.tools_used &&
               assistantMessageData.tools_used?.length > 0 &&
-              assistantMessageData.tools_used.map((tool) => (
-                <Badge key={tool.name} variant="surface" radius="full" color="purple" className="ml-2">{tool.name}</Badge>
+              assistantMessageData.tools_used.map((tool, index) => (
+                <Badge key={tool.name + index} variant="surface" radius="full" className="ml-2">{tool.name}</Badge>
               ))}
           </Flex>
         )}

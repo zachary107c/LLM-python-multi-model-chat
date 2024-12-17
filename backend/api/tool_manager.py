@@ -63,7 +63,8 @@ class ToolManager:
         """
         tool = self.tools.get(tool_name)["function"]
         if not tool:
-            raise ValueError(f"Tool '{tool_name}' not found.")
+            print(f"Tool '{tool_name}' not found.")
+            return None
 
         if self.is_async(tool):
             return await tool(**kwargs)

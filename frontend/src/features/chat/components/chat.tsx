@@ -287,6 +287,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           }
 
           let accumulatedContent = "";
+          let tools_used = null;
 
           const stream = new ReadableStream({
             start(controller) {
@@ -316,6 +317,10 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         if (data.message?.content) {
                           accumulatedContent += data.message.content;
 
+                          if (tools_used == null) {
+                            tools_used = data.tools_used
+                          }
+
                           const tempAssistantMessage: AssistantMessage = {
                             id: "temp",
                             created_at: new Date().toISOString(),
@@ -338,7 +343,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                             is_deleted: false,
                             deleted_at: "",
                             recoverable: false,
-                            tools_used: []
+                            tools_used: data.message.tools_used
                           };
 
                           setMessages((messages) => {
@@ -372,10 +377,10 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               model: model?.id || -1,
               provider: model?.provider || "ollama",
               generated_by: newUserMessage.id,
-              tools_used: (response as any).tools_used
+              tools_used: tools_used
             },
           });
-
+b
           const finalAssistantMessage: AssistantMessage = {
             id: assistantPostData.id,
             created_at: assistantPostData.created_at,

@@ -65,12 +65,13 @@ class OllamaService(LLMService):
             if entry in seen_called_tools:
                 continue
             seen_called_tools.add(entry)
-            called_tools.append(tool.function.dict())
             try:
                 result = await self.tool_manager.run_tool(
                     tool.function.name, **tool.function.arguments
                 )
-                tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: {result}\n\n"
+                if result:
+                    tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: {result}\n\n"
+                    called_tools.append(tool.function.dict())
             except Exception as e:
                 print(f"\t  error: {e}")
                 tool_call_results += f"Function call to tool {tool.function.name}:\n\tArguments: {tool.function.arguments}\n\tResult: Error Occurred {e}, no result\n\n"
