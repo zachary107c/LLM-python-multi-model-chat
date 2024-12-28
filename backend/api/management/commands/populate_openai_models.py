@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import openai
 import requests
@@ -26,8 +27,10 @@ class Command(BaseCommand):
             response.append({"message": f"Error fetching the model data: {e}", "success": False})
             return response
         
+
         for model in models:
-            if "gpt-" in model.id and "audio" not in model.id and "realtime" not in model.id:
+            print(model.id)
+            if ("gpt-" in model.id or re.match(r"^o\d+-.*", model.id)) and "audio" not in model.id and "realtime" not in model.id:
                 _, created = Model.objects.update_or_create(
                     name=model.id,
                     model=model.id,
