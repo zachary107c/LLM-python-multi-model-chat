@@ -1,5 +1,6 @@
 services:
   backend:
+    container_name: bruh-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -19,6 +20,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   frontend:
+    container_name: bruh-frontend
     build:
       context: .
       dockerfile: frontend/Dockerfile
@@ -31,6 +33,7 @@ services:
       - /app/node_modules
 
   nginx:
+    container_name: bruh-nginx
     build:
       context: .
       dockerfile: Dockerfile.nginx
