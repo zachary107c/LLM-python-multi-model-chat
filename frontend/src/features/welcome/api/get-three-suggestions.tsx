@@ -10,7 +10,7 @@ export const useGetSuggestionsQuery = (count: number) => {
     queryFn: async (): Promise<Suggestions | null> => {
       return api.post(
         "/suggestions/",
-        { provider: "ollama", model: "llama3.1", count: count },
+        { provider: "ollama", model: "phi4:latest", count: count },
         {
           headers: {
             Authorization: `Token ${Cookies.get("token")}`,

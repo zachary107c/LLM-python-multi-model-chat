@@ -10,12 +10,14 @@ services:
         - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
         - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT}
     ports:
-      - "6969:8000"
+      - "8000:8000"
     environment:
       - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
       - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT}
+      - USE_X_FORWARDED_HOST=True
+      - ALLOWED_HOSTS=*
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -38,7 +40,7 @@ services:
       context: .
       dockerfile: Dockerfile.nginx
     ports:
-      - "8080:80"
+      - "42069:42069"
     depends_on:
       - frontend
       - backend

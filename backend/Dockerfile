@@ -11,7 +11,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir poetry
+RUN pip install poetry
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root --no-interaction --no-ansi
 

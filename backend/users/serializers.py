@@ -5,6 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from .models import Profile, Settings
 from api.models import Model
 from api.serializers import ModelSerializer
+from django.http import HttpRequest
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -54,11 +55,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        request = self.context.get("request")
+        request: HttpRequest = self.context.get("request")
 
         # Modify image URL to include /api/v1 prefix if image exists
         if instance.image:
+            print("referer: ", request.headers.get("Referer"))
+            print("host: ", request.get_host())
+            print("full path: ", request.get_full_path())
+            print("port: ", request.get_port())
+            print("image_url: ", instance.image.url)
             image_url = request.build_absolute_uri(instance.image.url)
+            print("image url: ", image_url)
             representation["image"] = image_url.replace("/media/", "/api/v1/media/")
 
         return representation
