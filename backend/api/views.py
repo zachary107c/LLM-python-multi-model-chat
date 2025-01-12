@@ -520,6 +520,8 @@ class BaseStreamingAPIView(APIView):
                             ],
                         }
                 messages = old_messages + messages
+                for message in messages:
+                    print(message)
 
             self.llm_service = LLMServiceFactory.get_service(provider)
 
