@@ -4,17 +4,17 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       args:
-        - DJANGO_SUPERUSER_USERNAME=ethan
-        - DJANGO_SUPERUSER_PASSWORD=ethan
-        - DJANGO_SUPERUSER_EMAIL=ethanlchristensen@outlook.com
-        - OLLAMA_ENDPOINT=http://host.docker.internal:11434
+        - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+        - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+        - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+        - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT}
     ports:
       - "8000:8000"
     environment:
-      - DJANGO_SUPERUSER_USERNAME=ethan
-      - DJANGO_SUPERUSER_PASSWORD=ethan
-      - DJANGO_SUPERUSER_EMAIL=ethanlchristensen@outlook.com
-      - OLLAMA_ENDPOINT=http://host.docker.internal:11434
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -23,7 +23,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
     environment:
-      - VITE_APP_BACKEND_API_URL=/api/v1/
+      - VITE_APP_BACKEND_API_URL=${VITE_APP_BACKEND_API_URL}
     ports:
       - "5173:5173"
     volumes:
