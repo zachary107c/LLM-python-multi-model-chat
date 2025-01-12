@@ -11,7 +11,7 @@ db.sqlite3
 **/.flake8
 **/.eslintrc.cjs
 **/.gitignore
-**/poetry.lock
-poetry.lock
+# **/poetry.lock
+# poetry.lock
 **/.eslintrc.cjs
 **/README.md

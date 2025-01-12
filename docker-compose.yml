@@ -24,8 +24,8 @@ services:
   frontend:
     container_name: bruh-frontend
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
     environment:
       - VITE_APP_BACKEND_API_URL=${VITE_APP_BACKEND_API_URL}
     ports:
@@ -38,7 +38,7 @@ services:
     container_name: bruh-nginx
     build:
       context: .
-      dockerfile: Dockerfile.nginx
+      dockerfile: Dockerfile
     ports:
       - "42069:42069"
     depends_on:
