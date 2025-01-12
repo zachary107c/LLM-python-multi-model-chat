@@ -14,11 +14,17 @@ export type UserMessage = Entity<{
   type: string;
   is_deleted: boolean;
   deleted_at: string;
+  recoverable: string;
 }>;
 
 export type ContentVariation = {
   id: number;
   content: string;
+}
+
+export type UsedTool = {
+  name: string;
+  arguments: any;
 }
 
 export type AssistantMessage = Entity<{
@@ -31,6 +37,8 @@ export type AssistantMessage = Entity<{
   type: string;
   is_deleted: boolean;
   deleted_at: string;
+  recoverable: boolean;
+  tools_used: UsedTool[] | null;
 }>;
 
 export type Message = UserMessage | AssistantMessage;
@@ -142,9 +150,12 @@ export type Profile = {
 };
 
 export type Settings = {
-  preferred_model: BaseModelEntity;
+  preferred_model: BaseModelEntity | null;
   stream_responses: boolean;
   theme: string;
+  use_message_history: boolean;
+  message_history_count: number;
+  use_tools: boolean;
 }
 
 export type UserSettings = {
@@ -158,6 +169,7 @@ export type UserSettings = {
 
 export type Suggestion = {
   bucket: string;
+  summary: string;
   question: string;
 };
 
@@ -178,5 +190,16 @@ export type UserSettingsUpdatePayload = {
     preferred_model: number
     stream_responses?: boolean;
     theme?: string;
+    use_message_history?: boolean;
+    message_history_count?: number;
+    use_tools?: boolean;
   };
 };
+
+export type Tool = Entity<{
+  updated_at: string;
+  name: string;
+  description: string;
+  script: string;
+  user: string;
+}>;

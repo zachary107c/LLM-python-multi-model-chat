@@ -16,6 +16,7 @@ import {
 } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { Link as RouterLink } from "react-router-dom";
+import { loginUser } from "../api/login";
 
 export function LoginCard() {
   const [username, setUsername] = useState("");
@@ -24,25 +25,29 @@ export function LoginCard() {
 
   const navigate = useNavigate(); // Initialize useNavigate for redirection
 
-  const handleLogin = async (event: any) => {
+  const handleLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setError(null);
+    
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/v1/login/", {
+      const response = await loginUser({
         username,
         password,
       });
 
-      Cookies.set("token", response.data.token);
-
-      navigate("/");
-    } catch (error: any) {
-      if (error.response) {
-        setError(error.response.data.error || "Something went wrong!");
+      if (response.token) {
+        Cookies.set("token", response.token);
+        navigate("/");
       } else {
-        console.log(error);
-        setError(error.message);
+        setError("Invalid response from server");
       }
+    } catch (error: any) {
+      if (error.response?.data?.error) {
+        setError(error.response.data.error);
+      } else {
+        setError("Something went wrong! Please try again.");
+      }
+      console.error("Login error:", error);
     }
   };
 

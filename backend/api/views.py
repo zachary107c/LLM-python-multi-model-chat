@@ -5,18 +5,28 @@ import requests
 import datetime
 from io import StringIO
 from django.core.management import call_command
+from django.core.files.storage import default_storage
 from django.http import StreamingHttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation
+from .models import (
+    Conversation,
+    UserMessage,
+    AssistantMessage,
+    Model,
+    ContentVariation,
+    Tool,
+)
 from .serializers import (
     ConversationSerializer,
     UserMessageSerializer,
     AssistantMessageSerializer,
     ConversationDetailSerializer,
     ModelSerializer,
+    ToolSerializer,
 )
 from .services import (
     OllamaService,
@@ -24,9 +34,13 @@ from .services import (
     AzureOpenAIService,
     LLMServiceFactory,
 )
+from users.models import Settings
+from users.serializers import UserSerializer
 
 PROMPTS = {
-    "three_suggestions": 'You are an expert suggestion generator.\nYou generate three random questions a user could potentially ask to LLM, helping the user get started with a conversation.\nFor each of the questions you generate, you also generate a bucket title this question / request falls under.\nSome bucket examples might be:\n- Programming Questions\n- Fun Facts\n- General Knowledge\n- Story Creation\n- Jokes and Humor\n- etc\n\nResponse with three questions and their corresponding bucket as a json payload. Make the questions detailed an unique.\n\nExample response format:\n{\n  "suggestions": [\n    {\n      "bucket": "Programming Questions",\n      "question": "How do I reverse a string in Python?"\n    },\n    {\n      "bucket": "Fun Facts",\n      "question": "What are some interesting facts about the universe?"\n    },\n    {\n      "bucket": "Story Creation",\n      "question": "Can you help me write a short story about a time-traveling detective?"\n    }\n  ]\n}\n\nOnly repond with the JSON payload surounded in triple back ticks ``` and nothing else.'
+    "three_suggestions": open(
+        os.path.join(os.getcwd(), "api", "prompts", "three_suggestions.txt")
+    ).read()
 }
 
 
@@ -108,8 +122,24 @@ class UserListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return UserMessage.objects.filter(
             conversation__user=self.request.user,
-            is_deleted=False,  # Only show non-deleted messages
+            is_deleted=False,
         )
+
+    def perform_create(self, serializer):
+        # Get the file from request.FILES
+        image = self.request.FILES.get("image")
+        conversation_id = self.request.data.get("conversation")
+
+        # Get the conversation and verify ownership
+        conversation = get_object_or_404(
+            Conversation, id=conversation_id, user=self.request.user
+        )
+
+        # Save with the image if present
+        if image:
+            serializer.save(conversation=conversation, image=image)
+        else:
+            serializer.save(conversation=conversation)
 
     def get(self, request):
         messages = self.get_queryset()
@@ -123,9 +153,7 @@ class UserMessageDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return UserMessage.objects.filter(
-            conversation__user=self.request.user
-        )
+        return UserMessage.objects.filter(conversation__user=self.request.user)
 
     def get_object(self):
         message = super().get_object()
@@ -145,7 +173,9 @@ class AssistantListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return AssistantMessage.objects.filter(conversation__user=self.request.user, is_delete=False)
+        return AssistantMessage.objects.filter(
+            conversation__user=self.request.user, is_delete=False
+        )
 
     def post(self, request, *args, **kwargs):
         # Get the conversation and model from the request
@@ -168,6 +198,7 @@ class AssistantListCreateView(generics.ListCreateAPIView):
             provider=request.data.get("provider"),
             liked=request.data.get("liked", False),
             generated_by=user_message,
+            tools_used=request.data.get("tools_used", [])
         )
 
         assistant_message.save()  # Save the AssistantMessage to generate an ID
@@ -236,15 +267,15 @@ class ModelDetailWithInfoView(APIView):
     def get(self, request, pk):
         try:
             # Fetch model from the database using the primary key (pk)
-            ollama_model = Model.objects.get(pk=pk)
-            serializer = ModelSerializer(ollama_model)
-            if ollama_model.provider == "ollama":
+            model = Model.objects.get(pk=pk)
+            serializer = ModelSerializer(model)
+            if model.provider == "ollama":
                 # Query the Ollama API for additional details
-                model_info = self.ollama_service.get_model(serializer.data["name"])
+                model_info = self.ollama_service.get_model(serializer.data["name"]).dict()
                 if model_info:
                     # Remove unnecessary fields from the Ollama response
                     del model_info["details"]
-                    del model_info["model_info"]
+                    del model_info["modelinfo"]
 
                     # Combine the database model data with the Ollama service response
                     combined_data = {
@@ -269,10 +300,12 @@ class ModelDetailWithInfoView(APIView):
                 {"error": "Model not found."}, status=status.HTTP_404_NOT_FOUND
             )
         except requests.exceptions.RequestException as e:
+            print(f"requests.exception.RequestException: {e}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         except Exception as e:
+            print(f"Exception: {e}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
@@ -306,7 +339,7 @@ class ModelDetailWithInfoView(APIView):
             )
 
 
-class OllamaModelsPopulateAPIView(APIView):
+class ModelsPopulateAPIView(APIView):
     """
     View to handle chat requests with the Ollama API.
     """
@@ -320,19 +353,26 @@ class OllamaModelsPopulateAPIView(APIView):
     def post(self, request):
         try:
             output = StringIO()
-            call_command("populate_ollama_models", stdout=output)
+            response = []
+            response += json.loads(
+                call_command("populate_ollama_models", stdout=output)
+            )
+            response += json.loads(
+                call_command("populate_openai_models", stdout=output)
+            )
 
             return Response(
                 {
-                    "message": "Successfully re-populated Ollama models!",
+                    "message": "Successfully re-populated provider models!",
                     "details": output.getvalue(),
+                    "data": response,
                 },
                 status=status.HTTP_200_OK,
             )
 
         except requests.exceptions.RequestException as e:
             return Response(
-                {"error": str(e), "message": "Failed to re-populate Ollama models!"},
+                {"error": str(e), "message": "Failed to re-populate provider models!"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -346,9 +386,13 @@ class BaseChatAPIView(APIView):
 
     def post(self, request):
         try:
+            user_settings = Settings.objects.get(user=request.user)
+            user_tools = [str(tool.id) for tool in Tool.objects.filter(user=request.user)]
             model = request.data.get("model")
             messages = request.data.get("messages")
             provider = request.data.get("provider")
+            conversation_id = request.data.get("conversation")
+            use_tools = True if request.data.get("useTools") else False
 
             if not model or not messages or not provider:
                 return Response(
@@ -356,6 +400,39 @@ class BaseChatAPIView(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+            if user_settings.use_message_history and conversation_id:
+                conversation = Conversation.objects.filter(
+                    id=conversation_id, user=request.user
+                ).first()
+
+                if not conversation:
+                    return Response(
+                        {"error": "Conversation not found"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+
+                serializer = ConversationDetailSerializer(conversation)
+                serialized_data = serializer.data
+                old_messages = serialized_data.get("messages", [])
+                old_messages = [message for message in old_messages if not message["is_deleted"]]
+                message_history_count = user_settings.message_history_count
+                old_messages = old_messages[-message_history_count:-1]
+                for idx in range(len(old_messages)):
+                    role = old_messages[idx]["type"]
+                    if role == "user":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content"],
+                        }
+                    elif role == "assistant":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content_variations"][-1][
+                                "content"
+                            ],
+                        }
+                messages = old_messages + messages
+            
             self.llm_service = LLMServiceFactory.get_service(provider)
 
             if not self.llm_service:
@@ -364,7 +441,8 @@ class BaseChatAPIView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-            chat_completion = self.llm_service.chat(model, messages)
+            # chat_completion = self.llm_service.chat(model=model, messages=messages, use_tools=user_settings.use_tools, user_tools=user_tools)
+            chat_completion = self.llm_service.chat(model=model, messages=messages, use_tools=use_tools, user_tools=user_tools)
 
             if chat_completion and "error" not in chat_completion:
                 return Response(chat_completion, status=status.HTTP_200_OK)
@@ -377,6 +455,11 @@ class BaseChatAPIView(APIView):
                     {"error": f"Failed to fetch response from {provider} API."},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+        except Settings.DoesNotExist:
+            return Response(
+                {"error": "User settings not found."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -392,15 +475,51 @@ class BaseStreamingAPIView(APIView):
 
     def post(self, request):
         try:
+            user_settings = Settings.objects.get(user=request.user)
+            user_tools = [str(tool.id) for tool in Tool.objects.filter(user=request.user)]
             model = request.data.get("model")
-            messages = request.data.get("messages")
             provider = request.data.get("provider")
+            messages = request.data.get("messages")
+            conversation_id = request.data.get("conversation")
+            use_tools = True if request.data.get("useTools") else False
 
-            if not model or not messages or not provider:
+            if not model or not provider or not messages:
                 return Response(
-                    {"error": "Model, messages, and provider are required"},
+                    {"error": "Model, provider, and messages are required"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            if user_settings.use_message_history and conversation_id:
+                conversation = Conversation.objects.filter(
+                    id=conversation_id, user=request.user
+                ).first()
+
+                if not conversation:
+                    return Response(
+                        {"error": "Conversation not found"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+
+                serializer = ConversationDetailSerializer(conversation)
+                serialized_data = serializer.data
+                old_messages = serialized_data.get("messages", [])
+                message_history_count = user_settings.message_history_count
+                old_messages = old_messages[-message_history_count:-1]
+                for idx in range(len(old_messages)):
+                    role = old_messages[idx]["type"]
+                    if role == "user":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content"],
+                        }
+                    elif role == "assistant":
+                        old_messages[idx] = {
+                            "role": role,
+                            "content": old_messages[idx]["content_variations"][-1][
+                                "content"
+                            ],
+                        }
+                messages = old_messages + messages
 
             self.llm_service = LLMServiceFactory.get_service(provider)
 
@@ -411,9 +530,18 @@ class BaseStreamingAPIView(APIView):
                 )
 
             def stream_response():
-                for chunk in self.llm_service.chat_stream(model, messages):
+                for chunk in self.llm_service.chat_stream(model=model, messages=messages, use_tools=use_tools, user_tools=user_tools):
                     if chunk and not isinstance(chunk, str):
-                        data = f"data: {json.dumps(chunk)}\n\n"
+                        if "error" in chunk:
+                            return Response(
+                                {"message": chunk},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            )
+                        if provider == "ollama":
+                            data = f"data: {json.dumps(chunk)}\n\n"
+                        else:
+                            data = f"data: {json.dumps(chunk)}\n\n"
+                        
                         yield data.encode("utf-8")
 
             response = StreamingHttpResponse(
@@ -429,6 +557,11 @@ class BaseStreamingAPIView(APIView):
 
             return response
 
+        except Settings.DoesNotExist:
+            return Response(
+                {"error": "User settings not found."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -441,18 +574,44 @@ class BaseThreeSuggestionsAPIView(APIView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.llm_service = None
+        self.buckets = [
+            "Programming Questions",
+            "Fun Facts",
+            "General Knowledge",
+            "Story Creation",
+            "Jokes and Humor",
+            "Career Advice",
+            "Language Learning",
+            "Scientific Explanations",
+            "Mental Health & Wellness",
+            "Creative Writing",
+            "DIY & Home Projects",
+            "Music & Art",
+            "Historical Events",
+            "Travel Tips",
+            "Technology Trends",
+            "Life Skills",
+        ]
 
     def post(self, request):
         model = request.data.get("model")
         provider = request.data.get("provider")
+        count = request.data.get("count")
 
-        if not model or not provider:
+        if model is None or provider is None or count is None:
             return Response(
-                {"error": "Model and provider are required."},
+                {"error": "Model, provider, and count are required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        prompt = PROMPTS.get("three_suggestions")
+        if not isinstance(count, int):
+            return Response(
+                {"error": "Parameter count must be a number."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        base_prompt = PROMPTS.get("three_suggestions")
+
         self.llm_service = LLMServiceFactory.get_service(provider)
 
         if not self.llm_service:
@@ -461,33 +620,52 @@ class BaseThreeSuggestionsAPIView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        chat_completion = self.llm_service.chat(
-            model=model, messages=[{"role": "user", "content": prompt}]
-        )
+        suggestions = []
+        available_buckets = self.buckets[:]
+        used_buckets = []
 
-        if chat_completion and "error" not in chat_completion:
+        for _ in range(count):
             try:
-                payload = json.loads(
+                prompt = base_prompt.replace(
+                    "${buckets}", "- " + "\n- ".join(available_buckets) + "\n"
+                ).replace(
+                    "${suggestions}",
+                    (
+                        "\n- "
+                        + "\n- ".join(
+                            [suggestion["summary"] for suggestion in suggestions]
+                        )
+                        if suggestions
+                        else "No suggetions generated yet"
+                    ),
+                )
+
+                chat_completion = self.llm_service.chat(
+                    model=model, messages=[{"role": "user", "content": prompt}]
+                )
+
+                suggestion = json.loads(
                     chat_completion["message"]["content"]
                     .replace("```json", "")
                     .replace("```", "")
                 )
-                return Response(payload, status=status.HTTP_200_OK)
+
+                if (
+                    "bucket" in suggestion
+                    and "summary" in suggestion
+                    and "question" in suggestion
+                ):
+                    suggestions.append(suggestion)
             except Exception as e:
-                chat_completion["external_message"] = (
-                    f"Failed to decode the json -> {e}"
-                )
-                return Response(
-                    chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-        elif chat_completion and "error" in chat_completion:
+                print(f"three suggestions error: {e}")
+
+        try:
+            payload = {"suggestions": suggestions}
+            return Response(payload, status=status.HTTP_200_OK)
+        except Exception as e:
+            chat_completion["external_message"] = f"Failed to decode the json -> {e}"
             return Response(
                 chat_completion, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        else:
-            return Response(
-                {"error": f"Failed to fetch response from {provider} API."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
@@ -501,3 +679,56 @@ class StreamChatAPIView(BaseStreamingAPIView):
 
 class ThreeSuggestionsAPIView(BaseThreeSuggestionsAPIView):
     pass
+
+
+class ToolFileMixin:
+    """Mixin to handle saving and deleting script files."""
+
+    def save_script_to_file(self, tool):
+        script_file_path = os.path.join(os.getcwd(), "api", "tools", f"{tool.id}.py")
+        with open(script_file_path, "w") as file:
+            file.write(tool.script.replace("\r", ""))
+
+    def delete_script_file(self, tool):
+        script_file_path = os.path.join(os.getcwd(), "api", "tools", f"{tool.id}.py")
+        if os.path.exists(script_file_path):
+            os.remove(script_file_path)
+
+
+class ToolsListCreateView(ToolFileMixin, generics.ListCreateAPIView):
+    serializer_class = ToolSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Tool.objects.filter(user=self.request.user)
+
+    def get(self, request):
+        tools = self.get_queryset()
+        serializer = self.get_serializer(tools, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        tool = serializer.save(user=self.request.user)
+        self.save_script_to_file(tool)
+
+
+class ToolsDetailView(ToolFileMixin, generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ToolSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Tool.objects.filter(user=self.request.user)
+
+    def get_object(self):
+        tool = super().get_object()
+        if tool.user != self.request.user:
+            raise PermissionDenied("You do not have permission to access this tool.")
+        return tool
+
+    def perform_update(self, serializer):
+        tool = serializer.save(user=self.request.user)
+        self.save_script_to_file(tool)
+
+    def perform_destroy(self, instance):
+        self.delete_script_file(instance)
+        super().perform_destroy(instance)

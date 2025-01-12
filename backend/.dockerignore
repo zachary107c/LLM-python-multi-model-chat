@@ -1,0 +1,17 @@
+**/tests
+**/docs 
+**/.venv/
+**/__pycache__/
+
+db.sqlite3
+*.sqlite3
+**/*.sqlite3
+
+**/.pylintrc
+**/.flake8
+**/.eslintrc.cjs
+**/.gitignore
+**/poetry.lock
+poetry.lock
+**/.eslintrc.cjs
+**/README.md

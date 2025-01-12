@@ -6,7 +6,7 @@ export default function ModelsPage() {
   const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
 
   return (
-    <div className="w-full h-screen flex overflow-hidden">
+    <div className=" w-full h-screen flex overflow-hidden">
       <Models
         selectedModelId={selectedModelId}
         onSelectedModelIdChange={setSelectedModelId}

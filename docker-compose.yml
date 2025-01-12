@@ -1,20 +1,46 @@
-version: "3.8"
-
 services:
   backend:
+    container_name: bruh-backend
     build:
-      context: .
-      dockerfile: Dockerfile.backend
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+        - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+        - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+        - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT}
     ports:
-      - "8000:8000"
-    volumes:
-      - ./backend:/app
+      - "6969:8000"
+    environment:
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT}
+      - USE_X_FORWARDED_HOST=True
+      - ALLOWED_HOSTS=*
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   frontend:
+    container_name: bruh-frontend
     build:
       context: .
-      dockerfile: Dockerfile.frontend
-      args:
-        - VITE_APP_BACKEND_API_URL=http://127.0.0.1:8000/api/v1/
+      dockerfile: frontend/Dockerfile
+    environment:
+      - VITE_APP_BACKEND_API_URL=${VITE_APP_BACKEND_API_URL}
     ports:
-      - "3001:80"
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  nginx:
+    container_name: bruh-nginx
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "42069:42069"
+    depends_on:
+      - frontend
+      - backend

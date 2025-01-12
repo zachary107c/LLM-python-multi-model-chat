@@ -7,12 +7,7 @@ import { ModelList } from "@/features/model/components/model-list";
 import { ModelListLoading } from "@/features/model/components/model-list-loading";
 
 export function Models({ selectedModelId, onSelectedModelIdChange }: any) {
-  const [expanded, setExpanded] = useState(true);
   const { data: models, isLoading } = useGetModelsQuery();
-
-  function handleSetExpanded(e: any) {
-    setExpanded(e);
-  }
 
   function handleSetSelected(modelId: number) {
     if (models !== null && models !== undefined) {
@@ -31,27 +26,9 @@ export function Models({ selectedModelId, onSelectedModelIdChange }: any) {
   }, [models]);
 
   return (
-    <div
-      className={`${expanded ? "w-[250px] max-w-[250px] h-full" : "h-full"}`}
-    >
-      {!expanded && (
-        <div className="overflow-y-scroll no-scrollbar border-r border-[#7d7d7d68] h-full">
-          <div className="mx-2 mt-2">
-            <Button variant={"ghost"} className="p-2">
-              <PinRightIcon onClick={() => handleSetExpanded(true)} />
-            </Button>
-          </div>
-        </div>
-      )}
-      <div
-        className={`${
-          expanded ? "overflow-y-scroll no-scrollbar" : "hidden"
-        } border-r border-[#7d7d7d68] w-full h-full`}
-      >
-        <div className="flex justify-between items-center mx-2 mt-2">
-          <Button variant="ghost" className="p-2">
-            <PinLeftIcon onClick={() => handleSetExpanded(false)} />
-          </Button>
+    <div className="w-[250px] max-w-[250px] h-full">
+      <div className="overflow-y-scroll no-scrollbar border-r border-[#7d7d7d68] w-full h-full">
+        <div className="flex justify-end items-center mx-2 mt-2">
           <Tooltip content="New Model" side="right">
             <Button
               variant="ghost"

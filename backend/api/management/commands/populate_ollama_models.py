@@ -1,27 +1,36 @@
 import os
+import json
+import random
 import requests
 from django.core.management.base import BaseCommand
 from api.models import Model
 
+COLORS = ["gray", "gold", "bronze", "brown", "yellow", "amber", "orange", "tomato", "red", "ruby", "crimson", "pink", "plum", "purple", "violet", "iris", "indigo", "blue", "cyan", "teal", "jade", "green", "grass", "lime", "mint", "sky"]
 
 class Command(BaseCommand):
     help = "Populate Model table with models from Ollama"
 
     def handle(self, *args, **kwargs):
-        ollama_endpoint = os.getenv("OLLAMA_ENDPOINT")
+        responses = []
 
-        if not ollama_endpoint:
+        OLLAMA_ENDPOINT = os.getenv("OLLAMA_ENDPOINT")
+
+        print(OLLAMA_ENDPOINT)
+
+        if not OLLAMA_ENDPOINT:
             self.stderr.write(self.style.WARNING("No ollama endpoint provided. Did you forget to set the OLLAMA_ENDPOINT variable in the .env?"))
-            return
+            responses.append({"message": "No ollama endpoint provided. Did you forget to set the OLLAMA_ENDPOINT variable in the .env?", "success": False})
+            return responses
 
-        api_url = f"{ollama_endpoint}/api/tags"
+        api_url = f"{OLLAMA_ENDPOINT}/api/tags"
 
         try:
             response = requests.get(api_url)
             response.raise_for_status()
         except requests.RequestException as e:
             self.stderr.write(self.style.ERROR(f"Error fetching the API data: {e}"))
-            return
+            responses.append({"message": f"Error fetching the API data: {e}", "success": False})
+            return responses
 
         data = response.json()
 
@@ -30,16 +39,23 @@ class Command(BaseCommand):
             model = model_data.get("model")
 
             if name and model:
-                _, created = Model.objects.update_or_create(
+                obj, created = Model.objects.update_or_create(
                     name=name,
-                    model=model,
-                    provider="ollama",
-                    defaults={"name": name, "model": model}
+                    defaults={
+                        "model": model,
+                        "provider": "ollama",
+                        "color": random.choice(COLORS),
+                    }
                 )
 
                 if created:
                     self.stdout.write(self.style.SUCCESS(f"Model '{name}' created."))
+                    responses.append({"message": f"Model '{name}' created.", "success": True})
                 else:
-                    self.stdout.write(self.style.MIGRATE_HEADING(f"Model '{name}' already exists and updated."))
+                    self.stdout.write(self.style.NOTICE(f"Model '{name}' already exists and updated."))
+                    responses.append({"message": f"Model '{name}' already exists and updated.", "success": True})
             else:
                 self.stdout.write(self.style.ERROR(f"Invalid model data: {model_data}"))
+                responses.append({"message": f"Invalid model data: {model_data}", "success": False})
+
+        return json.dumps(responses)

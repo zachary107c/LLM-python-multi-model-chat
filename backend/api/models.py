@@ -1,11 +1,15 @@
+import os
 import uuid
+from datetime import timedelta
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class Model(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255, unique=False)
+    name = models.CharField(max_length=255, unique=True)
     model = models.CharField(max_length=255, unique=False)
     liked = models.BooleanField(default=False)
     provider = models.CharField(max_length=255, unique=False)
@@ -77,11 +81,24 @@ class UserMessage(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     def soft_delete(self):
-        from django.utils import timezone
-
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.save()
+
+    def recover(self):
+        if self.is_deleted and self.recoverable:
+            self.is_deleted = False
+            self.deleted_at = None
+            self.save()
+
+    @property
+    def recoverable(self):
+        if not self.is_deleted:
+            return False
+        if self.deleted_at is None:
+            return False
+        time_since_deletion = timezone.now() - self.deleted_at
+        return time_since_deletion < timedelta(hours=settings.RECOVERY_HOURS or 24)
 
     def __str__(self):
         return f"User Message {self.id} - {self.conversation.user.username}"
@@ -107,13 +124,40 @@ class AssistantMessage(models.Model):
     liked = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
+    tools_used = models.JSONField(null=True, default=None)
 
     def soft_delete(self):
-        from django.utils import timezone
-
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.save()
 
+    def recover(self):
+        if self.is_deleted and self.recoverable:
+            self.is_deleted = False
+            self.deleted_at = None
+            self.save()
+
+    @property
+    def recoverable(self):
+        if not self.is_deleted:
+            return False
+        if self.deleted_at is None:
+            return False
+        time_since_deletion = timezone.now() - self.deleted_at
+        return time_since_deletion < timedelta(hours=settings.RECOVERY_HOURS or 24)
+
     def __str__(self):
         return f"Assistant Message {self.id} - {self.model}"
+
+
+class Tool(models.Model):
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    user = models.ForeignKey(User, related_name="tools", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True, default="")
+    script = models.TextField(blank=True, default="")
+
+    def __str__(self):
+        return self.name

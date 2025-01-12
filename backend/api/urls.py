@@ -12,9 +12,11 @@ urlpatterns = [
     path("messages/assistant/", views.AssistantListCreateView.as_view(), name="assistant-messages"),
     path("messages/assistant/<int:pk>/", views.AssistantMessageDetailView.as_view(), name="assistant-message-detail"),
     path("models/", views.ModelListCreateView.as_view(), name="models"),
-    path("ollama/models/<int:pk>/", views.ModelDetailWithInfoView.as_view(), name="model-detail"),
-    path("ollama/models/populate/", views.OllamaModelsPopulateAPIView.as_view(), name="model-populate"),
+    path("models/<int:pk>/", views.ModelDetailWithInfoView.as_view(), name="models"),
+    path("models/populate/", views.ModelsPopulateAPIView.as_view(), name="models-populate"),
     path("chat/", views.ChatAPIView.as_view(), name="chat"),
     path("chat/stream/", views.StreamChatAPIView.as_view(), name="chat-stream"),
     path("suggestions/", views.ThreeSuggestionsAPIView.as_view(), name="suggestions"),
+    path("tools/", views.ToolsListCreateView.as_view(), name="tools"),
+    path("tools/<str:pk>/", views.ToolsDetailView.as_view(), name="tools-detail")
 ]

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export function WelcomeCardLoading() {
   return (
-    <div className="p-1 w-full h-32 overflow-y-scroll no-scrollbar">
+    <div className="p-1 w-full h-28 overflow-y-scroll no-scrollbar">
       <Card className="h-full w-full">
         <div className="flex flex-col h-full justify-between items-start w-full">
           <Skeleton className="w-full h-4" />

@@ -27,9 +27,10 @@ import {
 } from "@/types/api";
 import { Welcome } from "@/features/welcome/components/welcome";
 import { WelcomeLoading } from "@/features/welcome/components/welcome-loading";
-import { useGetSuggestionsQuery } from "../api/get-three-suggestions";
+import { useGetSuggestionsQuery } from "../../welcome/api/get-three-suggestions";
 import { useSearchParams } from "react-router-dom";
 import { useUserSettings } from "@/components/userSettings/user-settings-provider";
+import { useToast } from "@/components/ui/toast/toast-provider";
 
 interface ChatProps {
   chatId: string;
@@ -37,6 +38,7 @@ interface ChatProps {
 }
 
 export function Chat({ chatId, onCreateNewChat }: ChatProps) {
+  const { addToast } = useToast();
   const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>(
     []
   );
@@ -51,7 +53,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
   const createMutation = createConversationMutation();
 
   const { data: suggestionsData, isLoading: suggestionsLoading } =
-    useGetSuggestionsQuery();
+    useGetSuggestionsQuery(3);
   const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
   const {
     data,
@@ -77,6 +79,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             image: message.image,
             is_deleted: message.is_deleted,
             deleted_at: message.deleted_at,
+            recoverable: message.recoverable,
           } as UserMessage;
         } else {
           return {
@@ -91,6 +94,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             conversation: message.conversation,
             is_deleted: message.is_deleted,
             deleted_at: message.deleted_at,
+            recoverable: message.recoverable,
+            tools_used: message.tools_used,
           } as AssistantMessage;
         }
       });
@@ -136,6 +141,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
 
   useEffect(() => {
     if (error) {
+      addToast('Failed to get conversation!', "error");
       setSearchParams({});
     }
   }, [error]);
@@ -159,29 +165,45 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
     return response.id;
   }
 
-  const toDataURL = async (url: string | null): Promise<string | null> => {
+  const toDataURL = async (
+    url: string | null
+  ): Promise<{ base64: string; type: string } | null> => {
     if (!url) return null;
+
     const response = await fetch(url);
     const blob = await response.blob();
 
-    return new Promise<string>((resolve, reject) => {
+    return new Promise<{ base64: string; type: string }>((resolve, reject) => {
       const reader = new FileReader();
+
       reader.onloadend = () => {
         const base64Data = reader.result as string;
-        const base64String = base64Data.split(",")[1];
-        resolve(base64String);
+
+        // Extract the MIME type and base64 string
+        const [header, base64String] = base64Data.split(",");
+        const typeMatch = header.match(/:(.*?);/);
+
+        if (typeMatch) {
+          const mimeType = typeMatch[1];
+          resolve({ base64: base64String, type: mimeType });
+        } else {
+          reject(new Error("Failed to extract MIME type"));
+        }
       };
+
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
   };
 
-  async function handleSendMessage(message: string) {
+  async function handleSendMessage(message: string, useTools: boolean) {
     if (message.trim().length > 0) {
       let currentChatId = chatId;
+      let shouldAddMessageManually = true;
 
       if (!chatId) {
         currentChatId = await handleCreateNewConversation(message);
+        shouldAddMessageManually = false; // Don't manually add message for new conversations
       }
 
       const userPostData = await createUserMessage({
@@ -207,23 +229,46 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
         type: "user",
         is_deleted: userPostData.is_deleted,
         deleted_at: userPostData.deleted_at,
+        recoverable: userPostData.recoverable,
       };
 
-      setMessages((messages) => [...messages, newUserMessage]);
+      if (shouldAddMessageManually) {
+        setMessages((messages) => [...messages, newUserMessage]);
+      }
+
       setIsLoading(true);
 
       const image_data = await toDataURL(userPostData.image);
       const payload = {
         model: model?.name,
         provider: model?.provider,
+        conversation: currentChatId,
+        useTools: useTools,
         messages: [
           {
             role: "user",
-            content: message,
-            images: image_data ? [image_data] : [],
-          },
+            content: "",
+          } as { role: string; content: string | any[]; images?: string[] },
         ],
       };
+
+      if (image_data) {
+        if (model?.provider === "ollama") {
+          payload.messages[0]["images"] = [image_data.base64];
+          payload.messages[0].content = message;
+        } else if (model?.provider === "openai") {
+          let text_part = { type: "text", text: message };
+          let image_part = {
+            type: "image_url",
+            image_url: {
+              url: `data:${image_data.type};base64,${image_data.base64}`,
+            },
+          };
+          payload.messages[0].content = [text_part, image_part];
+        }
+      } else {
+        payload.messages[0].content = message;
+      }
 
       try {
         if (userSettings.settings?.stream_responses || false) {
@@ -242,6 +287,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
           }
 
           let accumulatedContent = "";
+          let tools_used = null;
 
           const stream = new ReadableStream({
             start(controller) {
@@ -264,8 +310,16 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                         const jsonStr = line.slice(6); // Remove "data: " prefix
                         const data = JSON.parse(jsonStr);
 
+                        if (data.message && data.message.error) {
+                          throw new Error(data.message.error);
+                        }
+
                         if (data.message?.content) {
                           accumulatedContent += data.message.content;
+
+                          if (tools_used == null) {
+                            tools_used = data.tools_used
+                          }
 
                           const tempAssistantMessage: AssistantMessage = {
                             id: "temp",
@@ -287,7 +341,9 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
                             liked: false,
                             type: "assistant",
                             is_deleted: false,
-                            deleted_at: ""
+                            deleted_at: "",
+                            recoverable: false,
+                            tools_used: data.message.tools_used
                           };
 
                           setMessages((messages) => {
@@ -321,9 +377,10 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               model: model?.id || -1,
               provider: model?.provider || "ollama",
               generated_by: newUserMessage.id,
+              tools_used: tools_used
             },
           });
-
+b
           const finalAssistantMessage: AssistantMessage = {
             id: assistantPostData.id,
             created_at: assistantPostData.created_at,
@@ -336,6 +393,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             type: "assistant",
             is_deleted: assistantPostData.is_deleted,
             deleted_at: assistantPostData.deleted_at,
+            recoverable: assistantPostData.recoverable,
+            tools_used: assistantPostData.tools_used,
           };
 
           setMessages((messages) => {
@@ -358,6 +417,7 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               model: model?.id || -1,
               provider: "ollama",
               generated_by: newUserMessage.id,
+              tools_used: (response as any).tools_used
             },
           });
 
@@ -373,6 +433,8 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
             type: "assistant",
             is_deleted: assistantPostData.is_deleted,
             deleted_at: assistantPostData.deleted_at,
+            recoverable: assistantPostData.recoverable,
+            tools_used: assistantPostData.tools_used,
           };
 
           setMessages((messages) => [...messages, newAssistantMessage]);
@@ -434,7 +496,6 @@ export function Chat({ chatId, onCreateNewChat }: ChatProps) {
               return null;
             }
           })}
-
           <div ref={ref} />
         </div>
         <ChatInput

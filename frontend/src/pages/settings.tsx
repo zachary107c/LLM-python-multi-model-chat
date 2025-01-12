@@ -10,80 +10,28 @@ import {
   Button,
   TextField,
   TextArea,
-  Select,
   Switch,
-  Callout,
-  Progress,
 } from "@radix-ui/themes";
 import { withUserSettings } from "@/components/userSettings/user-settings-provider";
 import { useUpdateUserSettingsMutation } from "@/components/userSettings/api/update-user-settings";
 import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-settings";
 import { useGetModelsQuery } from "@/features/model/api/get-models";
-import { Settings, UserSettingsUpdatePayload } from "@/types/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
-  CheckCircledIcon,
-  CrossCircledIcon,
-  Cross2Icon,
-} from "@radix-ui/react-icons";
-import { Button as LocalButton } from "@/components/ui/button";
+  BaseModelEntity,
+  Settings,
+} from "@/types/api";
+import { ModelSelect } from "@/features/model/components/model-select";
+import "react-toastify/dist/ReactToastify.css";
+import { api } from "@/lib/api-client";
+import Cookies from "js-cookie";
+import { useToast } from "@/components/ui/toast/toast-provider";
 
-function Toast({
-  message,
-  type,
-  progress,
-  onClose,
-}: {
-  message: string;
-  type: "success" | "error";
-  progress: number;
-  onClose: () => void;
-}) {
-  return (
-    <Callout.Root
-      color={type === "success" ? "green" : "red"}
-      role="alert"
-      style={{
-        animation: "slideIn 0.3s ease-out, slideOut 0.3s ease-in forwards",
-        animationDelay: "0s, 4.7s",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div className="flex items-center justify-between w-full">
-        <Callout.Icon className="mr-1">
-          {type === "success" ? <CheckCircledIcon /> : <CrossCircledIcon />}
-        </Callout.Icon>
-        <Callout.Text size="1">{message}</Callout.Text>
-        <LocalButton
-          onClick={onClose}
-          variant="ghost-no-hover"
-          className="m-1 p-0"
-        >
-          <Cross2Icon />
-        </LocalButton>
-      </div>
-      <Progress value={progress} />
-    </Callout.Root>
-  );
-}
 
 function SettingsPage() {
-  const [toasts, setToasts] = useState<
-    Array<{
-      id: number;
-      message: string;
-      type: "success" | "error";
-      progress: number;
-      timeoutId?: ReturnType<typeof setTimeout>;
-    }>
-  >([]);
+  const { addToast } = useToast();
   const { data: userSettings, isLoading: userSettingsLoading } =
     useGetUserSettingsQuery();
   const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
-  const updateUserSettings = useUpdateUserSettingsMutation();
-
   const initialSettings: Settings = userSettings?.settings || {
     preferred_model: {
       id: 1,
@@ -95,8 +43,10 @@ function SettingsPage() {
     },
     stream_responses: true,
     theme: "dark",
+    use_message_history: true,
+    message_history_count: 5,
+    use_tools: false
   };
-
   const [username, setUsername] = useState(userSettings?.username || "johndoe");
   const [email, setEmail] = useState(userSettings?.email || "john@example.com");
   const [bio, setBio] = useState(
@@ -105,50 +55,38 @@ function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(initialSettings);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [modelDetails, setModelDetails] = useState([]);
+  const updateUserSettings = useUpdateUserSettingsMutation();
 
-  const showToast = (message: string, type: "success" | "error") => {
-    const TOAST_DURATION = 5000; // 5 seconds
-    const UPDATE_INTERVAL = 10; // Update progress every 10ms
-    const id = Date.now();
 
-    // Initialize toast with 100% progress
-    const newToast = {
-      id,
-      message,
-      type,
-      progress: 100,
-    };
+  useEffect(() => {
+    if (modelDetails.length > 0) {
+      const timer = setTimeout(() => {
+        setModelDetails([]); // Clear models after 5 seconds
+      }, 10000);
 
-    setToasts((prev) => [...prev, newToast]);
+      return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+  }, [modelDetails]);
 
-    // Create interval to update progress
-    const intervalId = setInterval(() => {
-      setToasts((prev) =>
-        prev.map((toast) =>
-          toast.id === id
-            ? {
-                ...toast,
-                progress: Math.max(
-                  0,
-                  toast.progress - (UPDATE_INTERVAL / TOAST_DURATION) * 100
-                ),
-              }
-            : toast
-        )
-      );
-    }, UPDATE_INTERVAL);
+  function handleModelChange(model: BaseModelEntity) {
+    if (!userSettingsLoading) {
+      const newPreferredModel = model ||
+        (models && models[0]) || {
+        id: -1,
+        name: "llama3.1",
+        model: "llama3.1",
+        liked: false,
+        provider: "",
+        color: "gray",
+      };
 
-    // Remove toast after duration
-    const timeoutId = setTimeout(() => {
-      clearInterval(intervalId);
-      setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, TOAST_DURATION);
-
-    // Store timeout ID to clear if needed
-    setToasts((prev) =>
-      prev.map((toast) => (toast.id === id ? { ...toast, timeoutId } : toast))
-    );
-  };
+      setSettings((prev) => ({
+        ...prev,
+        preferred_model: newPreferredModel,
+      }));
+    }
+  }
 
   useEffect(() => {
     if (userSettings) {
@@ -175,6 +113,31 @@ function SettingsPage() {
     }));
   }
 
+  function handleUseToolsToggled() {
+    setSettings((prev) => ({
+      ...prev,
+      use_tools: !prev.use_tools,
+    }));
+  }
+
+  function handleUseMessageHistoryToggled() {
+    setSettings((prev) => ({
+      ...prev,
+      use_message_history: !prev.use_message_history,
+    }));
+  }
+
+  function handleSetMessageHistoryCount(count: string) {
+    const parsedCount = Number(count);
+    if (!isNaN(parsedCount)) {
+      setSettings((prev) => ({
+        ...prev,
+        message_history_count: parsedCount,
+      }));
+    }
+  }
+
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarClick = () => {
@@ -186,14 +149,14 @@ function SettingsPage() {
     if (file) {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        showToast("Image must be less than 5MB", "error");
+        addToast("Image must be less than 5MB", "error");
         return;
       }
 
       // Check file type - allow images and gifs
       const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!allowedTypes.includes(file.type)) {
-        showToast("File must be an image (JPG, PNG) or GIF", "error");
+        addToast("File must be an image (JPG, PNG) or GIF", "error");
         return;
       }
 
@@ -233,13 +196,16 @@ function SettingsPage() {
     // Append settings
     formData.append(
       "settings.preferred_model",
-      settings.preferred_model.id.toString()
+      settings.preferred_model?.id.toString() || ""
     );
     formData.append(
       "settings.stream_responses",
       settings.stream_responses.toString()
     );
     formData.append("settings.theme", settings.theme);
+    formData.append("settings.use_message_history", settings.use_message_history.toString());
+    formData.append("settings.message_history_count", settings.message_history_count.toString());
+    formData.append("settings.use_tools", settings.use_tools.toString());
 
     updateUserSettings.mutate(
       {
@@ -247,7 +213,7 @@ function SettingsPage() {
       },
       {
         onSuccess: () => {
-          showToast("Settings updated successfully!", "success");
+          addToast("Settings updated successfully!", "success");
           setSelectedFile(null);
         },
         onError: (error: any) => {
@@ -266,39 +232,31 @@ function SettingsPage() {
             errorMessage = formattedErrors || errorMessage;
           }
 
-          showToast(errorMessage, "error");
+          addToast(errorMessage, "error");
         },
       }
     );
   };
 
+  async function handleUpdateModels() {
+    try {
+      const response = await api.post("/models/populate/", undefined, {
+        headers: { Authorization: `Token ${Cookies.get("token")}` },
+      });
+      setModelDetails(response.data);
+    } catch (error) {
+      console.error("Error updating models:", error);
+      addToast("Failed to update models", "error");
+    }
+  }
+
   return (
-    <div className="overflow-y-scroll no-scrollbar">
-      <Box p="6" style={{ maxWidth: "64rem" }}>
-        <Box
-          style={{
-            position: "fixed",
-            top: "1rem",
-            right: "1rem",
-            zIndex: 1000,
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.5rem",
-            maxWidth: "300px",
-          }}
-        >
-          {toasts.map((toast) => (
-            <Toast
-              key={toast.id}
-              message={toast.message}
-              type={toast.type}
-              progress={toast.progress}
-              onClose={() =>
-                setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-              }
-            />
-          ))}
-        </Box>
+    <div className=" overflow-y-scroll no-scrollbar">
+      <Box
+        p="6"
+        style={{ maxWidth: "64rem" }}
+        className="overflow-y-scroll no-scrollbar"
+      >
         <Heading size="8" mb="6">
           Settings
         </Heading>
@@ -306,6 +264,7 @@ function SettingsPage() {
           <Tabs.List>
             <Tabs.Trigger value="settings">App Settings</Tabs.Trigger>
             <Tabs.Trigger value="profile">Profile</Tabs.Trigger>
+            <Tabs.Trigger value="admin">Admin</Tabs.Trigger>
           </Tabs.List>
           <Box mt="4">
             <Flex
@@ -314,6 +273,94 @@ function SettingsPage() {
               maxWidth="600px"
               style={{ width: "100%" }}
             >
+              <Tabs.Content value="settings" className="w-full">
+                <Card className="w-full">
+                  <Heading size="6" mb="">
+                    App Settings
+                  </Heading>
+                  <div className="mb-4">
+                    <Text color="gray">Customize your chat experience.</Text>
+                  </div>
+                  <Flex direction="column" gap="4">
+                    <Flex direction="column" align="start">
+                      <Text as="label" size="2" weight="bold">
+                        Stream Chat Responses
+                      </Text>
+                      <div className="flex justify-between items-start gap-2">
+                        <Text size="1" color="gray">
+                          See responses as they're being generated
+                        </Text>
+                        <Switch
+                          checked={settings.stream_responses}
+                          onCheckedChange={handleStreamingToggled}
+                        />
+                      </div>
+                    </Flex>
+                    <Flex justify="between" align="center">
+                      <div className="flex flex-col w-full">
+                        <Text as="label" size="2" weight="bold">
+                          Dark Mode
+                        </Text>
+                        <div className="flex justify-between items-center w-full">
+                          <Text size="1" color="gray">
+                            Toggle dark mode on or off
+                          </Text>
+                          <Switch
+                            checked={settings.theme === "dark"}
+                            onCheckedChange={handleThemeChange}
+                          />
+                        </div>
+                      </div>
+                    </Flex>
+                    <Flex justify="between" align="center">
+                      <div className="flex flex-col w-full">
+                        <Text as="label" size="2" weight="bold">
+                          Message History
+                        </Text>
+                        <div className="flex justify-between items-center w-full">
+                          <Text size="1" color="gray">
+                            Utilize message history for context
+                          </Text>
+                          <Switch
+                            checked={settings.use_message_history}
+                            onCheckedChange={handleUseMessageHistoryToggled}
+                          />
+                        </div>
+                        {settings.use_message_history && (
+                          <Flex align="center" mt="2">
+                            <Text size="1" mr="2">
+                              History Count:
+                            </Text>
+                            <TextField.Root
+                              type="number"
+                              value={settings.message_history_count}
+                              onChange={(e) => handleSetMessageHistoryCount(e.target.value)}
+                              min="1"
+                              max="10"
+                            />
+                          </Flex>
+                        )}
+                      </div>
+                    </Flex>
+                    <Flex justify="between" align="center">
+                      <div className="flex flex-col w-full">
+                        <Text as="label" size="2" weight="bold">
+                          Use Tools
+                        </Text>
+                        <div className="flex justify-between items-center w-full">
+                          <Text size="1" color="gray">
+                            Enable the LLM to utilize your tools
+                          </Text>
+                          <Switch
+                            checked={settings.use_tools}
+                            onCheckedChange={handleUseToolsToggled}
+                          />
+                        </div>
+                      </div>
+                    </Flex>
+                  </Flex>
+                </Card>
+              </Tabs.Content>
               <Tabs.Content value="profile">
                 <Card>
                   <Heading size="6" mb="2">
@@ -364,108 +411,81 @@ function SettingsPage() {
                         Bio
                       </Text>
                       <TextArea
-                        value={bio}
+                        value={bio || ""}
                         onChange={(e) => setBio(e.target.value)}
                       />
                     </Box>
                     <Box>
-                      <Text as="label" size="2" mb="1" weight="bold">
-                        Preferred Model
-                      </Text>
-                      <Select.Root
-                        value={
-                          userSettingsLoading
-                            ? "Loading Models"
-                            : (settings.preferred_model &&
-                                settings.preferred_model.id.toString()) ||
-                              "Error"
-                        }
-                        onValueChange={(id) => {
-                          if (!userSettingsLoading) {
-                            const selectedModel = models?.find(
-                              (model) => model.id === Number(id)
-                            );
-
-                            // Ensure that we have access to the models array before trying to access its elements
-                            const newPreferredModel = selectedModel ||
-                              (models && models[0]) || {
-                                id: -1,
-                                name: "llama3.1",
-                                model: "llama3.1",
-                                liked: false,
-                                provider: "",
-                                color: "gray",
-                              };
-
-                            setSettings((prev) => ({
-                              ...prev,
-                              preferred_model: newPreferredModel,
-                            }));
+                      <div className="flex flex-col ">
+                        <Text as="label" size="2" mb="1" weight="bold">
+                          Preferred Model
+                        </Text>
+                        <ModelSelect
+                          selectedModel={
+                            userSettingsLoading
+                              ? null
+                              : settings.preferred_model
                           }
-                        }}
-                      >
-                        <Select.Trigger />
-                        <Select.Content>
-                          {models?.map((model) => (
-                            <Select.Item
-                              key={model.id}
-                              value={model.id.toString()}
-                            >
-                              {model.name}
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Root>
+                          models={models}
+                          modelsLoading={modelsLoading}
+                          onModelChange={handleModelChange}
+                        />
+                      </div>
                     </Box>
                   </Flex>
                 </Card>
               </Tabs.Content>
-              <Tabs.Content value="settings">
+              <Tabs.Content value="admin">
                 <Card>
                   <Heading size="6" mb="2">
-                    App Settings
+                    Admin Stuff
                   </Heading>
                   <Text color="gray" mb="4">
-                    Customize your chat experience.
+                    Admin related features.
                   </Text>
-                  <Flex direction="column" gap="4">
-                    <Flex justify="between" align="center">
-                      <Box>
-                        <Text as="label" size="2" weight="bold">
-                          Stream Chat Responses
-                        </Text>
-                        <Text size="1" color="gray">
-                          See responses as they're being generated
-                        </Text>
-                      </Box>
-                      <Switch
-                        checked={settings.stream_responses}
-                        onCheckedChange={handleStreamingToggled}
-                      />
+                  <Flex align="center" gap="4" mb="4">
+                    <Button
+                      onClick={async () => {
+                        try {
+                          await handleUpdateModels();
+                        } catch (error) {
+                          console.error("Error syncing models:", error);
+                        }
+                      }}
+                    >
+                      Sync Models
+                    </Button>
+                    <Flex
+                      direction="column"
+                      overflowY="scroll"
+                      className="no-scrollbar h-64"
+                    >
+                      {modelDetails.map(
+                        (
+                          group: { message: string; success: boolean },
+                          index
+                        ) => (
+                          <Card key={index} mb="2" size="5">
+                            <Text
+                              color={group.success ? "green" : "red"}
+                              className="h-full flex align-middle justify-start items-center text-left"
+                            >
+                              {group.message}
+                            </Text>
+                          </Card>
+                        )
+                      )}
                     </Flex>
-                    <Flex justify="between" align="center">
-                      <Box>
-                        <Text as="label" size="2" weight="bold">
-                          Dark Mode
-                        </Text>
-                        <Text size="1" color="gray">
-                          Toggle dark mode on or off
-                        </Text>
-                      </Box>
-                      <Switch
-                        checked={settings.theme === "dark"}
-                        onCheckedChange={handleThemeChange}
-                      />
-                    </Flex>
-                    {/* Additional settings can be added here */}
                   </Flex>
                 </Card>
               </Tabs.Content>
             </Flex>
           </Box>
         </Tabs.Root>
-        <Box mt="6">
-          <Button onClick={handleSave}>Save Changes</Button>
+        <Box mt="4">
+          <Button onClick={handleSave} variant="surface">
+            Save Changes
+          </Button>
         </Box>
       </Box>
     </div>

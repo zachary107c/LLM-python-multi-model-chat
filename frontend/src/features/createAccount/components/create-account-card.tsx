@@ -39,7 +39,7 @@ export function CreateAccountCard() {
           email: email,
           first_name: firstName,
           last_name: lastName,
-        },
+        }
       );
 
       Cookies.set("token", response.data.token);
@@ -188,9 +188,9 @@ export function CreateAccountCard() {
           </Box>
 
           <Flex mt="6" justify="between" gap="3">
-            <Button variant="soft">
-              <RouterLink to="/login">Back</RouterLink>
-            </Button>
+            <RouterLink to="/login" tabIndex={-1}>
+              <Button variant="soft">Back</Button>
+            </RouterLink>
             <Button onClick={handleCreateAccount}>Create an account</Button>
           </Flex>
 

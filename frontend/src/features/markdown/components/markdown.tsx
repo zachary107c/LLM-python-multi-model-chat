@@ -97,13 +97,12 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`prose dark:prose-invert max-w-none ${className} 
+      className={`font-erm prose dark:prose-invert max-w-none ${className} 
         [&>*:first-child]:mt-0 
         [&>*:last-child]:mb-0
         [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:mt-8 [&>h1]:mb-4
         [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:mt-6 [&>h2]:mb-4
         [&>h3]:text-xl [&>h3]:font-bold [&>h3]:mt-4 [&>h3]:mb-2
-        [&>p]:leading-7 [&>p]:mb-2
         [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-4
         [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-4
         [&>li]:mb-1

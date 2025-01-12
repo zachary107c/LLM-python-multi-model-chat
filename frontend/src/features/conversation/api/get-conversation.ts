@@ -13,7 +13,7 @@ export type GetConversationInput = z.infer<typeof getConversationInputSchema>;
 export const useGetConversationQuery = ({
   conversationId,
 }: GetConversationInput) => {
-  return useQuery({
+  return useQuery<ConversationDetail, Error>({
     queryKey: ["conversation", conversationId],
     queryFn: async (): Promise<ConversationDetail> => {
       return api.get(`/conversations/${conversationId}/`, {
@@ -23,6 +23,6 @@ export const useGetConversationQuery = ({
       });
     },
     enabled: !!conversationId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5
   });
 };

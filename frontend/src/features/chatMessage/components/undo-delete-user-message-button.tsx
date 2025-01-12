@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ResetIcon } from "@radix-ui/react-icons";
 import { undoDeleteUserMessageMutation } from "../api/undo-delete-message";
+import { Tooltip } from "@radix-ui/themes";
 
-export function UndoDeleteMessageButton({
+export function UndoDeleteUserMessageButton({
   messageId,
   conversationId,
 }: {
@@ -24,14 +25,16 @@ export function UndoDeleteMessageButton({
   }
 
   return (
-    <Button
-      variant={"ghost-no-hover"}
-      className="mx-1 px-1 py-0 my-0"
-      size={"icon"}
-      onClick={handleUndoDeleteUserMessage}
-      aria-label="Redo"
-    >
-      <ResetIcon />
-    </Button>
+    <Tooltip content="Undo Delete">
+      <Button
+        variant={"ghost-no-hover"}
+        className="mx-1 px-1 py-0 my-0"
+        size={"icon"}
+        onClick={handleUndoDeleteUserMessage}
+        aria-label="Redo"
+      >
+        <ResetIcon />
+      </Button>
+    </Tooltip>
   );
 }

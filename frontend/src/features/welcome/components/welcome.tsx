@@ -9,12 +9,11 @@ interface WelcomeProps {
 export function Welcome({ suggestions, handleMessageSend }: WelcomeProps) {
   return (
     <div className="w-full h-full">
-      <div className="h-full flex justify-between items-center">
+      <div className="h-full flex justify-between items-center w-full">
         {suggestions.map((suggestion) => {
           return (
             <WelcomeCard
-              title={suggestion.bucket}
-              content={suggestion.question}
+              suggestion={suggestion}
               handleMessageSend={handleMessageSend}
               key={suggestion.bucket + suggestion.question}
             />

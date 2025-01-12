@@ -1,22 +1,14 @@
-import {
-  Text,
-  Button,
-  Card,
-  DropdownMenu,
-  Skeleton,
-  Badge,
-  Switch,
-} from "@radix-ui/themes";
+import { Text, Button, Card, Switch } from "@radix-ui/themes";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { BaseModelEntity } from "@/types/api";
 import { Button as LocalButton } from "@/components/ui/button";
-import { ImageUploadButton } from "@/features/imageUpload/components/image-upload-button";
-import { Rocket, Folder, X } from "lucide-react";
-import { useUserSettings } from "@/components/userSettings/user-settings-provider";
+import { Rocket, Folder } from "lucide-react";
+import { ModelSelect } from "@/features/model/components/model-select";
+import { FileUpload } from "./file-upload";
 
 interface Props {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, useTools: boolean) => void;
   onModelChange: (model: BaseModelEntity) => void;
   onImageDataChange: (model: File | null) => void;
   selectedModel: BaseModelEntity | null;
@@ -37,23 +29,32 @@ export function ChatInput({
   const [newMessage, setNewMessage] = useState("");
   const [textAreaHeight, setTextAreaHeight] = useState(48);
   const [imageName, setImageName] = useState<string | null>(null);
-  const [imageData, setImageData] = useState<File | null>(null);
-
+  const [_, setImageData] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [useTools, setUseTools] = useState(false);
 
   const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSendMessage(newMessage);
+    onSendMessage(newMessage, useTools);
     setNewMessage("");
     setTextAreaHeight(48);
     handleClear();
   };
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, []);
 
   const handleKeyDown = (event: any) => {
     if (event.shiftKey && event.key === "Enter") {
       setTextAreaHeight(Math.min(textAreaHeight + 24, 240)); // Limit expansion to 240px
     } else if (event.key === "Enter") {
       event.preventDefault();
-      onSendMessage(newMessage);
+      onSendMessage(newMessage, useTools);
       setNewMessage("");
       setTextAreaHeight(48);
       handleClear();
@@ -68,37 +69,38 @@ export function ChatInput({
     onModelChange(model);
   }
 
-  const handleFileChange = useCallback((newFile: File | null) => {
-    onImageDataChange(newFile);
-    setImageData(newFile);
-    setImageName(newFile ? newFile.name : null);
+  function handleUseToolsToggled() {
+    setUseTools(!useTools);
+  }
+
+  const handleFileChange = useCallback((file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        // const base64Data = reader.result as string;
+        // Create blob URL for preview
+        const blobUrl = URL.createObjectURL(file);
+        setPreviewUrl(blobUrl);
+        // Store the original file for upload
+        setImageData(file);
+        setImageName(file.name);
+        onImageDataChange(file);
+      };
+      reader.readAsDataURL(file); // Changed from readAsArrayBuffer
+    }
   }, []);
 
   const handleClear = useCallback(() => {
     onImageDataChange(null);
     setImageData(null);
     setImageName(null);
+    setPreviewUrl(null);
   }, []);
-
-  const handleOuterClear = () => {
-    handleClear();
-    console.log("File cleared from parent component");
-  };
-
-  const groupedModels = models?.reduce((acc, model) => {
-    const { provider } = model; // Ensure your model has a provider field
-    if (!acc[provider]) {
-      acc[provider] = [];
-    }
-    acc[provider].push(model);
-    return acc;
-  }, {} as Record<string, BaseModelEntity[]>);
 
   return (
     <div
-      className={`chat-input mb-4 flex flex-col w-full ${
-        isLoading ? "chat-input-border" : ""
-      }`}
+      className={`chat-input mb-4 flex flex-col w-full ${isLoading ? "chat-input-border" : ""
+        }`}
     >
       <form onSubmit={handleSendMessage} className="flex justify-between">
         <Card
@@ -127,88 +129,34 @@ export function ChatInput({
               <div className="flex justify-between items-center">
                 <div className="mr-2">
                   <div className="flex items-center">
-                    <DropdownMenu.Root>
-                      <DropdownMenu.Trigger>
-                        <Button
-                          variant="surface"
-                          color={selectedModel?.color || "gray"}
-                          size="1"
-                        >
-                          {modelsLoading ? (
-                            <Skeleton width="60px" />
-                          ) : (
-                            selectedModel?.name || "Select a model"
-                          )}
-
-                          <DropdownMenu.TriggerIcon />
-                        </Button>
-                      </DropdownMenu.Trigger>
-                      <DropdownMenu.Content>
-                        {groupedModels &&
-                          Object.keys(groupedModels).map((provider) => (
-                            <DropdownMenu.Group key={provider}>
-                              <Badge
-                                variant="soft"
-                                className="w-full"
-                                color="gray"
-                              >
-                                <Text size="2" weight="bold">
-                                  {provider}
-                                </Text>
-                              </Badge>
-                              {groupedModels[provider].map((model) => (
-                                <DropdownMenu.Item
-                                  onClick={() => handleModelChange(model)}
-                                  key={model.id}
-                                  color={model.color}
-                                >
-                                  <Text size="1" weight="regular">
-                                    {model.model}
-                                  </Text>
-                                </DropdownMenu.Item>
-                              ))}
-                            </DropdownMenu.Group>
-                          ))}
-                      </DropdownMenu.Content>
-                    </DropdownMenu.Root>
+                    <ModelSelect
+                      selectedModel={selectedModel}
+                      models={models}
+                      modelsLoading={modelsLoading}
+                      onModelChange={handleModelChange}
+                    />
+                    <div className="ml-2 flex items-center">
+                      <Text size="1" color="gray" className="mr-1">
+                        Use Tools
+                      </Text>
+                      <Switch
+                        checked={useTools}
+                        onCheckedChange={handleUseToolsToggled}
+                        size="1"
+                      />
+                    </div>
                     <div className="ml-2">
                       <LocalButton variant="ghost-no-hover" className="m-1 p-0">
                         <Folder size={15} strokeWidth={1.5} />
                       </LocalButton>
                     </div>
-                    {imageName ? null : (
-                      <div>
-                        <ImageUploadButton
-                          fileName={imageName}
-                          onFileChange={handleFileChange}
-                          onClear={handleClear}
-                        />
-                      </div>
-                    )}
-                    {imageName ? (
-                      <div>
-                        <Badge
-                          radius="full"
-                          variant="surface"
-                          color="gray"
-                          className="ml-2"
-                        >
-                          <div className="w-full flex justify-between items-center px-2">
-                            <Text weight="light" size="1">
-                              {imageName}
-                            </Text>
-                            <LocalButton
-                              size="tiny"
-                              variant="ghost-no-hover"
-                              className="h-6"
-                              onClick={handleOuterClear}
-                            >
-                              <X size={10} />
-                            </LocalButton>
-                          </div>
-                        </Badge>
-                      </div>
-                    ) : null}
+                    <FileUpload
+                      imageName={imageName}
+                      onFileChange={handleFileChange}
+                      onClear={handleClear}
+                      handleOuterClear={handleClear}
+                      previewUrl={previewUrl}
+                    />
                   </div>
                 </div>
                 <Button type="submit" size="1" variant="surface" color="green">

@@ -14,7 +14,7 @@ export const useGetModelQuery = ({ modelId }: GetModelInput) => {
   return useQuery({
     queryKey: ["model", modelId],
     queryFn: async (): Promise<ModelDetail> => {
-      return api.get(`/ollama/models/${modelId}/`, {
+      return api.get(`/models/${modelId}/`, {
         headers: {
           Authorization: `Token ${Cookies.get("token")}`,
         },

@@ -1,6 +1,8 @@
 import { useGetConversationQuery } from "@/features/conversation/api/get-conversation";
-import axios from "axios";
 import { useState } from "react";
+import { api } from "@/lib/api-client";
+import Cookies from "js-cookie";
+
 
 export const useConversationalTitleGenerator = (conversationId: string) => {
   const {
@@ -25,22 +27,21 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
       data.messages.forEach((message) => {
         if (message.type === "user") {
           if ("content" in message) {
-            prompt += `${message.type.toUpperCase()} MESSAGE: ${
-              message.content
-            }\n\n`;
+            prompt += `${message.type.toUpperCase()} MESSAGE: ${message.content
+              }\n\n`;
           }
         } else if (message.type === "assistant") {
           if ("content_variations" in message) {
             const lastIndex = message.content_variations.length - 1;
-            prompt += `${message.type.toUpperCase()} MESSAGE: ${
-              message.content_variations[lastIndex].content
-            }\n\n`;
+            prompt += `${message.type.toUpperCase()} MESSAGE: ${message.content_variations[lastIndex].content
+              }\n\n`;
           }
         }
       });
 
       const summaryPayload = {
-        model: "llama3.1",
+        model: "gpt-4o-mini",
+        provider: "openai",
         messages: [
           {
             role: "system",
@@ -49,17 +50,17 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
           },
           { role: "user", content: prompt },
         ],
-        stream: false,
       };
 
-      const summaryResponse = await axios.post(
-        "http://192.168.1.11:11434/api/chat",
-        summaryPayload
-      );
-      const summary = summaryResponse.data.message.content.replace(/"/g, "");
+      const summaryResponse = await api.post('/chat/', summaryPayload, {
+        headers: { Authorization: `Token ${Cookies.get("token")}` },
+      });
+
+      const summary = summaryResponse.message.content.replace(/"/g, "");
 
       const payload = {
-        model: "llama3.1",
+        model: "gpt-4o-mini",
+        provider: "openai",
         messages: [
           {
             role: "system",
@@ -68,14 +69,13 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
           },
           { role: "user", content: summary },
         ],
-        stream: false,
       };
 
-      const response = await axios.post(
-        "http://192.168.1.11:11434/api/chat",
-        payload
-      );
-      return response.data.message.content.replace(/"/g, "");
+      const response = await api.post('/chat/', payload, {
+        headers: { Authorization: `Token ${Cookies.get("token")}` },
+      });
+
+      return response.message.content.replace(/"/g, "");
     } catch (err) {
       setError("Failed to generate a title.");
       console.error(err);

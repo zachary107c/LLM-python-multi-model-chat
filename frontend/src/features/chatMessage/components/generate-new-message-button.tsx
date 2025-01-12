@@ -161,12 +161,12 @@ const GenerateNewMessageButton: React.FC<{
   onUpdateContent: (newContent: string) => void;
   onRegenerate: () => void;
   onStreamComplete: (finalContent: string) => void;
-}> = ({ 
-  assistantMessage, 
-  conversationId, 
-  onUpdateContent, 
+}> = ({
+  assistantMessage,
+  conversationId,
+  onUpdateContent,
   onRegenerate,
-  onStreamComplete
+  onStreamComplete,
 }) => {
   const { mutate } = useAddContentVariationMutation({
     conversationId,
@@ -174,17 +174,32 @@ const GenerateNewMessageButton: React.FC<{
   const { userSettings } = useUserSettings();
   const [isLoading, setIsLoading] = useState(false);
 
-  const toDataURL = async (url: string | null): Promise<string | null> => {
+  const toDataURL = async (
+    url: string | null
+  ): Promise<{ base64: string; type: string } | null> => {
     if (!url) return null;
+
     const response = await fetch(url);
     const blob = await response.blob();
-    return new Promise<string>((resolve, reject) => {
+
+    return new Promise<{ base64: string; type: string }>((resolve, reject) => {
       const reader = new FileReader();
+
       reader.onloadend = () => {
         const base64Data = reader.result as string;
-        const base64String = base64Data.split(",")[1];
-        resolve(base64String);
+
+        // Extract the MIME type and base64 string
+        const [header, base64String] = base64Data.split(",");
+        const typeMatch = header.match(/:(.*?);/);
+
+        if (typeMatch) {
+          const mimeType = typeMatch[1];
+          resolve({ base64: base64String, type: mimeType });
+        } else {
+          reject(new Error("Failed to extract MIME type"));
+        }
       };
+
       reader.onerror = reject;
       reader.readAsDataURL(blob);
     });
@@ -194,23 +209,41 @@ const GenerateNewMessageButton: React.FC<{
     setIsLoading(true);
     onRegenerate();
     const assistantMessageId = assistantMessage.id;
-    
+
     try {
-      const imageData = assistantMessage.generated_by.image 
-        ? [await toDataURL(assistantMessage.generated_by.image)] 
-        : [];
+      const image_data = assistantMessage.generated_by.image
+        ? await toDataURL(assistantMessage.generated_by.image)
+        : null;
 
       const payload = {
-        model: assistantMessage.model.name,
-        provider: assistantMessage.model.provider,
+        model: assistantMessage.model?.name,
+        provider: assistantMessage.model?.provider,
+        conversation: assistantMessage.conversation,
         messages: [
           {
             role: "user",
-            content: assistantMessage.generated_by.content,
-            images: imageData,
-          },
+            content: "",
+          } as { role: string; content: string | any[]; images?: string[] },
         ],
       };
+
+      if (image_data) {
+        if (assistantMessage.model?.provider === "ollama") {
+          payload.messages[0]["images"] = [image_data.base64];
+          payload.messages[0].content = assistantMessage.generated_by.content;
+        } else if (assistantMessage.model?.provider === "openai") {
+          let text_part = { type: "text", text: assistantMessage.generated_by.content };
+          let image_part = {
+            type: "image_url",
+            image_url: {
+              url: `data:${image_data.type};base64,${image_data.base64}`,
+            },
+          };
+          payload.messages[0].content = [text_part, image_part];
+        }
+      } else {
+        payload.messages[0].content = assistantMessage.generated_by.content;
+      }
 
       if (userSettings.settings?.stream_responses) {
         const response = await fetch(`${env.BACKEND_API_URL}chat/stream/`, {
@@ -223,14 +256,18 @@ const GenerateNewMessageButton: React.FC<{
           credentials: "include",
         });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
 
         let accumulatedContent = "";
         const reader = response.body?.getReader();
-        
+
         while (true) {
-          const { done, value } = await reader?.read() || { done: true, value: undefined };
-          
+          const { done, value } = (await reader?.read()) || {
+            done: true,
+            value: undefined,
+          };
+
           if (done) {
             // Stream is complete
             onStreamComplete(accumulatedContent);

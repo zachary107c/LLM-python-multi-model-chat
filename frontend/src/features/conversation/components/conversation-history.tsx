@@ -7,6 +7,7 @@ import { useGetConversationsQuery } from "@/features/conversation/api/get-conver
 import { Conversation, GroupedConverations } from "@/types/api";
 import { ConversationList } from "./conversation-list";
 import { ConversationListLoading } from "./conversation-list-loading";
+import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-settings";
 import {
   ArrowLeftToLine,
   ArrowRightToLine,
@@ -91,7 +92,9 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out h-full ${expanded ? "w-[250px] max-w-[250px]" : ""}`}
+      className={`transition-all duration-300 ease-in-out h-full ${
+        expanded ? "w-[250px] max-w-[250px]" : ""
+      }`}
     >
       {!expanded && (
         <div className="overflow-y-scroll no-scrollbar h-full">
@@ -120,7 +123,16 @@ export function ConversationHistory({ onSelectedIdChange }: any) {
           expanded ? "overflow-y-scroll no-scrollbar" : "hidden"
         } border-r border-[#7d7d7d68] w-full h-full`}
       >
-        <div className="flex justify-between items-center mx-2 mt-2">
+        <div
+          className="flex justify-between items-center m-2"
+          // style={{
+          //   backgroundImage: `url(${userSettings?.profile.image})`,
+          //   backgroundSize: "cover",
+          //   backgroundPosition: "center",
+          //   borderRadius: "4px", // Adjust the value to your preference
+          //   overflow: "hidden", // Ensures the background image is clipped by the border
+          // }}
+        >
           <Button
             variant="ghost"
             className="p-2"

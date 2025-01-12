@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
 import pytz
 from rest_framework import serializers
-from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation
+from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation, Tool
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -22,6 +22,8 @@ class MessageSerializer(serializers.Serializer):
 
 
 class UserMessageSerializer(serializers.ModelSerializer):
+    recoverable = serializers.SerializerMethodField()
+
     class Meta:
         model = UserMessage
         fields = "__all__"
@@ -36,6 +38,9 @@ class UserMessageSerializer(serializers.ModelSerializer):
 
         return representation
 
+    def get_recoverable(self, obj):
+        return obj.recoverable
+
 
 class ContentVariationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,6 +49,7 @@ class ContentVariationSerializer(serializers.ModelSerializer):
 
 
 class AssistantMessageSerializer(serializers.ModelSerializer):
+    recoverable = serializers.SerializerMethodField()
     model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
     content_variations = ContentVariationSerializer(many=True)
     generated_by = UserMessageSerializer()
@@ -57,6 +63,9 @@ class AssistantMessageSerializer(serializers.ModelSerializer):
         representation["model"] = ModelSerializer(instance.model).data
         representation["type"] = "assistant"
         return representation
+
+    def get_recoverable(self, obj):
+        return obj.recoverable
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -83,7 +92,6 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "user", "created_at", "updated_at"]
 
     def get_messages(self, obj):
-        # Get all user messages including deleted ones
         user_messages = UserMessage.objects.filter(conversation=obj)
         user_message_list = UserMessageSerializer(user_messages, many=True).data
         for message in user_message_list:
@@ -94,10 +102,29 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
                 else None
             )
             if message["is_deleted"]:
-                deleted_time = datetime.strptime(message["deleted_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
-                deleted_time_iso = deleted_time.replace(tzinfo=pytz.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
-                message["content"] = f"*This message was deleted on {deleted_time_iso}*"
-                message["image"] = None
+                if message["recoverable"]:
+                    deleted_time = datetime.strptime(message["deleted_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    deleted_time = deleted_time.replace(tzinfo=pytz.utc)
+                    expiration_time = deleted_time + timedelta(hours=settings.RECOVERY_HOURS or 24)
+                    current_time = datetime.now(pytz.utc)
+                    remaining_time = expiration_time - current_time
+                    if remaining_time.total_seconds() > 0:
+                        hours, remainder = divmod(int(remaining_time.total_seconds()), 3600)
+                        message["time_remaining"] = f"{hours} more hour{'s' if hours > 1 else ''}"
+                    else: 
+                        message["time_remaining"] = "0 more hours"
+                    deleted_time_iso = deleted_time.isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+                    message["content"] = (
+                        f"*This message was deleted on {deleted_time_iso} and will be recoverable for {message['time_remaining']}.*"
+                        if remaining_time.total_seconds() > 0 else
+                        "*This message was deleted and is no longer recoverable.*"
+                    )
+                    message["image"] = None
+                else:
+                    deleted_time = datetime.strptime(message["deleted_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    deleted_time_iso = deleted_time.replace(tzinfo=pytz.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+                    message["content"] = f"*This message was deleted on {deleted_time_iso} and is no longer recoverable.*"
+                    message["image"] = None
 
         assistant_messages = AssistantMessage.objects.filter(conversation=obj)
         assistant_message_list = AssistantMessageSerializer(
@@ -110,10 +137,29 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
                     message["generated_by"]["image"]
                 )
             if message["is_deleted"]:
-                deleted_time = datetime.strptime(message["deleted_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
-                deleted_time_iso = deleted_time.replace(tzinfo=pytz.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
-                message["content_variations"] = [{"id": -1, "content": f"*This message was deleted on {deleted_time_iso}*"}]
-                message["image"] = None
+                if message["recoverable"]:
+                    deleted_time = datetime.strptime(message["deleted_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    deleted_time = deleted_time.replace(tzinfo=pytz.utc)
+                    expiration_time = deleted_time + timedelta(hours=settings.RECOVERY_HOURS or 24)
+                    current_time = datetime.now(pytz.utc)
+                    remaining_time = expiration_time - current_time
+                    if remaining_time.total_seconds() > 0:
+                        hours, remainder = divmod(int(remaining_time.total_seconds()), 3600)
+                        message["time_remaining"] = f"{hours} more hour{'s' if hours > 1 else ''}"
+                    else: 
+                        message["time_remaining"] = "0 more hours"
+                    deleted_time_iso = deleted_time.isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+                    message["content_variations"] = [{"id": -1, "content": (
+                        f"*This message was deleted on {deleted_time_iso} and will be recoverable for {message['time_remaining']}.*"
+                        if remaining_time.total_seconds() > 0 else
+                        "*This message was deleted and is no longer recoverable.*"
+                    )}]
+                    message["image"] = None
+                else:
+                    deleted_time = datetime.strptime(message["deleted_at"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    deleted_time_iso = deleted_time.replace(tzinfo=pytz.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+                    message["content_variations"] = [{"id": -1, "content": f"*This message was deleted on {deleted_time_iso} and is no longer recoverable.*"}]
+                    message["image"] = None
 
         merged_messages = user_message_list + assistant_message_list
         merged_messages.sort(key=lambda x: x["created_at"])
@@ -127,3 +173,11 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
                 "/media/", "/api/v1/media/"
             )
         return None
+
+
+class ToolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tool
+        fields = "__all__"
+        read_only_fields = ["id", "user", "created_at", "updated_at"]
+

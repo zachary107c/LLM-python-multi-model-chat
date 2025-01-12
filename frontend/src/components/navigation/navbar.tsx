@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { handleLogout } from "@/components/utils/handle-logout.ts";
 import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-settings";
 
-import { Settings, MessageSquare, LogOut, BrainCircuit } from "lucide-react";
+import { Settings, MessageSquare, LogOut, BrainCircuit, Wrench } from "lucide-react";
 
 export default function Navbar() {
   const location = useLocation();
@@ -24,8 +24,11 @@ export default function Navbar() {
       case "/settings":
         setIndex(3);
         break;
+      case "/tools":
+        setIndex(4);
+        break;
       default:
-        setIndex(0); // Or handle other undefined paths
+        setIndex(0);
         break;
     }
   }, [location.pathname]);
@@ -49,10 +52,11 @@ export default function Navbar() {
                 ) : (
                   <Avatar
                     src={userSettings.profile.image}
-                    fallback="BS"
+                    fallback={userSettings.username.slice(0, 2).toUpperCase()}
                     alt="Profile"
                     radius="medium"
                     size="2"
+                    variant="soft"
                   />
                 )}
               </Button>
@@ -87,6 +91,22 @@ export default function Navbar() {
                 }
               >
                 <BrainCircuit size={20} strokeWidth={1.5} />
+              </Button>
+            </Link>
+          </Tooltip>
+        </div>
+        <div className="mb-2">
+          <Tooltip content="Tools" side="right">
+            <Link to="/tools">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIndex(4)}
+                className={
+                  index === 4 ? "bg-accent text-accent-foreground" : ""
+                }
+              >
+                <Wrench size={20} strokeWidth={1.5} />
               </Button>
             </Link>
           </Tooltip>
