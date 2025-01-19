@@ -120,13 +120,13 @@
   font-family: var(--erm-font);;
 } */
 
-.main-page {
+/* .main-page {
   background: radial-gradient(at 100% 0%,
       rgba(0, 45, 245, 0.106) 0px,
       transparent 50%),
     radial-gradient(at 93% 98%, hsla(237, 98%, 52%, 0) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(0, 17, 255, 0.095) 0px, transparent 50%);
-}
+} */
 
 .chat-history {
   background-image: url("http://127.0.0.1:8000/api/v1/media/user_message_images/snow2.gif");
@@ -402,6 +402,7 @@
 
 /* Dark mode specific styles */
 .dark .chat-input-border {
+  position: relative;
   border-radius: 8px;
   /* background: linear-gradient(45deg, #30005f4e, #45004e45, #00316659, #3f1b6163, #63093953, #0a2e5347); */
   background: linear-gradient(45deg,
