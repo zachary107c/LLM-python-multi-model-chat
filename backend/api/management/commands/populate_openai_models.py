@@ -4,7 +4,7 @@ import json
 import openai
 import requests
 from django.core.management.base import BaseCommand
-from api.models import Model
+from api.models.model import Model
 
 
 class Command(BaseCommand):

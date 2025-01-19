@@ -3,8 +3,8 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile, Settings
-from api.models import Model
-from api.serializers import ModelSerializer
+from api.models.model import Model
+from api.serializers.model_serializer import ModelSerializer
 from django.http import HttpRequest
 
 

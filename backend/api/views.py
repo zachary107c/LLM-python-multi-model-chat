@@ -5,37 +5,29 @@ import requests
 import datetime
 from io import StringIO
 from django.core.management import call_command
-from django.core.files.storage import default_storage
 from django.http import StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.views import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import (
-    Conversation,
-    UserMessage,
-    AssistantMessage,
-    Model,
-    ContentVariation,
-    Tool,
-)
-from .serializers import (
-    ConversationSerializer,
-    UserMessageSerializer,
-    AssistantMessageSerializer,
-    ConversationDetailSerializer,
-    ModelSerializer,
-    ToolSerializer,
-)
-from .services import (
-    OllamaService,
-    OpenAIService,
-    AzureOpenAIService,
-    LLMServiceFactory,
-)
+
+from .models.model import Model
+from .models.tool import Tool
+from .models.content_variation import ContentVariation
+from .models.user_message import UserMessage
+from .models.assistant_message import AssistantMessage
+from .models.conversation import Conversation
+
+from .serializers.user_message_serializer import UserMessageSerializer
+from .serializers.assistant_message_serializer import AssistantMessageSerializer
+from .serializers.conversation_serializer import ConversationSerializer
+from .serializers.conversation_detail_serializer import ConversationDetailSerializer
+from .serializers.tool_serializer import ToolSerializer
+from .serializers.model_serializer import ModelSerializer
+
+from .services.llm_service_factory import LLMServiceFactory
 from users.models import Settings
-from users.serializers import UserSerializer
 
 PROMPTS = {
     "three_suggestions": open(
@@ -261,7 +253,7 @@ class ModelDetailWithInfoView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ollama_service = OllamaService()
+        self.ollama_service = LLMServiceFactory.get_service("ollama")
 
     # Fetch and combine model data and Ollama details (GET)
     def get(self, request, pk):
@@ -348,7 +340,7 @@ class ModelsPopulateAPIView(APIView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ollama_service = OllamaService()
+        # self.ollama_service =LLMServiceFactory.get_service("ollama")
 
     def post(self, request):
         try:
@@ -377,7 +369,7 @@ class ModelsPopulateAPIView(APIView):
             )
 
 
-class BaseChatAPIView(APIView):
+class ChatAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def __init__(self, *args, **kwargs):
@@ -441,7 +433,6 @@ class BaseChatAPIView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-            # chat_completion = self.llm_service.chat(model=model, messages=messages, use_tools=user_settings.use_tools, user_tools=user_tools)
             chat_completion = self.llm_service.chat(model=model, messages=messages, use_tools=use_tools, user_tools=user_tools)
 
             if chat_completion and "error" not in chat_completion:
@@ -466,7 +457,7 @@ class BaseChatAPIView(APIView):
             )
 
 
-class BaseStreamingAPIView(APIView):
+class StreamChatAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def __init__(self, *args, **kwargs):
@@ -568,7 +559,7 @@ class BaseStreamingAPIView(APIView):
             )
 
 
-class BaseThreeSuggestionsAPIView(APIView):
+class ThreeSuggestionsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def __init__(self, *args, **kwargs):
@@ -669,18 +660,6 @@ class BaseThreeSuggestionsAPIView(APIView):
             )
 
 
-class ChatAPIView(BaseChatAPIView):
-    pass
-
-
-class StreamChatAPIView(BaseStreamingAPIView):
-    pass
-
-
-class ThreeSuggestionsAPIView(BaseThreeSuggestionsAPIView):
-    pass
-
-
 class ToolFileMixin:
     """Mixin to handle saving and deleting script files."""
 
@@ -692,7 +671,10 @@ class ToolFileMixin:
     def delete_script_file(self, tool):
         script_file_path = os.path.join(os.getcwd(), "api", "tools", f"{tool.id}.py")
         if os.path.exists(script_file_path):
+            print(f"Removing tool found on path: {script_file_path}")
             os.remove(script_file_path)
+        else:
+            print(f"Tried to delete tool {tool.id} but path {script_file_path} did not exist!")
 
 
 class ToolsListCreateView(ToolFileMixin, generics.ListCreateAPIView):
@@ -730,5 +712,6 @@ class ToolsDetailView(ToolFileMixin, generics.RetrieveUpdateDestroyAPIView):
         self.save_script_to_file(tool)
 
     def perform_destroy(self, instance):
+        print("Attempting to delete the python script associated with the tool.")
         self.delete_script_file(instance)
         super().perform_destroy(instance)

@@ -1,78 +1,14 @@
-from datetime import datetime, timedelta
-from django.conf import settings
 import pytz
+from datetime import datetime, timedelta
 from rest_framework import serializers
-from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation, Tool
+from django.conf import settings
 
+from ..models.conversation import Conversation
+from ..models.user_message import UserMessage
+from ..models.assistant_message import AssistantMessage
 
-class ModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Model
-        fields = "__all__"
-        read_only_fields = ["id", "name", "model"]
-
-
-class MessageSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    content = serializers.CharField()
-    created_at = serializers.DateTimeField()
-    type = serializers.CharField()
-    model = serializers.CharField(required=False)  # Only for AssistantMessage
-    provider = serializers.CharField(required=False)  # Only for AssistantMessage
-
-
-class UserMessageSerializer(serializers.ModelSerializer):
-    recoverable = serializers.SerializerMethodField()
-
-    class Meta:
-        model = UserMessage
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        if representation.get("image"):
-            request = self.context.get("request")
-            if request:
-                image_url = request.build_absolute_uri(representation["image"])
-                representation["image"] = image_url.replace("/media/", "/api/v1/media/")
-
-        return representation
-
-    def get_recoverable(self, obj):
-        return obj.recoverable
-
-
-class ContentVariationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ContentVariation
-        fields = ["id", "content"]
-
-
-class AssistantMessageSerializer(serializers.ModelSerializer):
-    recoverable = serializers.SerializerMethodField()
-    model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
-    content_variations = ContentVariationSerializer(many=True)
-    generated_by = UserMessageSerializer()
-
-    class Meta:
-        model = AssistantMessage
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation["model"] = ModelSerializer(instance.model).data
-        representation["type"] = "assistant"
-        return representation
-
-    def get_recoverable(self, obj):
-        return obj.recoverable
-
-
-class ConversationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Conversation
-        fields = "__all__"
-        read_only_fields = ["id", "user", "created_at", "updated_at"]
+from .user_message_serializer import UserMessageSerializer
+from .assistant_message_serializer import AssistantMessageSerializer
 
 
 class ConversationDetailSerializer(serializers.ModelSerializer):
@@ -173,11 +109,3 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
                 "/media/", "/api/v1/media/"
             )
         return None
-
-
-class ToolSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tool
-        fields = "__all__"
-        read_only_fields = ["id", "user", "created_at", "updated_at"]
-

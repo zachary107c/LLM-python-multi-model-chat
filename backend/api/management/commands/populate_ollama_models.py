@@ -3,7 +3,7 @@ import json
 import random
 import requests
 from django.core.management.base import BaseCommand
-from api.models import Model
+from api.models.model import Model
 
 COLORS = ["gray", "gold", "bronze", "brown", "yellow", "amber", "orange", "tomato", "red", "ruby", "crimson", "pink", "plum", "purple", "violet", "iris", "indigo", "blue", "cyan", "teal", "jade", "green", "grass", "lime", "mint", "sky"]
 
