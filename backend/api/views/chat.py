@@ -13,7 +13,7 @@ from ..serializers.conversation_detail_serializer import ConversationDetailSeria
 
 from ..services.llm_service_factory import LLMServiceFactory
 
-from users.models import Settings
+from users.models.settings import Settings
 
 
 class ChatAPIView(APIView):
