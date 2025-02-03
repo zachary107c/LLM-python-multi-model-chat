@@ -14,20 +14,38 @@ import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 
 import { ConversationHistory } from "@/features/conversation/components/conversation-history";
+import { createConversationMutation } from "@/features/conversation/api/create-conversation";
+import { useConversationId } from "@/features/conversation/contexts/conversationContext";
 
 export function NavConversation() {
   const { open } = useSidebar();
+  const { conversationId, setConversationId } = useConversationId();
+  const createConversation = createConversationMutation();
+
+  async function createNewConversation() {
+    try {
+      var response = await createConversation.mutateAsync({
+        data: {
+          previousConversationId: conversationId || undefined,
+          data: { title: "New Conversation" },
+        },
+      });
+      setConversationId(response.id);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <SidebarGroup>
       <SidebarMenu>
-        <Button variant="default">
+        <Button variant="default" onClick={async () => await createNewConversation()}>
           {open && 'New Conversation' } <MessageSquarePlus />
         </Button>
         <Collapsible
           key="conversation-list"
           asChild
-          defaultOpen={false}
+          defaultOpen={true}
           className="group/collapsible"
         >
           <SidebarMenuItem>

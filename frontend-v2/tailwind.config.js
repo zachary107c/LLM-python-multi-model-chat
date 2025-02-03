@@ -61,7 +61,15 @@ export default {
     				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
     				border: 'hsl(var(--sidebar-border))',
     				ring: 'hsl(var(--sidebar-ring))'
-    			}
+    			},
+				'colorscheme-default': 'hsl(var(--colorscheme-default))',
+				'colorscheme-red': 'hsl(var(--colorscheme-red))',
+				'colorscheme-rose': 'hsl(var(--colorscheme-rose))',
+				'colorscheme-orange': 'hsl(var(--colorscheme-orange))',
+				'colorscheme-green': 'hsl(var(--colorscheme-green))',
+				'colorscheme-blue': 'hsl(var(--colorscheme-blue))',
+				'colorscheme-yellow': 'hsl(var(--colorscheme-yellow))',
+				'colorscheme-violet': 'hsl(var(--colorscheme-violet))',
     		},
     		keyframes: {
     			'accordion-down': {

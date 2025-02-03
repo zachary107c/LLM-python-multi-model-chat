@@ -18,7 +18,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: user, isLoading: userLoading} = useUser();
 
   return (
-    <Sidebar collapsible="icon" { ...props }>
+    <Sidebar collapsible="icon" { ...props } className="border-none">
       <div
         className={`flex items-center p-2 ${
           open ? "justify-between" : "justify-center"

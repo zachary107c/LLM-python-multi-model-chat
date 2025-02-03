@@ -51,12 +51,10 @@ export function ConversationList({
               </Button>
             )}
           </div>
-          <div className={`absolute right-0 flex justify-center transition-opacity ${
-            chat.id === conversationId ? 'opacity-100' : 'opacity-0'
-          } before:absolute before:inset-y-0 before:right-full before:w-8 before:bg-gradient-to-r before:from-transparent before:to-background/80`}>
+          <div className={`absolute right-0 flex justify-center ${ chat.id === conversationId ? 'opacity-100' : 'opacity-0' }`}>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 bg-sidebar">
+                <Button variant="ghost" size="icon" className="h-8 w-8 bg-secondary">
                   <Ellipsis className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
