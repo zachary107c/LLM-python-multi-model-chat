@@ -1,0 +1,102 @@
+import { configureAuth } from "react-query-auth";
+import { Navigate, useLocation } from "react-router-dom";
+import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { AuthResponse, RegisterAuthResponse, User } from "@/types/api";
+import { api } from "./api-client";
+
+const getUser = async (): Promise<User | null> => {
+  const token = localStorage.getItem("token");
+
+  if (!token) return null;
+  try {
+    const response = await api.get("/user/");
+    const user = response as User;
+    return user;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    localStorage.removeItem("token");
+    return null;
+  }
+};
+
+export const loginInputSchema = z.object({
+  username: z.string().min(1, "Required"),
+  password: z.string().min(5, "Required"),
+});
+
+export type LoginInput = z.infer<typeof loginInputSchema>;
+
+const loginWithUsernameAndPassword = (
+  data: LoginInput
+): Promise<AuthResponse> => {
+  localStorage.removeItem("token");
+  return api.post("/login/", data);
+};
+
+export const registerInputSchema = z.object({
+  username: z.string().min(1, "Required"),
+  email: z.string().min(1, "Required"),
+  firstName: z.string().min(1, "Required"),
+  lastName: z.string().min(1, "Required"),
+  password: z.string().min(5, "Required"),
+});
+
+export type RegisterInput = z.infer<typeof registerInputSchema>;
+
+const registerWithEmailAndPassword = (
+  data: RegisterInput
+): Promise<RegisterAuthResponse> => {
+  return api.post("/register", data);
+};
+
+const authConfig = {
+  userFn: getUser,
+  loginFn: async (data: LoginInput) => {
+    const response = await loginWithUsernameAndPassword(data);
+    localStorage.setItem("token", response.token);
+    const user = await getUser();
+    return user;
+  },
+  registerFn: async (data: RegisterInput) => {
+    const response = await registerWithEmailAndPassword(data);
+    localStorage.setItem("token", response.token);
+    const user = await getUser();
+    return user;
+  },
+  logoutFn: async (): Promise<void> => {
+    console.log("Logging out the current user.");
+    try {
+      await api.post("/logout/");
+      localStorage.removeItem("token");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  },
+};
+
+export const { useUser, useLogin, useLogout, useRegister, AuthLoader } =
+  configureAuth(authConfig);
+
+export const useAuthLogin = () => {
+  const login = useLogin();
+  const queryClient = useQueryClient();
+
+  return {
+    ...login,
+    mutate: async (data: LoginInput) => {
+      const user = await login.mutateAsync(data);
+      await queryClient.invalidateQueries({ queryKey: ["authenticated-user"] });
+      return user;
+    },
+  };
+};
+
+export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  console.log("Trying to hit a protected route.");
+  const user = useUser();
+  if (!user.data) {
+    return <Navigate to="login" replace />;
+  }
+  return children;
+};

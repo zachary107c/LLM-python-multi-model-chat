@@ -5,7 +5,13 @@ import { Link, useLocation } from "react-router-dom";
 import { handleLogout } from "@/components/utils/handle-logout.ts";
 import { useGetUserSettingsQuery } from "@/components/userSettings/api/get-user-settings";
 
-import { Settings, MessageSquare, LogOut, BrainCircuit, Wrench } from "lucide-react";
+import {
+  Settings,
+  MessageSquare,
+  LogOut,
+  BrainCircuit,
+  Wrench,
+} from "lucide-react";
 
 export default function Navbar() {
   const location = useLocation();
