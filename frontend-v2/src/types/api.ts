@@ -42,6 +42,20 @@ export type ModelEntity<T> = {
     [K in keyof T]: T[K];
 } & BaseModelEntity;
 
+export type ModelDetails = {
+  license: string;
+  modelfile: string;
+  parameters: string;
+  template: string;
+  system: string;
+  modified_at: string;
+};
+
+export type ModelDetail = ModelEntity<{
+  details: ModelDetails | null;
+}>;
+
+
 export type Settings = {
     preferred_model: BaseModelEntity | null;
     stream_responses: boolean;
@@ -155,3 +169,18 @@ export type ConversationDetail = {
   liked: boolean;
   messages: ConversationDetailMessage[];
 };
+
+export type Suggestion = {
+  bucket: string;
+  summary: string;
+  question: string;
+};
+
+export type Suggestions = {
+  suggestions: Suggestion[];
+};
+
+export type Provider = {
+  id: number;
+  name: string;
+}
