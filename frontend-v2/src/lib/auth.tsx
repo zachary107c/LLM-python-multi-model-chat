@@ -1,5 +1,5 @@
 import { configureAuth } from "react-query-auth";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { AuthResponse, RegisterAuthResponse, User } from "@/types/api";
@@ -35,11 +35,15 @@ const loginWithUsernameAndPassword = (
 };
 
 export const registerInputSchema = z.object({
-  username: z.string().min(1, "Required"),
-  email: z.string().min(1, "Required"),
-  firstName: z.string().min(1, "Required"),
-  lastName: z.string().min(1, "Required"),
-  password: z.string().min(5, "Required"),
+  username: z.string().min(1, "Username is required"),
+  email: z.string().email({ message: "Invalid email address" }).min(1, { message: "Email is required" }),
+  first_name: z.string().min(1, "First Name is required"),
+  last_name: z.string().min(1, "Last Name is required"),
+  password: z.string().min(5, "Password must be at least 5 characters long"),
+  password2: z.string().min(5, "Password Confirmation must be at least 5 characters long"),
+}).refine((data) => data.password === data.password2, {
+  message: "Passwords must match",
+  path: ["password2"],
 });
 
 export type RegisterInput = z.infer<typeof registerInputSchema>;
@@ -47,7 +51,7 @@ export type RegisterInput = z.infer<typeof registerInputSchema>;
 const registerWithEmailAndPassword = (
   data: RegisterInput
 ): Promise<RegisterAuthResponse> => {
-  return api.post("/register", data);
+  return api.post("/register/", data);
 };
 
 const authConfig = {

@@ -1,7 +1,7 @@
 export function ChatRoute() {
     return (
         <div>
-            <h1>Chat</h1>
+            <h1 className="text-background">Chat</h1>
         </div>
     )
 };

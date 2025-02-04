@@ -14,7 +14,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <AppSidebar />
         <SidebarInset>
           <main className="relative z-0 flex flex-col flex-1 bg-background py-2 pr-2 w-full max-w-full">
-            <div className="flex flex-col bg-secondary rounded-xl h-full overflow-hidden w-full p-2">
+            <div className="flex flex-col bg-card-foreground rounded-xl h-full overflow-hidden w-full p-2">
               {children}
             </div>
           </main>

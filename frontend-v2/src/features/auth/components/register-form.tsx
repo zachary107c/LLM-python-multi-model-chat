@@ -11,6 +11,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRegister, registerInputSchema } from "@/lib/auth";
@@ -30,9 +31,10 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     defaultValues: {
       username: "",
       email: "",
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       password: "",
+      password2: "",
     },
   });
 
@@ -60,97 +62,63 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       });
 
       form.setValue("password", "");
+      form.setValue("password2", "");
     }
   }
 
+  const placeholders: Record<string, string> = {
+    username: "Username",
+    email: "Email",
+    first_name: "First Name",
+    last_name: "Last Name",
+    password: "Password",
+    password2: "Password Confirmation",
+  };
+
   return (
-    <div>
+    <div className="flex flex-col gap-6 items-center">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    autoComplete="username"
-                    placeholder="Username"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="email"
-                    autoComplete="email"
-                    placeholder="Email"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    autoComplete="name"
-                    placeholder="First Name"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    autoComplete="family-name"
-                    placeholder="Last Name"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder="Password"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-2 w-[25vw]"
+        >
+          {Object.keys(placeholders).map((fieldName) => (
+            <FormField
+              key={fieldName}
+              control={form.control}
+              name={fieldName as keyof z.infer<typeof registerInputSchema>}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      type={
+                        fieldName.includes("password") ? "password" : "text"
+                      }
+                      autoComplete={fieldName}
+                      placeholder={placeholders[fieldName]}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage>
+                    {
+                      form.formState.errors[
+                        fieldName as keyof z.infer<typeof registerInputSchema>
+                      ]?.message
+                    }
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+          ))}
           <div className="flex justify-end gap-1 pt-4">
-            <Button type="submit" className="w-full">Sign In</Button>
+            <Button type="submit" className="w-full">
+              Sign Up
+            </Button>
           </div>
         </form>
       </Form>
       <div className="flex justify-center gap-1 pt-2 text-center text-sm">
-        <p className="text-muted-foreground">Don't have an account?</p>
+        <p className="text-muted-foreground">Already have an account?</p>
         <Link to="/login" replace>
           Login
         </Link>

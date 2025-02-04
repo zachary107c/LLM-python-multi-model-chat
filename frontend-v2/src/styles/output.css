@@ -1413,6 +1413,10 @@ body {
   margin-bottom: 0.25rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-6 {
   margin-bottom: 1.5rem;
 }
@@ -1455,10 +1459,6 @@ body {
 
 .mt-52 {
   margin-top: 13rem;
-}
-
-.mt-8 {
-  margin-top: 2rem;
 }
 
 .mt-auto {
@@ -1727,6 +1727,14 @@ body {
 
 .w-\[1px\] {
   width: 1px;
+}
+
+.w-\[25vw\] {
+  width: 25vw;
+}
+
+.w-\[40vw\] {
+  width: 40vw;
 }
 
 .w-auto {
@@ -2013,6 +2021,10 @@ body {
   gap: 1rem;
 }
 
+.gap-6 {
+  gap: 1.5rem;
+}
+
 .space-x-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.25rem * var(--tw-space-x-reverse));
@@ -2073,6 +2085,10 @@ body {
 
 .whitespace-nowrap {
   white-space: nowrap;
+}
+
+.text-balance {
+  text-wrap: balance;
 }
 
 .break-words {
@@ -2238,6 +2254,38 @@ body {
   background-color: hsl(var(--card));
 }
 
+.bg-colorscheme-blue {
+  background-color: hsl(var(--colorscheme-blue));
+}
+
+.bg-colorscheme-default {
+  background-color: hsl(var(--colorscheme-default));
+}
+
+.bg-colorscheme-green {
+  background-color: hsl(var(--colorscheme-green));
+}
+
+.bg-colorscheme-orange {
+  background-color: hsl(var(--colorscheme-orange));
+}
+
+.bg-colorscheme-red {
+  background-color: hsl(var(--colorscheme-red));
+}
+
+.bg-colorscheme-rose {
+  background-color: hsl(var(--colorscheme-rose));
+}
+
+.bg-colorscheme-violet {
+  background-color: hsl(var(--colorscheme-violet));
+}
+
+.bg-colorscheme-yellow {
+  background-color: hsl(var(--colorscheme-yellow));
+}
+
 .bg-destructive {
   background-color: hsl(var(--destructive));
 }
@@ -2290,36 +2338,8 @@ body {
   background-color: transparent;
 }
 
-.bg-colorscheme-blue {
-  background-color: hsl(var(--colorscheme-blue));
-}
-
-.bg-colorscheme-default {
-  background-color: hsl(var(--colorscheme-default));
-}
-
-.bg-colorscheme-green {
-  background-color: hsl(var(--colorscheme-green));
-}
-
-.bg-colorscheme-orange {
-  background-color: hsl(var(--colorscheme-orange));
-}
-
-.bg-colorscheme-red {
-  background-color: hsl(var(--colorscheme-red));
-}
-
-.bg-colorscheme-rose {
-  background-color: hsl(var(--colorscheme-rose));
-}
-
-.bg-colorscheme-violet {
-  background-color: hsl(var(--colorscheme-violet));
-}
-
-.bg-colorscheme-yellow {
-  background-color: hsl(var(--colorscheme-yellow));
+.bg-card-foreground {
+  background-color: hsl(var(--card-foreground));
 }
 
 .fill-current {
@@ -2328,6 +2348,11 @@ body {
 
 .fill-primary {
   fill: hsl(var(--primary));
+}
+
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .p-0 {
@@ -2470,10 +2495,6 @@ body {
   padding-right: 0.625rem;
 }
 
-.pr-4 {
-  padding-right: 1rem;
-}
-
 .pr-6 {
   padding-right: 1.5rem;
 }
@@ -2577,6 +2598,10 @@ body {
   font-weight: 600;
 }
 
+.italic {
+  font-style: italic;
+}
+
 .tabular-nums {
   --tw-numeric-spacing: tabular-nums;
   font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction);
@@ -2666,6 +2691,10 @@ body {
 
 .text-sidebar-primary-foreground {
   color: hsl(var(--sidebar-primary-foreground));
+}
+
+.text-background {
+  color: hsl(var(--background));
 }
 
 .underline-offset-4 {
@@ -3930,6 +3959,11 @@ body {
   border-color: hsl(var(--destructive));
 }
 
+.dark\:brightness-\[0\.8\]:is(.dark *) {
+  --tw-brightness: brightness(0.8);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 @media (min-width: 640px) {
   .sm\:bottom-0 {
     bottom: 0px;
@@ -4010,11 +4044,6 @@ body {
     border-radius: var(--radius);
   }
 
-  .sm\:px-10 {
-    padding-left: 2.5rem;
-    padding-right: 2.5rem;
-  }
-
   .sm\:px-6 {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -4059,8 +4088,16 @@ body {
     max-width: 420px;
   }
 
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .md\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .md\:p-8 {
+    padding: 2rem;
   }
 
   .md\:text-sm {
@@ -4601,6 +4638,18 @@ body {
 
 .\[\&_\[cmdk-item\]_svg\]\:w-5 [cmdk-item] svg {
   width: 1.25rem;
+}
+
+.\[\&_a\]\:underline a {
+  text-decoration-line: underline;
+}
+
+.\[\&_a\]\:underline-offset-4 a {
+  text-underline-offset: 4px;
+}
+
+.hover\:\[\&_a\]\:text-primary a:hover {
+  color: hsl(var(--primary));
 }
 
 .\[\&_p\]\:leading-relaxed p {

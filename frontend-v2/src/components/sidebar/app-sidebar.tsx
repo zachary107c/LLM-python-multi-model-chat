@@ -24,7 +24,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           open ? "justify-between" : "justify-center"
         }`}
       >
-        {open && <span className="text-xl font-bold">bruh.</span>}
+        {open && <span className="text-xl font-medium italic">bruh.</span>}
         <SidebarTrigger />
       </div>
       <SidebarContent className="no-scrollbar">
