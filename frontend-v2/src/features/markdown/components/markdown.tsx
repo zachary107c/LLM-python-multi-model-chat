@@ -5,7 +5,6 @@ import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import { cn } from "@/lib/utils";
 import 'katex/dist/katex.min.css';
-import 'highlight.js/styles/github.css';
 
 interface MarkdownStyles {
   container?: string;
@@ -70,8 +69,8 @@ const defaultStyles: MarkdownStyles = {
     inline: "overflow-x-auto",
   },
   code: {
-    block: "rounded-lg p-4 bg-gray-100 dark:bg-gray-800 overflow-x-auto whitespace-pre",
-    inline: "bg-gray-100 dark:bg-gray-800 rounded px-1 whitespace-nowrap",
+    block: "rounded-lg p-4 bg-secondary overflow-x-auto whitespace-pre",
+    inline: "bg-secondary rounded px-1 whitespace-nowrap",
   },
 };
 

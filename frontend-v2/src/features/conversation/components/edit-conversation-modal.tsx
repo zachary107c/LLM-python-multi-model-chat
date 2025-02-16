@@ -15,90 +15,117 @@ import { updateConversationMutation } from "../api/update-conversation";
 import { useConversationalTitleGenerator } from "@/features/conversation/hooks/generate-conversation-title";
 import { BarLoader } from "react-spinners";
 import { Pencil, WandSparkles } from "lucide-react";
+import { toast } from "sonner";
 
-interface UpdateConversationModalProps {
+interface Props {
   conversationId: string;
   currentTitle: string;
+  onClose?: () => void;
 }
 
-export function UpdateConversationModal({
+export function EditConversationModal({
   conversationId,
   currentTitle,
-}: UpdateConversationModalProps) {
-  const [newTitle, setNewTitle] = useState(currentTitle);
-  const updateMutation = updateConversationMutation();
-  const { generateConversationTitle, isLoading } =
+  onClose,
+}: Props) {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState(currentTitle);
+  const { mutateAsync: updateConversation, isLoading: isUpdating } =
+    updateConversationMutation();
+  const { generateConversationTitle, isLoading: isGenerating } =
     useConversationalTitleGenerator(conversationId);
 
   useEffect(() => {
-    setNewTitle(currentTitle);
+    setTitle(currentTitle);
   }, [currentTitle]);
 
-  const handleUpdate = async (title: string) => {
+  const handleUpdate = async () => {
+    if (title == currentTitle) {
+      setOpen(false)
+      onClose?.();
+      return;
+    }
     try {
-      await updateMutation.mutateAsync({
-        data: { conversationId: conversationId, updates: { title: title } },
+      await updateConversation({
+        data: {
+          conversationId,
+          updates: { title },
+        },
       });
-    } catch (e) {
-      console.log(e);
+      toast.success("Conversation updated successfully");
+      setOpen(false);
+      onClose?.();
+    } catch (error) {
+      toast.error("Failed to update conversation");
+      console.error(error);
     }
   };
 
-  const handleGenerateAiTitle = async () => {
-    setNewTitle(await generateConversationTitle());
+  const handleGenerateTitle = async () => {
+    try {
+      const generatedTitle = await generateConversationTitle();
+      setTitle(generatedTitle);
+    } catch (error) {
+      toast.error("Failed to generate title");
+      console.error(error);
+    }
   };
 
   return (
-    <>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="ghost" className="p-2 w-full flex justify-start">
-            <Pencil size={15} className="mr-2" />
-            <div className="w-full text-left">Edit Conversation</div>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Conversation Title</DialogTitle>
-            <DialogDescription>
-              Update the title to your conversation manually or by using the
-              MagicTitle™.
-            </DialogDescription>
-          </DialogHeader>
-          <Card className="w-full flex justify-between items-center">
-            {isLoading ? (
-              <div className="h-[48px] flex items-center">
-                <BarLoader height={4} width={"100%"} color="#484848" />
-              </div>
-            ) : (
-              <Textarea
-                className="mr-2 outline-none border-none w-full py-3 px-1 rounded-l resize-none h-[48px] no-scrollbar"
-                onChange={(event: any) => setNewTitle(event.target.value)}
-                value={newTitle}
-                placeholder="Type your message here"
-              />
-            )}
-            <div className="flex justify-end">
-              <Button
-                variant="ghost"
-                onClick={async () => handleGenerateAiTitle()}
-                className="p-3"
-              >
-                <WandSparkles size={15} />
-              </Button>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          className="p-2 w-full flex justify-start hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          <Pencil size={15} className="mr-2" />
+          <span className="w-full text-left">Edit Conversation</span>
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit Conversation Title</DialogTitle>
+          <DialogDescription>
+            Update the title manually or generate one with AI.
+          </DialogDescription>
+        </DialogHeader>
+
+        <Card className="w-full flex justify-between items-center p-2">
+          {isGenerating ? (
+            <div className="h-12 flex items-center w-full">
+              <BarLoader height={4} width="100%" color="hsl(var(--primary))" />
             </div>
-          </Card>
-          <DialogFooter>
+          ) : (
+            <Textarea
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter conversation title"
+              className="outline-none border-none w-full py-3 px-1 resize-none no-scrollbar focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 focus-visible:ring-offset-0 shadow-none min-h-12 h-12"
+            />
+          )}
+        </Card>
+
+        <DialogFooter>
+          <div className="flex w-full justify-between items-center">
             <Button
-              variant="default"
-              onClick={() => handleUpdate(newTitle)}
+              variant="ghost"
+              onClick={handleGenerateTitle}
+              className="p-3"
+              disabled={isGenerating}
+            >
+              <WandSparkles size={15} />
+            </Button>
+            <Button
+              onClick={handleUpdate}
+              disabled={isGenerating}
               size="sm"
             >
-              Update Conversation
+              Update
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

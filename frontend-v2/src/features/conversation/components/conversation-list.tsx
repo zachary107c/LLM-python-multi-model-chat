@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/popover";
 import { Ellipsis } from "lucide-react";
 import { DeleteConversationModal } from "./delete-conversation-modal";
-import { UpdateConversationModal } from "./edit-conversation-modal";
+import { EditConversationModal } from "./edit-conversation-modal";
 import { MagicTitleButton } from "@/features/conversation/components/magic-title-button";
 import { PinConversationButton } from "./pin-conversation-button";
 import { Conversation } from "@/types/api";
@@ -71,13 +71,13 @@ export function ConversationList({
                   </Button>
                 </div>
               </PopoverTrigger>
-              <PopoverContent side="bottom">
-                <div className="flex flex-col items-start">
+              <PopoverContent side="bottom" className="p-2">
+                <div className="flex flex-col gap-1 items-start">
                   <PinConversationButton
                     conversationId={chat.id}
                     isLiked={chat.liked}
                   />
-                  <UpdateConversationModal
+                  <EditConversationModal
                     conversationId={chat.id}
                     currentTitle={chat.title}
                   />

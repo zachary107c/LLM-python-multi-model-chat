@@ -40,9 +40,9 @@ export function DeleteConversationModal({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" className="p-2 w-full flex justify-start">
+        <Button variant="ghost" className="p-2 w-full flex justify-start text-destructive">
           <Trash2 size={15} className="mr-2" />
-          <span className="text-left text-red-600">
+          <span className="text-left">
             Delete Conversation
           </span>
         </Button>
@@ -54,14 +54,12 @@ export function DeleteConversationModal({
         </AlertDialogDescription>
         <div className="flex gap-3 mt-4 justify-between">
           <AlertDialogCancel asChild>
-            <Button variant="default" size="sm">
+            <Button variant="secondary" size="sm">
               Cancel
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction>
-            <Button variant="default" onClick={handleDelete} size="sm">
-              Delete Conversation
-            </Button>
+          <AlertDialogAction onClick={handleDelete}>
+              <span>Delete Conversation</span>
           </AlertDialogAction>
         </div>
       </AlertDialogContent>
