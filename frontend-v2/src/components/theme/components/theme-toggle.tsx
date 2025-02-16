@@ -50,7 +50,7 @@ export function ThemeToggle({
     { key: "green", className: "bg-colorscheme-green", name: "Green" },
     { key: "blue", className: "bg-colorscheme-blue", name: "Blue" },
     { key: "yellow", className: "bg-colorscheme-yellow", name: "Yellow" },
-    { key: "violet", className: "bg-colorscheme-violet", name: "Violet" },
+    { key: "violet", className: "bg-colorscheme-violet", name: "Violet"},
   ];
 
   if (variant === "buttons") {
@@ -87,8 +87,6 @@ export function ThemeToggle({
       </Button>
     );
   }
-
-  // ... existing code ...
 
   return (
     <DropdownMenu>
@@ -127,25 +125,18 @@ export function ThemeToggle({
         <span className="text-xs font-medium pl-2">Primary Color</span>
         <div className="grid grid-cols-4 gap-1 p-2">
           {colorOptions.map(({ key, className, name }) => (
-            <Tooltip key={`tooltip-cs-${key}`}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  key={`cs-${key}`}
-                  className={`w-full h-4 p-0 ${className} ${
-                    colorTheme === key ? "border-2 border-border" : ""
-                  }`}
-                  onClick={() => handleColorThemeSelect(key as ColorTheme)}
-                  aria-label={`Select ${name} theme`}
-                >
-                  <span className="sr-only">{name}</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className={className}>
-                <p>{name}</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              variant="ghost"
+              size="sm"
+              key={`cs-${key}`}
+              className={`w-full h-4 p-0 hover:${className} hover:opacity-100 ${className} opacity-80 ${
+                colorTheme === key ? "border-2 border-border opacity-100" : ""
+              }`}
+              onClick={() => handleColorThemeSelect(key as ColorTheme)}
+              aria-label={`Select ${name} theme`}
+            >
+              <span className="sr-only">{name}</span>
+            </Button>
           ))}
         </div>
       </DropdownMenuContent>

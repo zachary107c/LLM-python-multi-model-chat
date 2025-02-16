@@ -96,7 +96,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         <ReactMarkdown
           remarkPlugins={[remarkMath]}
           rehypePlugins={[
-            // rehypeKatex,
+            rehypeKatex,
             [rehypeHighlight, { ignoreMissing: true }],
           ]}
           components={{

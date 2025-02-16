@@ -51,12 +51,25 @@ export function ConversationList({
               </Button>
             )}
           </div>
-          <div className={`absolute right-0 flex justify-center ${ chat.id === conversationId ? 'opacity-100' : 'opacity-0' }`}>
+          <div
+            className={`absolute right-0 flex justify-center ${
+              chat.id === conversationId ? "opacity-100" : "opacity-0"
+            }`}
+          >
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 bg-accent-2 rounded-md">
-                  <Ellipsis className="h-4 w-4" />
-                </Button>
+                <div className="relative">
+                  {/* Gradient shadow pseudo-element */}
+                  <div className="absolute -left-7 top-0 h-full w-8 bg-gradient-to-l from-accent-2/100 to-transparent pointer-events-none" />
+                  {/* Ellipsis button */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 bg-accent-2 hover:bg-accent-2 rounded-md relative z-10"
+                  >
+                    <Ellipsis className="h-4 w-4" />
+                  </Button>
+                </div>
               </PopoverTrigger>
               <PopoverContent side="bottom">
                 <div className="flex flex-col items-start">
