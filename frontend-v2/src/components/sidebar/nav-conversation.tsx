@@ -52,7 +52,7 @@ export function NavConversation() {
             <CollapsibleTrigger asChild>
               <SidebarMenuButton tooltip="Conversations">
                 <MessageSquare />
-                <span>Conversations</span>
+                <span className="font-bold">Conversations</span>
                 <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
               </SidebarMenuButton>
             </CollapsibleTrigger>

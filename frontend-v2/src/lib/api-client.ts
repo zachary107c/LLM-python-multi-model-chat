@@ -47,25 +47,25 @@ class ApiClient {
   private getHeaders(config: RequestConfig = {}): Headers {
     const isStreaming = config.headers?.Accept === 'text/event-stream';
     const headers = new Headers();
-  
+
     // Only set Content-Type if it's not explicitly set in config
     if (!config.headers?.['Content-Type']) {
       headers.set('Content-Type', 'application/json');
     }
-    
+
     headers.set('Accept', isStreaming ? 'text/event-stream' : 'application/json');
-  
+
     if (config.headers) {
       Object.entries(config.headers).forEach(([key, value]) => {
         headers.set(key, value);
       });
     }
-  
+
     const token = localStorage.getItem('token');
     if (token) {
       headers.set('Authorization', `Token ${token}`);
     }
-  
+
     return headers;
   }
 
@@ -123,16 +123,16 @@ class ApiClient {
     try {
       console.log('POST Request Data:', data);
       console.log('Making POST request to:', endpoint, 'with data:', data);
-  
+
       // Determine if the data is FormData
       const isFormData = data instanceof FormData;
-      
+
       // Don't set Content-Type for FormData, let the browser handle it
       const headers = this.getHeaders(config);
       if (isFormData) {
         headers.delete('Content-Type');
       }
-  
+
       const response = await fetch(this.getFullURL(endpoint), {
         method: 'POST',
         headers: headers,
@@ -140,9 +140,9 @@ class ApiClient {
         // Don't stringify if it's FormData
         body: isFormData ? data : JSON.stringify(data),
       });
-  
+
       console.log('POST Response:', response);
-  
+
       if (!response.ok) {
         console.error('Response status:', response.status);
         console.error('Response headers:', Object.fromEntries(response.headers));
@@ -150,17 +150,17 @@ class ApiClient {
         console.error('Response body:', errorText);
         throw new Error(response.statusText || 'Network response was not ok');
       }
-  
+
       if (config.headers?.Accept === 'text/event-stream') {
         return response.body as unknown as T;
       }
-  
+
       // Handle empty responses (like from logout endpoint)
       const contentLength = response.headers.get('content-length');
       if (contentLength === '0' || response.status === 204) {
         return null as T;
       }
-  
+
       try {
         return await response.json();
       } catch (error) {
@@ -199,15 +199,46 @@ class ApiClient {
     return response.json();
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    const response = await fetch(this.getFullURL(endpoint), {
-      method: 'DELETE',
-      headers: authRequestHeaders(),
-      credentials: 'include',
-    });
+  async delete<T>(endpoint: string, data?: unknown): Promise<T> {
+    try {
+      console.log('DELETE Request to:', endpoint);
 
-    await this.handleResponse(response);
-    return response.json();
+      const response = await fetch(this.getFullURL(endpoint), {
+        method: 'DELETE',
+        headers: this.getHeaders(),
+        credentials: 'include',
+        body: data ? JSON.stringify(data) : undefined,
+      });
+
+      console.log('DELETE Response:', response);
+
+      if (!response.ok) {
+        console.error('Response status:', response.status);
+        console.error('Response headers:', Object.fromEntries(response.headers));
+        const errorText = await response.text();
+        console.error('Response body:', errorText);
+        throw new Error(response.statusText || 'Network response was not ok');
+      }
+
+      // Handle empty responses
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0' || response.status === 204) {
+        return null as T;
+      }
+
+      try {
+        return await response.json();
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          // If response is empty or not JSON, return null
+          return null as T;
+        }
+        throw error;
+      }
+    } catch (error) {
+      console.error('API Client Error:', error);
+      throw error;
+    }
   }
 
   async streamCompletion(

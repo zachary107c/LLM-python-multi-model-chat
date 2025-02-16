@@ -98,11 +98,11 @@ export function ChatInput({
   return (
     <div className='chat-input mb-2 flex flex-col w-full'>
       <form onSubmit={handleSendMessage} className="flex justify-between">
-        <Card className='w-full p-2'>
+        <Card className='w-full p-2 bg-sidebar shadow-none rounded-lg'>
           <div className={`flex justify-between items-center h-full`}>
             <div className="flex flex-col w-full">
               <Textarea
-                className="outline-none border-none w-full py-3 px-1 rounded-l resize-none h-[48px] no-scrollbar focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 focus-visible:ring-offset-0 shadow-none"
+                className="outline-none border-none w-full py-3 px-1 resize-none no-scrollbar focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 focus-visible:ring-offset-0 shadow-none min-h-[48px]"
                 onChange={(event) => setNewMessage(event.target.value)}
                 value={newMessage}
                 placeholder="Type your message here"
@@ -118,15 +118,16 @@ export function ChatInput({
                       modelsLoading={modelsLoading}
                       onModelChange={handleModelChange}
                     />
-                    <div className="ml-2 flex items-center">
+                    {/* <div className="ml-2 flex items-center">
                       <span className="mr-1 text-sm">
                         Use Tools
                       </span>
                       <Switch
                         checked={useTools}
                         onCheckedChange={handleUseToolsToggled}
+                        className="bg-background"
                       />
-                    </div>
+                    </div> */}
                     <div className="ml-2">
                       <Button variant="ghost" className="m-1 p-0">
                         <Folder size={15} strokeWidth={1.5} />
@@ -141,7 +142,7 @@ export function ChatInput({
                     />
                   </div>
                 </div>
-                <Button type="submit" variant="default">
+                <Button type="submit" variant="default" size="sm">
                   <span className="text-sm">Submit</span>
                   <Rocket size={15} />
                 </Button>

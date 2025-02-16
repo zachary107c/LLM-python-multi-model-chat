@@ -31,7 +31,7 @@ export function DeleteMessageModal({
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger asChild>
         <Button variant="ghost" className="mx-1 px-1 py-0 my-0">
           <Trash2Icon />
         </Button>

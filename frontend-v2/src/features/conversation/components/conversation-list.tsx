@@ -24,10 +24,10 @@ export function ConversationList({
 
   return (
     <div>
-      {title && <span className="text-xs">{title}</span>}
+      {title && <span className="text-xs font-bold">{title}</span>}
       {chats?.map((chat) => (
         <div
-          className="w-full relative flex items-center hover:bg-accent/50 rounded-md [&:hover>div:last-child]:opacity-100"
+          className="w-full relative flex items-center hover:bg-accent-2 rounded-md [&:hover>div:last-child]:opacity-100"
           key={chat.id}
         >
           <div className="w-full overflow-hidden">
@@ -35,7 +35,7 @@ export function ConversationList({
               <Button
                 size="sm"
                 variant={"ghost"}
-                className="w-full justify-between bg-accent text-accent-foreground truncate"
+                className="w-full justify-between text-accent-foreground truncate bg-accent-2 hover:bg-accent-2"
                 onClick={() => setConversationId(chat.id)}
               >
                 {chat.title}
@@ -44,7 +44,7 @@ export function ConversationList({
               <Button
                 size="sm"
                 variant={"ghost"}
-                className="w-full justify-between overflow-hidden"
+                className="w-full justify-between overflow-hidden font-base hover:bg-accent-2"
                 onClick={() => setConversationId(chat.id)}
               >
                 {chat.title}
@@ -54,7 +54,7 @@ export function ConversationList({
           <div className={`absolute right-0 flex justify-center ${ chat.id === conversationId ? 'opacity-100' : 'opacity-0' }`}>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 bg-secondary">
+                <Button variant="ghost" size="icon" className="h-8 w-8 bg-accent-2 rounded-md">
                   <Ellipsis className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>

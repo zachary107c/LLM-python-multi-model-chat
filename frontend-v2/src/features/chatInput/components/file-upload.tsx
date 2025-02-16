@@ -62,7 +62,7 @@ export function FileUpload({
       )}
       {imageName && (
         <div>
-          <Badge variant="default" className="ml-2">
+          <Badge variant="outline" className="ml-2 p-0">
             <div className="w-full flex justify-between items-center ml-2">
               <span className="text-sm font-light">
                 {imageName}

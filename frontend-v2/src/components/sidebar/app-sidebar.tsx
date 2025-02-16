@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { Separator } from "../ui/separator";
 import {
   useSidebar,
   Sidebar,
@@ -15,10 +16,15 @@ import { useUser } from "@/lib/auth";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar();
-  const { data: user, isLoading: userLoading} = useUser();
+  const { data: user, isLoading: userLoading } = useUser();
 
   return (
-    <Sidebar collapsible="icon" { ...props } className="border-none">
+    <Sidebar
+      collapsible="icon"
+      variant="floating"
+      {...props}
+      className="border-none bg-background shadow-none"
+    >
       <div
         className={`flex items-center p-2 ${
           open ? "justify-between" : "justify-center"
@@ -31,11 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavConversation />
       </SidebarContent>
       <SidebarFooter>
-        {userLoading ? (
-          <NavUserSkeleton />
-        ) : (
-          <NavUser user={user} />
-        )}
+        {userLoading ? <NavUserSkeleton /> : <NavUser user={user} />}
       </SidebarFooter>
     </Sidebar>
   );

@@ -31,16 +31,16 @@ export function UserChatMessage({
 
   return (
     <div className="mb-2">
-      <div className="flex justify-end">
-        <Card className="w-fit flex flex-col p-2 bg-secondary">
-          {userMessageData.image
-            ? ImageExpandModal({ imagePath: userMessageData.image })
-            : null}
+      <div className="flex flex-col items-end">
+        {userMessageData.image
+          ? ImageExpandModal({ imagePath: userMessageData.image })
+          : null}
+        <Card className="w-fit flex flex-col p-2 bg-secondary shadow-none rounded-md">
           <div>
             <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
-              <span className="text-base">
+              <span className="text-sm">
                 <MarkdownRenderer
-                  markdown={localizeUTCDates(userMessageData.content)}
+                  content={localizeUTCDates(userMessageData.content)}
                 />
               </span>
             </div>

@@ -93,9 +93,7 @@ export function AssistantChatMessage({
         <div>
           <div className="mb-1 flex justify-start items-center">
             <div className="flex items-center gap-2">
-              <span className="text-sm">
-                {assistantMessageData.model.name}
-              </span>
+              <span className="text-sm">{assistantMessageData.model.name}</span>
               <span className="font-light text-sm">
                 {new Date(assistantMessageData.created_at).toLocaleDateString(
                   "en-US",
@@ -111,22 +109,17 @@ export function AssistantChatMessage({
               </span>
             </div>
           </div>
-          <div className="flex justify-start">
-            {displayContent ? (
-              <Card className="w-fit flex flex-col p-2">
-                <div>
-                  <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
-                    <span className="text-base">
-                      <MarkdownRenderer
-                        markdown={localizeUTCDates(displayContent) || ""}
-                      />
-                    </span>
-                  </div>
+          <div className="w-full">
+            <Card className="w-full bg-transparent shadow-none border-none">
+              <div className="max-w-full overflow-hidden">
+                <div className="text-sm">
+                  <MarkdownRenderer
+                    content={localizeUTCDates(displayContent)}
+                    className="max-w-full" // Ensure markdown content doesn't exceed container
+                  />
                 </div>
-              </Card>
-            ) : (
-              <></>
-            )}
+              </div>
+            </Card>
           </div>
         </div>
       </div>
@@ -182,8 +175,8 @@ export function AssistantChatMessage({
               assistantMessageData.tools_used.map((tool, index) => (
                 <Badge
                   key={tool.name + index}
-                  className="p-1 my-1 text-xs"
-                  variant='default'
+                  className="p-1 m-1 border-none bg-background text-xs"
+                  variant="outline"
                 >
                   {tool.name}
                 </Badge>

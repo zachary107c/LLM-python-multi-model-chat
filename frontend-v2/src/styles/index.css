@@ -33,7 +33,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 240 4.8% 95.9%;
     --sidebar-foreground: 240 10% 3.9%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -50,6 +50,13 @@
     --colorscheme-blue: 221.2 83.2% 53.3%;
     --colorscheme-yellow: 47.9 95.8% 53.1%;
     --colorscheme-violet: 262.1 83.3% 57.8%;
+
+    .hljs {
+      border-radius: 10px;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      background: var(--secondary) !important;
+    }
   }
 
   .dark {
@@ -78,7 +85,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 240 10% 3.9%;
+    --sidebar-background: 240 3.7% 15.9%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 0 0% 98%;
     --sidebar-primary-foreground: 240 5.9% 10%;
@@ -116,7 +123,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 0 0% 96.1%;
     --sidebar-foreground: 0 0% 3.9%;
     --sidebar-primary: 0 72.2% 50.6%;
     --sidebar-primary-foreground: 0 85.7% 97.3%;
@@ -152,7 +159,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 0 0% 3.9%;
+    --sidebar-background: 0 0% 14.9%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 0 72.2% 50.6%;
     --sidebar-primary-foreground: 0 85.7% 97.3%;
@@ -190,7 +197,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 240 4.8% 95.9%;
     --sidebar-foreground: 240 10% 3.9%;
     --sidebar-primary: 346.8 77.2% 49.8%;
     --sidebar-primary-foreground: 355.7 100% 97.3%;
@@ -199,7 +206,7 @@
     --sidebar-border: 240 5.9% 90%;
     --sidebar-ring: 346.8 77.2% 49.8%;
   }
- 
+
   .theme-rose.dark {
     --background: 20 14.3% 4.1%;
     --foreground: 0 0% 95%;
@@ -226,7 +233,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 20 14.3% 4.1%;
+    --sidebar-background: 240 3.7% 15.9%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 346.8 77.2% 49.8%;
     --sidebar-primary-foreground: 355.7 100% 97.3%;
@@ -264,7 +271,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 60 4.8% 95.9%;
     --sidebar-foreground: 20 14.3% 4.1%;
     --sidebar-primary: 24.6 95% 53.1%;
     --sidebar-primary-foreground: 60 9.1% 97.8%;
@@ -273,7 +280,7 @@
     --sidebar-border: 20 5.9% 90%;
     --sidebar-ring: 24.6 95% 53.1%;
   }
- 
+
   .theme-orange.dark {
     --background: 20 14.3% 4.1%;
     --foreground: 60 9.1% 97.8%;
@@ -300,7 +307,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 20 14.3% 4.1%;
+    --sidebar-background: 12 6.5% 15.1%;
     --sidebar-foreground: 60 9.1% 97.8%;
     --sidebar-primary: 20.5 90.2% 48.2%;
     --sidebar-primary-foreground: 60 9.1% 97.8%;
@@ -338,7 +345,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 240 4.8% 95.9%;
     --sidebar-foreground: 240 10% 3.9%;
     --sidebar-primary: 142.1 76.2% 36.3%;
     --sidebar-primary-foreground: 355.7 100% 97.3%;
@@ -347,7 +354,7 @@
     --sidebar-border: 240 5.9% 90%;
     --sidebar-ring: 142.1 76.2% 36.3%;
   }
- 
+
   .theme-green.dark {
     --background: 20 14.3% 4.1%;
     --foreground: 0 0% 95%;
@@ -374,7 +381,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 20 14.3% 4.1%;
+    --sidebar-background: 240 3.7% 15.9%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 142.1 70.6% 45.3%;
     --sidebar-primary-foreground: 144.9 80.4% 10%;
@@ -412,7 +419,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 210 40% 96.1%;
     --sidebar-foreground: 222.2 84% 4.9%;
     --sidebar-primary: 221.2 83.2% 53.3%;
     --sidebar-primary-foreground: 210 40% 98%;
@@ -421,7 +428,7 @@
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 221.2 83.2% 53.3%;
   }
- 
+
   .theme-blue.dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -437,6 +444,8 @@
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
+    --accent-2: 217.2 32.6% 30.5%;
+    --accent-2-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
@@ -448,13 +457,13 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-background: 217.2 32.6% 17.5%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 217.2 91.2% 59.8%;
     --sidebar-primary-foreground: 222.2 47.4% 11.2%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent: 217.2 32.6% 25.5%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-border: 217.2 32.6% 30.5%;
     --sidebar-ring: 224.3 76.3% 48%;
   }
 
@@ -486,7 +495,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 60 4.8% 95.9%;
     --sidebar-foreground: 20 14.3% 4.1%;
     --sidebar-primary: 47.9 95.8% 53.1%;
     --sidebar-primary-foreground: 26 83.3% 14.1%;
@@ -495,7 +504,7 @@
     --sidebar-border: 20 5.9% 90%;
     --sidebar-ring: 20 14.3% 4.1%;
   }
- 
+
   .theme-yellow.dark {
     --background: 20 14.3% 4.1%;
     --foreground: 60 9.1% 97.8%;
@@ -522,7 +531,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 20 14.3% 4.1%;
+    --sidebar-background: 12 6.5% 15.1%;
     --sidebar-foreground: 60 9.1% 97.8%;
     --sidebar-primary: 47.9 95.8% 53.1%;
     --sidebar-primary-foreground: 26 83.3% 14.1%;
@@ -560,7 +569,7 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 220 14.3% 95.9%;
     --sidebar-foreground: 224 71.4% 4.1%;
     --sidebar-primary: 262.1 83.3% 57.8%;
     --sidebar-primary-foreground: 210 20% 98%;
@@ -569,7 +578,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 262.1 83.3% 57.8%;
   }
- 
+
   .theme-violet.dark {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
@@ -596,7 +605,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 224 71.4% 4.1%;
+    --sidebar-background: 215 27.9% 16.9%;
     --sidebar-foreground: 210 20% 98%;
     --sidebar-primary: 263.4 70% 50.4%;
     --sidebar-primary-foreground: 210 20% 98%;
@@ -618,6 +627,7 @@
 }
 
 @layer utilities {
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;

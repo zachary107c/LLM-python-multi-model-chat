@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BaseModelEntity } from "@/types/api";
+import { ChevronsUpDown } from "lucide-react";
 
 interface ModelSelectProps {
   selectedModel: BaseModelEntity | null;
@@ -34,16 +35,18 @@ export function ModelSelect({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button
           variant='default'
           size="sm"
+          className="flex justify-between pr-1"
         >
           {modelsLoading ? (
             <Skeleton className="w-[60px]" />
           ) : (
             selectedModel?.name || "Select a model"
           )}
+          <ChevronsUpDown />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" className="h-[30vh] overflow-y-scroll">
@@ -51,7 +54,7 @@ export function ModelSelect({
           Object.keys(groupedModels).map((provider) => (
             <DropdownMenuGroup key={provider}>
               <Badge variant='default' className="w-full hover:none">
-                <span className="text-sm font-bold">
+                <span className="text-sm font-bold hover:none">
                   {provider}
                 </span>
               </Badge>

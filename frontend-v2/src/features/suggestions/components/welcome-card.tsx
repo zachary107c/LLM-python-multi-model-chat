@@ -20,11 +20,11 @@ export function WelcomeCard({
     <div className="p-1 w-full max-w-sm h-28 overflow-hidden no-scrollbar">
       <Button
         variant="ghost"
-        className="p-0 m-0 flex items-center h-full w-full"
+        className="p-0 m-0 flex items-center h-full w-full rounded-md"
         onClick={handleSuggestionClick}
       >
-        <div className="rainbow-border h-full w-full">
-          <Card className="h-full w-full p-4">
+        <div className="h-full w-full">
+          <Card className="h-full w-full p-4 bg-secondary rounded-md">
             <div className="flex flex-col h-full justify-between items-start">
               <div className="flex justify-start items-center">
                 <div className="mr-1 sparkles">

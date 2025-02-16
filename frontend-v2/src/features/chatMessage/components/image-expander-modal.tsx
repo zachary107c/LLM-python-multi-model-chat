@@ -14,11 +14,11 @@ export function ImageExpandModal({ imagePath }: ImageExpandModalProps) {
     <div className="relative pb-[current]">
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="ghost" className="p-0 m-0 w-full h-full">
+          <Button variant="ghost" className="p-0 m-0 w-44 h-auto">
             <img
               src={imagePath}
               alt="Bold typography"
-              className="block w-full h-[140px] object-cover bg-gray-100"
+              className="block w-full h-auto object-cover bg-gray-100 rounded-md"
             />
           </Button>
         </DialogTrigger>

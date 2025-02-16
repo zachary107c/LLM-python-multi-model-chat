@@ -1,128 +1,169 @@
-import React, { useEffect, useRef, useMemo } from "react";
-import { Marked } from "marked";
-import { markedHighlight } from "marked-highlight";
-import hljs from "highlight.js";
-import "highlight.js/styles/github.css";
-import DOMPurify from "dompurify";
-import katex from "katex";
-import "katex/contrib/mhchem/mhchem.js";
-import "katex/dist/katex.min.css";
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeHighlight from 'rehype-highlight';
+import { cn } from "@/lib/utils";
+import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github.css';
 
-interface MarkdownRendererProps {
-  markdown: string;
-  className?: string;
+interface MarkdownStyles {
+  container?: string;
+  headings?: {
+    h1?: string;
+    h2?: string;
+    h3?: string;
+  };
+  lists?: {
+    ul?: string;
+    ol?: string;
+    li?: string;
+  };
+  blockquote?: string;
+  table?: {
+    container?: string;
+    th?: string;
+    td?: string;
+  };
+  hr?: string;
+  image?: string;
+  link?: string;
+  math?: {
+    display?: string;
+    inline?: string;
+  };
+  code?: {
+    block?: string;
+    inline?: string;
+  };
 }
 
-// Custom renderer for marked to handle LaTeX
-const renderer = {
-  text(text: string) {
-    let result = text;
+interface MarkdownRendererProps {
+  content: string;
+  className?: string;
+  styles?: MarkdownStyles;
+}
 
-    // Handle inline math with single $ delimiters
-    result = result.replace(/\$([^\$]+)\$/g, (_, math) => {
-      try {
-        return katex.renderToString(math, { displayMode: false });
-      } catch (error) {
-        console.error("KaTeX error:", error);
-        return math;
-      }
-    });
-
-    // Handle display math with double $$ delimiters
-    result = result.replace(/\$\$([^\$]+)\$\$/g, (_, math) => {
-      try {
-        return katex.renderToString(math, { displayMode: true });
-      } catch (error) {
-        console.error("KaTeX error:", error);
-        return math;
-      }
-    });
-
-    return result;
+const defaultStyles: MarkdownStyles = {
+  container: "font-erm prose dark:prose-invert max-w-none overflow-x-auto break-words",
+  headings: {
+    h1: "text-3xl font-bold mt-8 mb-4 break-words",
+    h2: "text-2xl font-bold mt-6 mb-4 break-words",
+    h3: "text-xl font-bold mt-4 mb-2 break-words",
+  },
+  lists: {
+    ul: "list-disc ml-6 mb-4",
+    ol: "list-decimal ml-6 mb-4",
+    li: "mb-1 break-words",
+  },
+  blockquote: "border-l-4 border-gray-300 pl-4 py-1 my-4 italic bg-gray-50 dark:bg-gray-800 break-words",
+  table: {
+    container: "w-full border-collapse my-4 overflow-x-auto block",
+    th: "border border-gray-300 p-2 bg-secondary whitespace-nowrap",
+    td: "border border-gray-300 p-2 break-words",
+  },
+  hr: "my-8 border-gray-200 dark:border-gray-700",
+  image: "max-w-full rounded-lg my-4",
+  link: "text-blue-600 underline hover:text-blue-800 dark:text-blue-400 break-all",
+  math: {
+    display: "my-4 overflow-x-auto",
+    inline: "overflow-x-auto",
+  },
+  code: {
+    block: "rounded-lg p-4 bg-gray-100 dark:bg-gray-800 overflow-x-auto whitespace-pre",
+    inline: "bg-gray-100 dark:bg-gray-800 rounded px-1 whitespace-nowrap",
   },
 };
 
-const markedInstance = new Marked(
-  markedHighlight({
-    langPrefix: "hljs language-",
-    highlight(code, lang) {
-      const language = hljs.getLanguage(lang) ? lang : "plaintext";
-      return hljs.highlight(code, { language }).value;
-    },
-  })
-);
-
-markedInstance.setOptions({
-  gfm: true,
-  breaks: true,
-});
-
-// Configure DOMPurify to allow KaTeX classes and attributes
-const purifyConfig = {
-  ADD_TAGS: [
-    "math",
-    "semantics",
-    "mrow",
-    "mi",
-    "mn",
-    "mo",
-    "msup",
-    "mfrac",
-    "annotation",
-  ],
-  ADD_ATTR: ["xmlns", "encoding"],
-  ADD_CLASS: ["katex", "katex-display", "katex-html"],
-};
-
-const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
-  markdown,
-  className = "",
+const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ 
+  content, 
+  className,
+  styles = {} 
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const mergedStyles = {
+    ...defaultStyles,
+    ...styles,
+    headings: { ...defaultStyles.headings, ...styles.headings },
+    lists: { ...defaultStyles.lists, ...styles.lists },
+    table: { ...defaultStyles.table, ...styles.table },
+    math: { ...defaultStyles.math, ...styles.math },
+    code: { ...defaultStyles.code, ...styles.code },
+  };
 
-  const sanitizedHtml = useMemo(() => {
-    const html = markedInstance.parse(markdown);
-    return DOMPurify.sanitize(html as string, purifyConfig);
-  }, [markdown]);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.querySelectorAll("pre code").forEach((block) => {
-        hljs.highlightElement(block as HTMLElement);
-      });
-    }
-  }, [sanitizedHtml]);
-
-  // Return the component's JSX
   return (
-    <div
-      ref={containerRef}
-      className={`font-erm prose dark:prose-invert max-w-none ${className} 
-        [&>*:first-child]:mt-0 
-        [&>*:last-child]:mb-0
-        [&>h1]:text-3xl [&>h1]:font-bold [&>h1]:mt-8 [&>h1]:mb-4
-        [&>h2]:text-2xl [&>h2]:font-bold [&>h2]:mt-6 [&>h2]:mb-4
-        [&>h3]:text-xl [&>h3]:font-bold [&>h3]:mt-4 [&>h3]:mb-2
-        [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-4
-        [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-4
-        [&>li]:mb-1
-        [&>blockquote]:border-l-4 [&>blockquote]:border-gray-300 
-        [&>blockquote]:pl-4 [&>blockquote]:py-1 [&>blockquote]:my-4 
-        [&>blockquote]:italic [&>blockquote]:bg-gray-50 
-        dark:[&>blockquote]:bg-gray-800
-        [&>table]:w-full [&>table]:border-collapse [&>table]:my-4
-        [&>table_th]:border [&>table_th]:border-gray-300 [&>table_th]:p-2 
-        [&>table_th]:bg-secondary
-        [&>table_td]:border [&>table_td]:border-gray-300 [&>table_td]:p-2
-        [&>hr]:my-8 [&>hr]:border-gray-200 dark:[&>hr]:border-gray-700
-        [&>img]:max-w-full [&>img]:rounded-lg [&>img]:my-4
-        [&>a]:text-blue-600 [&>a]:underline 
-        hover:[&>a]:text-blue-800 dark:[&>a]:text-blue-400
-        [&_.katex-display]:my-4 [&_.katex-display]:overflow-x-auto
-        [&_.katex]:overflow-x-auto
-      `}
-      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-    />
+    <div className={cn("overflow-x-hidden w-full", className)}>
+      <div className={cn(mergedStyles.container)}>
+        <ReactMarkdown
+          remarkPlugins={[remarkMath]}
+          rehypePlugins={[
+            // rehypeKatex,
+            [rehypeHighlight, { ignoreMissing: true }],
+          ]}
+          components={{
+            h1: ({ children }) => (
+              <h1 className={mergedStyles.headings?.h1}>{children}</h1>
+            ),
+            h2: ({ children }) => (
+              <h2 className={mergedStyles.headings?.h2}>{children}</h2>
+            ),
+            h3: ({ children }) => (
+              <h3 className={mergedStyles.headings?.h3}>{children}</h3>
+            ),
+            ul: ({ children }) => (
+              <ul className={mergedStyles.lists?.ul}>{children}</ul>
+            ),
+            ol: ({ children }) => (
+              <ol className={mergedStyles.lists?.ol}>{children}</ol>
+            ),
+            li: ({ children }) => (
+              <li className={mergedStyles.lists?.li}>{children}</li>
+            ),
+            blockquote: ({ children }) => (
+              <blockquote className={mergedStyles.blockquote}>{children}</blockquote>
+            ),
+            table: ({ children }) => (
+              <div className="overflow-x-auto">
+                <table className={mergedStyles.table?.container}>{children}</table>
+              </div>
+            ),
+            th: ({ children }) => (
+              <th className={mergedStyles.table?.th}>{children}</th>
+            ),
+            td: ({ children }) => (
+              <td className={mergedStyles.table?.td}>{children}</td>
+            ),
+            hr: () => <hr className={mergedStyles.hr} />,
+            img: ({ src, alt }) => (
+              <img src={src} alt={alt} className={mergedStyles.image} />
+            ),
+            a: ({ href, children }) => (
+              <a href={href} className={mergedStyles.link}>{children}</a>
+            ),
+            code({ node, inline, className, children, ...props }: any) {
+              const match = /language-(\w+)/.exec(className || '');
+              return !inline && match ? (
+                <div className="overflow-x-auto">
+                  <pre className={mergedStyles.code?.block}>
+                    <code className={`language-${match[1]}`} {...props}>
+                      {children}
+                    </code>
+                  </pre>
+                </div>
+              ) : (
+                <code className={cn(mergedStyles.code?.inline, className)} {...props}>
+                  {children}
+                </code>
+              );
+            },
+            p: ({ children }) => (
+              <p className="break-words">{children}</p>
+            ),
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+    </div>
   );
 };
 

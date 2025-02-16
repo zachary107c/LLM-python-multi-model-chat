@@ -43,14 +43,14 @@ export function ThemeToggle({
   };
 
   const colorOptions: ColorOption[] = [
-    { key: 'default', className: 'bg-colorscheme-default', name: 'Default' },
-    { key: 'red', className: 'bg-colorscheme-red', name: 'Red' },
-    { key: 'rose', className: 'bg-colorscheme-rose', name: 'Rose' },
-    { key: 'orange', className: 'bg-colorscheme-orange', name: 'Orange' },
-    { key: 'green', className: 'bg-colorscheme-green', name: 'Green' },
-    { key: 'blue', className: 'bg-colorscheme-blue', name: 'Blue' },
-    { key: 'yellow', className: 'bg-colorscheme-yellow', name: 'Yellow' },
-    { key: 'violet', className: 'bg-colorscheme-violet', name: 'Violet' },
+    { key: "default", className: "bg-colorscheme-default", name: "Default" },
+    { key: "red", className: "bg-colorscheme-red", name: "Red" },
+    { key: "rose", className: "bg-colorscheme-rose", name: "Rose" },
+    { key: "orange", className: "bg-colorscheme-orange", name: "Orange" },
+    { key: "green", className: "bg-colorscheme-green", name: "Green" },
+    { key: "blue", className: "bg-colorscheme-blue", name: "Blue" },
+    { key: "yellow", className: "bg-colorscheme-yellow", name: "Yellow" },
+    { key: "violet", className: "bg-colorscheme-violet", name: "Violet" },
   ];
 
   if (variant === "buttons") {
@@ -88,21 +88,22 @@ export function ThemeToggle({
     );
   }
 
+  // ... existing code ...
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="defaultNoPadding"
-          className="flex justify-start w-full px-4"
+          className="flex justify-start w-full pr-4"
         >
-          {/* Show icon, theme, and color name when collapsed */}
           <Sun className={`mr-2 ${theme === "light" ? "" : "hidden"}`} />
           <Moon className={`mr-2 ${theme === "dark" ? "" : "hidden"}`} />
           <Laptop className={`mr-2 ${theme === "system" ? "" : "hidden"}`} />
           <span>
             {theme.charAt(0).toUpperCase() + theme.slice(1)} -{" "}
-            {colorOptions.find(co => co.key === colorTheme)?.name}
+            {colorOptions.find((co) => co.key === colorTheme)?.name}
           </span>
         </Button>
       </DropdownMenuTrigger>
@@ -114,7 +115,7 @@ export function ThemeToggle({
           { mode: "system", Icon: Laptop },
         ].map(({ mode, Icon }) => (
           <DropdownMenuItem
-            key={mode}
+            key={`${mode}-theme-toggle--button`}
             onClick={(event) => handleThemeSelect(mode as Theme, event)}
           >
             <Icon className="mr-2" />
@@ -125,16 +126,21 @@ export function ThemeToggle({
         <DropdownMenuSeparator />
         <span className="text-xs font-medium pl-2">Primary Color</span>
         <div className="grid grid-cols-4 gap-1 p-2">
-          {colorOptions.map(({key, className, name}) => (
-            <Tooltip>
+          {colorOptions.map(({ key, className, name }) => (
+            <Tooltip key={`tooltip-cs-${key}`}>
               <TooltipTrigger asChild>
-                <div
+                <Button
+                  variant="ghost"
+                  size="sm"
                   key={`cs-${key}`}
-                  className={`w-full h-4 cursor-pointer rounded ${className} ${
+                  className={`w-full h-4 p-0 ${className} ${
                     colorTheme === key ? "border-2 border-border" : ""
                   }`}
                   onClick={() => handleColorThemeSelect(key as ColorTheme)}
-                />
+                  aria-label={`Select ${name} theme`}
+                >
+                  <span className="sr-only">{name}</span>
+                </Button>
               </TooltipTrigger>
               <TooltipContent className={className}>
                 <p>{name}</p>

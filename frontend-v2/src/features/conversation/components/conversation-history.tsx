@@ -74,17 +74,17 @@ export function ConversationHistory() {
       ) : (
         <>
           {bookmarkedChats.length > 0 && (
-            <SidebarMenuSub>
+            <SidebarMenuSub className="px-0 pl-2.5">
               <ConversationList chats={bookmarkedChats} title="Favorited" />
             </SidebarMenuSub>
           )}
           {nonBookmarkChats.Today.length > 0 && (
-            <SidebarMenuSub>
+            <SidebarMenuSub className="px-0 pl-2.5">
               <ConversationList chats={nonBookmarkChats.Today} title="Today" />
             </SidebarMenuSub>
           )}
           {nonBookmarkChats["This Week"].length > 0 && (
-            <SidebarMenuSub>
+            <SidebarMenuSub className="px-0 pl-2.5">
               <ConversationList
                 chats={nonBookmarkChats["This Week"]}
                 title="This Week"
@@ -92,7 +92,7 @@ export function ConversationHistory() {
             </SidebarMenuSub>
           )}
           {nonBookmarkChats["This Month"].length > 0 && (
-            <SidebarMenuSub>
+            <SidebarMenuSub className="px-0 pl-2.5">
               <ConversationList
                 chats={nonBookmarkChats["This Month"]}
                 title="This Month"
@@ -100,7 +100,7 @@ export function ConversationHistory() {
             </SidebarMenuSub>
           )}
           {nonBookmarkChats.Old.length > 0 && (
-            <SidebarMenuSub>
+            <SidebarMenuSub className="px-0 pl-2.5">
               <ConversationList chats={nonBookmarkChats.Old} title="Old" />
             </SidebarMenuSub>
           )}
