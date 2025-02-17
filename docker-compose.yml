@@ -30,9 +30,7 @@ services:
       - VITE_APP_BACKEND_API_URL=${VITE_APP_BACKEND_API_URL}
     ports:
       - "5173:5173"
-    volumes:
-      - ./frontend-v2:/app
-
+      
   nginx:
     container_name: bruh-nginx
     build:
