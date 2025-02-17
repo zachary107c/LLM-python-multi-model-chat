@@ -4,10 +4,10 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# RUN npm ci --only=production --save
-RUN npm install --save
+RUN npm install
 
-COPY . ./
+COPY . .
+
 COPY .env ./
 
 EXPOSE 5173
