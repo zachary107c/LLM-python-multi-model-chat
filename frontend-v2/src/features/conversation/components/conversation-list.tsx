@@ -83,7 +83,7 @@ export function ConversationList({
                   />
                   <MagicTitleButton conversationId={chat.id} />
                   <Separator />
-                  <DeleteConversationModal conversationId={chat.id} />
+                  <DeleteConversationModal conversationId={chat.id} key={`delete-covo-modal-${chat.id}`}/>
                 </div>
               </PopoverContent>
             </Popover>

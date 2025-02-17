@@ -21,8 +21,8 @@ const getUser = async (): Promise<User | null> => {
 };
 
 export const loginInputSchema = z.object({
-  username: z.string().min(1, "Required"),
-  password: z.string().min(5, "Required"),
+  username: z.string().min(1, "Username must be atleast 1 character long"),
+  password: z.string().min(5, "Password must be at least 5 characters long"),
 });
 
 export type LoginInput = z.infer<typeof loginInputSchema>;
@@ -39,8 +39,8 @@ export const registerInputSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }).min(1, { message: "Email is required" }),
   first_name: z.string().min(1, "First Name is required"),
   last_name: z.string().min(1, "Last Name is required"),
-  password: z.string().min(5, "Password must be at least 5 characters long"),
-  password2: z.string().min(5, "Password Confirmation must be at least 5 characters long"),
+  password: z.string().min(5, "Password must be at least 8 characters long"),
+  password2: z.string().min(5, "Password Confirmation must be at least 8 characters long"),
 }).refine((data) => data.password === data.password2, {
   message: "Passwords must match",
   path: ["password2"],

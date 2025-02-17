@@ -90,7 +90,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   };
 
   return (
-    <div className={cn("overflow-x-hidden w-full", className)}>
+    <div className={cn("w-full overflow-none markdown markdown-prose prose", className)}>
       <div className={cn(mergedStyles.container)}>
         <ReactMarkdown
           remarkPlugins={[remarkMath]}

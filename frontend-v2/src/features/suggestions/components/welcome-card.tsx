@@ -19,30 +19,26 @@ export function WelcomeCard({
   return (
     <div className="p-1 w-full max-w-sm h-28 overflow-hidden no-scrollbar">
       <Button
-        variant="ghost"
+        variant="ghostNoHover"
         className="p-0 m-0 flex items-center h-full w-full rounded-md"
         onClick={handleSuggestionClick}
       >
-        <div className="h-full w-full">
-          <Card className="h-full w-full p-4 bg-secondary rounded-md">
-            <div className="flex flex-col h-full justify-between items-start">
-              <div className="flex justify-start items-center">
-                <div className="mr-1 sparkles">
-                  <Sparkles size={15} strokeWidth={1.5} color="yellow" />
-                </div>
-                <span className="text-lg font-bold">
-                  {suggestion.bucket}
-                </span>
+        <div className="h-full w-full suggestion-border group">
+          <Card className="h-full w-full p-2 bg-secondary rounded-md shadow-none">
+            <div className="flex flex-col h-full justify-between items-start truncate gap-1">
+              <div className="flex justify-start items-center gap-1">
+                <Sparkles
+                  size={15}
+                  strokeWidth={1.5}
+                  color="hsl(var(--foreground))"
+                />
+                <span className="text-md font-bold">{suggestion.bucket}</span>
               </div>
-              <span className="flex-grow text-xs font-light">
+              <span className="">
                 {suggestion.summary}
               </span>
-              <div className="w-full flex justify-end items-center">
-                <div className="mr-1">
-                  <span className="text-sm font-light">
-                    Prompt
-                  </span>
-                </div>
+              <div className="w-full flex justify-end items-center gap-1">
+                <span className="text-sm">Prompt</span>
                 <ChevronRight size={15} strokeWidth={1.5} />
               </div>
             </div>

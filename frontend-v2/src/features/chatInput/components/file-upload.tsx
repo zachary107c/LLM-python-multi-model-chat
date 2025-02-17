@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageUploadButton } from "@/features/imageUpload/components/image-upload-button";
 import { X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface FileUploadProps {
   imageName: string | null;
@@ -18,31 +19,28 @@ export function FileUpload({
   handleOuterClear,
   previewUrl,
 }: FileUploadProps) {
+  const { toast } = useToast();
+
+
   const handleFileValidation = (file: File | null) => {
     if (!file) {
       onFileChange(null);
       return;
     }
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image must be less than 5MB");
+    if (file.size > 30 * 1024 * 1024) {
+      toast({title: "Image Too Large", description: "Image must be less than 30MB", variant: "destructive"});
       return;
     }
 
-    // Check file type
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic"];
     if (!allowedTypes.includes(file.type)) {
-      alert("File must be an image (JPG, PNG, WebP, HEIC) or GIF");
+      toast({title: "Invalid image file type", description: "File must be an image (JPG, PNG, WebP, HEIC) or GIF", variant: "destructive"});
       return;
     }
 
-    // Create preview URL
     const reader = new FileReader();
     reader.onload = () => {
-      const blobUrl = URL.createObjectURL(
-        new Blob([reader.result as ArrayBuffer], { type: file.type })
-      );
       onFileChange(file);
     };
     reader.readAsArrayBuffer(file);
@@ -62,17 +60,18 @@ export function FileUpload({
       )}
       {imageName && (
         <div>
-          <Badge variant="outline" className="ml-2 p-0">
-            <div className="w-full flex justify-between items-center ml-2">
-              <span className="text-sm font-light">
+          <Badge variant="outline" className="px-1 py-0">
+            <div className="w-full flex justify-between items-center gap-1">
+              <span className="text-xs">
                 {imageName}
               </span>
               <Button
                 size="sm"
-                variant="ghost"
+                variant="ghostNoHover"
                 onClick={handleOuterClear}
+                className="p-0 w-2"
               >
-                <X size={10} className=""/>
+                <X size={6}className="p-0 m-0"/>
               </Button>
             </div>
           </Badge>

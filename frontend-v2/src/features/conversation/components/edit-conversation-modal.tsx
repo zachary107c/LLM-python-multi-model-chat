@@ -76,7 +76,7 @@ export function EditConversationModal({
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className="p-2 w-full flex justify-start hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="p-2 w-full flex justify-start"
         >
           <Pencil size={15} className="mr-2" />
           <span className="w-full text-left">Edit Conversation</span>

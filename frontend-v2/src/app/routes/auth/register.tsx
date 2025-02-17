@@ -9,7 +9,7 @@ export const RegisterRoute = () => {
   const redirectTo = searchParams.get('redirectTo');
 
   return (
-    <AuthLayout title="Register your account">
+    <AuthLayout>
       <RegisterForm
         onSuccess={() => {
           navigate(

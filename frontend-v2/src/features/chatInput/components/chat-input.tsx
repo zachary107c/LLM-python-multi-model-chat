@@ -1,12 +1,20 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useState, useCallback, useEffect } from "react";
 import { BaseModelEntity } from "@/types/api";
-import { Rocket, Folder } from "lucide-react";
+import { RocketIcon, LightbulbIcon, LightbulbOffIcon } from "lucide-react";
 import { ModelSelect } from "@/features/model/components/model-select";
 import { FileUpload } from "./file-upload";
+import { TbTools, TbToolsOff } from "react-icons/tb";
 
 interface Props {
   onSendMessage: (message: string, useTools: boolean) => void;
@@ -52,7 +60,7 @@ export function ChatInput({
 
   const handleKeyDown = (event: any) => {
     if (event.shiftKey && event.key === "Enter") {
-      setTextAreaHeight(Math.min(textAreaHeight + 24, 240)); // Limit expansion to 240px
+      setTextAreaHeight(Math.min(textAreaHeight + 24, 240));
     } else if (event.key === "Enter") {
       event.preventDefault();
       onSendMessage(newMessage, useTools);
@@ -96,9 +104,9 @@ export function ChatInput({
   }, []);
 
   return (
-    <div className='chat-input mb-2 flex flex-col w-full'>
+    <div className="chat-input mb-2 flex flex-col w-full">
       <form onSubmit={handleSendMessage} className="flex justify-between">
-        <Card className='w-full p-2 bg-sidebar shadow-none rounded-lg'>
+        <Card className="w-full p-2 bg-sidebar shadow-none rounded-lg">
           <div className={`flex justify-between items-center h-full`}>
             <div className="flex flex-col w-full">
               <Textarea
@@ -109,42 +117,41 @@ export function ChatInput({
                 onKeyDown={handleKeyDown}
                 style={{ height: `${textAreaHeight}px` }}
               />
-              <div className="flex justify-between items-center">
-                <div className="mr-2">
-                  <div className="flex items-center">
-                    <ModelSelect
-                      selectedModel={selectedModel}
-                      models={models}
-                      modelsLoading={modelsLoading}
-                      onModelChange={handleModelChange}
-                    />
-                    {/* <div className="ml-2 flex items-center">
-                      <span className="mr-1 text-sm">
-                        Use Tools
-                      </span>
-                      <Switch
-                        checked={useTools}
-                        onCheckedChange={handleUseToolsToggled}
-                        className="bg-background"
-                      />
-                    </div> */}
-                    <div className="ml-2">
-                      <Button variant="ghost" className="m-1 p-0">
-                        <Folder size={15} strokeWidth={1.5} />
-                      </Button>
-                    </div>
-                    <FileUpload
-                      imageName={imageName}
-                      onFileChange={handleFileChange}
-                      onClear={handleClear}
-                      handleOuterClear={handleClear}
-                      previewUrl={previewUrl}
-                    />
-                  </div>
+              <div className="flex justify-between items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <ModelSelect
+                    selectedModel={selectedModel}
+                    models={models}
+                    modelsLoading={modelsLoading}
+                    onModelChange={handleModelChange}
+                  />
+                  <Tooltip>
+                    <TooltipTrigger
+                      asChild
+                      onClick={handleUseToolsToggled}
+                      className="hover:cursor-pointer"
+                    >
+                      {useTools ? (
+                        <LightbulbIcon size={15} />
+                      ) : (
+                        <LightbulbOffIcon size={15} />
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {useTools ? <p>Disable Tools</p> : <p>Enable Tools</p>}
+                    </TooltipContent>
+                  </Tooltip>
+                  <FileUpload
+                    imageName={imageName}
+                    onFileChange={handleFileChange}
+                    onClear={handleClear}
+                    handleOuterClear={handleClear}
+                    previewUrl={previewUrl}
+                  />
                 </div>
                 <Button type="submit" variant="default" size="sm">
                   <span className="text-sm">Submit</span>
-                  <Rocket size={15} />
+                  <RocketIcon size={15} />
                 </Button>
               </div>
             </div>

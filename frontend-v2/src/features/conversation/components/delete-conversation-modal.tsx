@@ -4,8 +4,6 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
@@ -29,7 +27,7 @@ export function DeleteConversationModal({
       await deleteMutation.mutateAsync({
         data: { conversationId: conversationId },
       });
-      if (searchParams.get("conversationId") === conversationId) {
+      if (searchParams.get("c") === conversationId) {
         setSearchParams({});
       }
     } catch (e) {
@@ -40,7 +38,10 @@ export function DeleteConversationModal({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" className="p-2 w-full flex justify-start text-destructive">
+        <Button
+          variant="ghost"
+          className="p-2 w-full flex justify-start text-destructive hover:text-destructive"
+        >
           <Trash2 size={15} className="mr-2" />
           <span className="text-left">
             Delete Conversation
@@ -58,8 +59,13 @@ export function DeleteConversationModal({
               Cancel
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>
-              <span>Delete Conversation</span>
+          <AlertDialogAction onClick={handleDelete} asChild>
+            <Button
+              className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
+              size="sm"
+            >
+              Delete Conversation
+            </Button>
           </AlertDialogAction>
         </div>
       </AlertDialogContent>

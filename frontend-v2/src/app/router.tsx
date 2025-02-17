@@ -5,7 +5,7 @@ import { RouterProvider } from 'react-router/dom';
 
 import { ProtectedRoute } from '@/lib/auth';
 
-import { AppRoot } from '@/app/routes/root';
+import { AppRoot } from '@/app/routes/app/root';
 
 export const createAppRouter = (_queryClient: QueryClient) =>
   createBrowserRouter([

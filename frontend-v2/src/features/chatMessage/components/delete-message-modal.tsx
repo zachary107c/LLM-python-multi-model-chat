@@ -4,8 +4,6 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
@@ -32,7 +30,7 @@ export function DeleteMessageModal({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" className="mx-1 px-1 py-0 my-0">
+        <Button variant="ghostNoHover" className="m-0 p-0">
           <Trash2Icon />
         </Button>
       </AlertDialogTrigger>
@@ -43,13 +41,13 @@ export function DeleteMessageModal({
         </AlertDialogDescription>
 
         <div className="flex gap-3 mt-4 justify-between">
-        <AlertDialogCancel>
-            <Button variant="default">
+          <AlertDialogCancel asChild>
+            <Button variant="secondary" size="sm">
               Cancel
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction>
-            <Button variant="default" className="bg-red-500" onClick={handleDelete}>
+          <AlertDialogAction asChild className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90">
+            <Button size="sm" onClick={handleDelete}>
               Delete Message
             </Button>
           </AlertDialogAction>

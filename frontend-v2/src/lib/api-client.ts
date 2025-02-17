@@ -72,23 +72,26 @@ class ApiClient {
   private async handleResponse(response: Response) {
     if (!response.ok) {
       let errorMessage = 'Network response was not ok';
-      let errorData;
-
+      let errorData: any = {};
+  
       try {
         errorData = await response.json();
         errorMessage = errorData.message || errorData.detail || errorMessage;
       } catch (e) {
         errorMessage = response.statusText || errorMessage;
       }
-
+  
+      // Handle Unauthorized Access (401)
       if (response.status === 401) {
-        console.log("401 status recieved, redirecting to login.");
+        console.log("401 status received, redirecting to login.");
         const searchParams = new URLSearchParams(window.location.search);
         const redirectTo = searchParams.get('redirectTo') || window.location.pathname;
         window.location.href = '/login';
       }
 
-      throw new Error(errorMessage);
+      const error = new Error(errorMessage);
+      (error as any).response = { status: response.status, data: errorData };
+      throw error;
     }
     return response;
   }
@@ -123,16 +126,16 @@ class ApiClient {
     try {
       console.log('POST Request Data:', data);
       console.log('Making POST request to:', endpoint, 'with data:', data);
-
+  
       // Determine if the data is FormData
       const isFormData = data instanceof FormData;
-
+  
       // Don't set Content-Type for FormData, let the browser handle it
       const headers = this.getHeaders(config);
       if (isFormData) {
         headers.delete('Content-Type');
       }
-
+  
       const response = await fetch(this.getFullURL(endpoint), {
         method: 'POST',
         headers: headers,
@@ -140,27 +143,21 @@ class ApiClient {
         // Don't stringify if it's FormData
         body: isFormData ? data : JSON.stringify(data),
       });
-
+  
       console.log('POST Response:', response);
-
-      if (!response.ok) {
-        console.error('Response status:', response.status);
-        console.error('Response headers:', Object.fromEntries(response.headers));
-        const errorText = await response.text();
-        console.error('Response body:', errorText);
-        throw new Error(response.statusText || 'Network response was not ok');
-      }
-
+  
+      await this.handleResponse(response);
+  
       if (config.headers?.Accept === 'text/event-stream') {
         return response.body as unknown as T;
       }
-
+  
       // Handle empty responses (like from logout endpoint)
       const contentLength = response.headers.get('content-length');
       if (contentLength === '0' || response.status === 204) {
         return null as T;
       }
-
+  
       try {
         return await response.json();
       } catch (error) {

@@ -7,7 +7,6 @@ import { createUserMessage } from "@/features/chatMessage/api/create-user-messag
 import { createAssistantMessage } from "@/features/chatMessage/api/create-assistant-message";
 import { updateConversationMutation } from "@/features/conversation/api/update-conversation";
 import { useGetConversationQuery } from "@/features/conversation/api/get-conversation";
-import { AlertCircle } from "lucide-react";
 import { HashLoader } from "react-spinners";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
 import { useGetModelsQuery } from "@/features/model/api/get-models";
@@ -21,18 +20,15 @@ import {
   Message,
   Suggestion,
 } from "@/types/api";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Welcome } from "@/features/suggestions/components/welcome";
 import { WelcomeLoading } from "@/features/suggestions/components/welcome-loading";
 import { useGetSuggestionsQuery } from "../../suggestions/api/get-three-suggestions";
 import { useSearchParams } from "react-router-dom";
 import { useUser } from "@/lib/auth";
-import { useToast } from "@/hooks/use-toast";
 import { useConversationId } from "@/features/conversation/contexts/conversationContext";
+import { useToast } from "@/hooks/use-toast";
 
-
-export function Chat() {
-  const { toast } = useToast();
+export function ChatArea() {
   const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>(
     []
   );
@@ -59,6 +55,8 @@ export function Chat() {
   const ref = useScrollToEnd(messages);
 
   const queryClient = useQueryClient();
+
+  const { toast } = useToast();
 
   useEffect(() => {
     if (data) {
@@ -131,13 +129,20 @@ export function Chat() {
   useEffect(() => {
     if (conversationId) {
       console.log("conversation id changed!", conversationId);
-      queryClient.invalidateQueries({ queryKey: ["conversation", conversationId] });
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", conversationId],
+      });
     }
   }, [conversationId]);
 
   useEffect(() => {
     if (error) {
-      toast({ title: "Error", description: "Failed to get conversation!" });
+      toast({
+        title: "Conversation Error",
+        description: "Failed to load messages for conversation.",
+        variant: "destructive",
+      });
+      setConversationId("");
       setSearchParams({});
     }
   }, [error]);
@@ -437,6 +442,11 @@ export function Chat() {
         }
       } catch (error) {
         console.error(error);
+        toast({
+          title: "Chat Error",
+          description: `Failed to Chat with the AI: ${error}`,
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -451,16 +461,7 @@ export function Chat() {
             <HashLoader color="#484848" size={200} />
           </div>
         )}
-        <div className="h-full w-full pt-4 overflow-x-hidden overflow-y-scroll no-scrollbar">
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>
-                Failed to get conversation {conversationId}: {error.message}
-              </AlertDescription>
-            </Alert>
-          )}
+        <div className="h-full w-full pt-4 overflow-y-scroll no-scrollbar">
           {(!messages || messages.length == 0) &&
             suggestionsLoading &&
             !conversationLoading && <WelcomeLoading />}
@@ -502,6 +503,9 @@ export function Chat() {
           models={models}
           modelsLoading={modelsLoading}
         />
+        <div className="w-full flex justify-center items-center">
+          <span className="text-muted-foreground text-xs italic">AI can make mistakes. Check important information.</span>
+        </div>
       </div>
     </div>
   );

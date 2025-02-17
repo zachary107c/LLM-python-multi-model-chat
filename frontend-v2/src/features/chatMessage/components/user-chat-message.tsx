@@ -38,7 +38,7 @@ export function UserChatMessage({
         <Card className="w-fit flex flex-col p-2 bg-secondary shadow-none rounded-md">
           <div>
             <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
-              <span className="text-sm">
+              <span className="text-sm text-left w-fit">
                 <MarkdownRenderer
                   content={localizeUTCDates(userMessageData.content)}
                 />
