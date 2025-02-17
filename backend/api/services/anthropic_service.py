@@ -52,8 +52,8 @@ class AnthropicService(BaseLLMService):
             response: Completion = self.client.messages.create(
                 model=model, messages=messages, max_tokens=4096
             )
-
-            response_json = response.model_dump_json()
+            response_json = response.model_dump()
+            response_json["message"] = {"content": response_json["content"][0]["text"]}
             return response_json
         except Exception as e:
             self.logger.error(f"Anthropic API request failed: {e}")
