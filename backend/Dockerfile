@@ -34,6 +34,7 @@ RUN python manage.py collectstatic --noinput && \
     python manage.py migrate && \
     python manage.py populate_ollama_models && \
     python manage.py populate_openai_models && \
+    python manage.py populate_anthropic_models && \
     python manage.py update_fixtures && \
     python manage.py createsuperuser --noinput && \
     python manage.py loaddata tools_fixture.json

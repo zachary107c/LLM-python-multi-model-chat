@@ -242,7 +242,7 @@ export function ChatArea() {
 
       const image_data = await toDataURL(userPostData.image);
       const payload = {
-        model: model?.name,
+        model: model?.model,
         provider: model?.provider,
         conversation: currentChatId,
         useTools: useTools,

@@ -175,11 +175,8 @@ class StreamChatAPIView(APIView):
                                 {"message": chunk},
                                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             )
-                        if provider == "ollama":
-                            data = f"data: {json.dumps(chunk)}\n\n"
-                        else:
-                            data = f"data: {json.dumps(chunk)}\n\n"
-                        
+
+                        data = f"data: {json.dumps(chunk)}\n\n"
                         yield data.encode("utf-8")
 
             response = StreamingHttpResponse(

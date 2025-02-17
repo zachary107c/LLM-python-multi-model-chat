@@ -35,9 +35,7 @@ class Command(BaseCommand):
         data = response.json()
 
         for model_data in data.get("models", []):
-            name = model_data.get("name")
-            model = model_data.get("model")
-
+            print(name, model)
             if name and model:
                 obj, created = Model.objects.update_or_create(
                     name=name,

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BaseModelEntity } from "@/types/api";
 import { ChevronsUpDown, TextSearchIcon, BotIcon } from "lucide-react";
-import { SiOllama, SiOpenai } from "react-icons/si";
+import { SiOllama, SiOpenai, SiAnthropic } from "react-icons/si";
 
 interface ModelSelectProps {
   selectedModel: BaseModelEntity | null;
@@ -20,7 +20,7 @@ interface ModelSelectProps {
   onModelChange: (model: BaseModelEntity) => void;
 }
 
-type ProviderType = "ollama" | "openai";
+type ProviderType = "ollama" | "openai" | "anthropic";
 
 export function ModelSelect({
   selectedModel,
@@ -59,6 +59,7 @@ export function ModelSelect({
   const PROVIDER_ICONS: Record<string, JSX.Element> = {
     ollama: <SiOllama />,
     openai: <SiOpenai />,
+    anthropic: <SiAnthropic />,
   };
 
   return (
@@ -117,7 +118,7 @@ export function ModelSelect({
                       {PROVIDER_ICONS[provider as ProviderType] || <BotIcon />}
                     </Badge>
                     <span className="text-left text-sm font-normal truncate ml-2">
-                      {model.model}
+                      {model.name}
                     </span>
                   </DropdownMenuItem>
                 ))}

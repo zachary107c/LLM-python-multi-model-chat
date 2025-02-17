@@ -11,7 +11,7 @@ import GenerateNewMessageButton from "./generate-new-message-button";
 import { Button } from "@/components/ui/button";
 import { UndoDeleteAssistantMessageButton } from "./undo-delete-assistant-message.button";
 import { Avatar } from "@/components/ui/avatar";
-import { SiOllama, SiOpenai } from "react-icons/si";
+import { SiOllama, SiOpenai, SiAnthropic } from "react-icons/si";
 
 function localizeUTCDates(text: string) {
   const utcDatePattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z/g;
@@ -87,9 +87,10 @@ export function AssistantChatMessage({
   const PROVIDER_ICONS: Record<string, JSX.Element> = {
     ollama: <SiOllama color="hsl(var(--primary-foreground))"/>,
     openai: <SiOpenai color="hsl(var(--primary-foreground))"/>,
+    anthropic: <SiAnthropic color="hsl(var(--primary-foreground))"/>,
   };
 
-  type ProviderType = "ollama" | "openai";
+  type ProviderType = "ollama" | "openai" | "anthropic";
 
   return (
     <div className="flex items-start gap-2 mb-2">
@@ -104,7 +105,7 @@ export function AssistantChatMessage({
             <span className="text-xs text-primary font-bold">
               {assistantMessageData.model.name}
             </span>
-            <span className="font-light text-xs">
+            <span className="text-xs">
               {new Date(assistantMessageData.created_at).toLocaleDateString(
                 "en-US",
                 {
