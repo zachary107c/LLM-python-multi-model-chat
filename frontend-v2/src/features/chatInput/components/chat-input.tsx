@@ -1,12 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useState, useCallback, useEffect } from "react";
@@ -14,7 +11,6 @@ import { BaseModelEntity } from "@/types/api";
 import { RocketIcon, LightbulbIcon, LightbulbOffIcon } from "lucide-react";
 import { ModelSelect } from "@/features/model/components/model-select";
 import { FileUpload } from "./file-upload";
-import { TbTools, TbToolsOff } from "react-icons/tb";
 
 interface Props {
   onSendMessage: (message: string, useTools: boolean) => void;
