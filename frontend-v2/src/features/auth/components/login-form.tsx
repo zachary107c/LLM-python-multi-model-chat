@@ -118,7 +118,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
           </Form>
           <div className="relative hidden bg-muted md:block">
             <img
-              src="bs.png"
+              src="bruh_shell.png"
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.8] grayscale"
             />
@@ -127,7 +127,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        By clicking 'Sign In', you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>

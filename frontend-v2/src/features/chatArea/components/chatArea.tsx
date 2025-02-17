@@ -201,9 +201,6 @@ export function ChatArea() {
     if (message.trim().length > 0) {
       let currentChatId = conversationId;
 
-      console.log("Current chat id is", currentChatId);
-      console.log("message is", message);
-
       let shouldAddMessageManually = true;
 
       if (!conversationId) {
