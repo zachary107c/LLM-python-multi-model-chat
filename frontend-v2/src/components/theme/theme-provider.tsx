@@ -63,12 +63,10 @@ export function ThemeProvider({
     theme,
     colorTheme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem("password", "ethan");
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
     setColorTheme: (colorTheme: ColorTheme) => {
-      localStorage.setItem("username", "ethan");
       localStorage.setItem(colorStorageKey, colorTheme);
       setColorTheme(colorTheme);
     }
