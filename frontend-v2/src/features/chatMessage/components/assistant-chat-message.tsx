@@ -157,13 +157,13 @@ export function AssistantChatMessage({
 
               {variations.length > 1 && streamingContent === null && (
                 <div className="flex justify-end text-center items-center">
-                  <Button onClick={handlePrevious} variant="ghost">
+                  <Button onClick={handlePrevious} variant="ghostNoHover">
                     <ChevronLeftIcon />
                   </Button>
                   <span className="text-sm font-light">
                     {currentVariationIndex + 1}
                   </span>
-                  <Button onClick={handleNext} variant="ghost">
+                  <Button onClick={handleNext} variant="ghostNoHover">
                     <ChevronRightIcon />
                   </Button>
                 </div>

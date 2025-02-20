@@ -267,6 +267,17 @@ export function ChatArea() {
             },
           };
           payload.messages[0].content = [text_part, image_part];
+        } else if (model?.provider === "anthropic") {
+          let text_part = { type: "text", text: message };
+          let image_part = {
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: image_data.type,
+              data: image_data.base64
+            },
+          };
+          payload.messages[0].content = [text_part, image_part];
         }
       } else {
         payload.messages[0].content = message;
