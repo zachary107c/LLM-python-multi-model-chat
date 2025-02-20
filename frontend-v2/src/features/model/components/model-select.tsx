@@ -88,7 +88,7 @@ export function ModelSelect({
         className="max-h-[30vh] overflow-y-auto p-0"
         style={{ width: "250px" }} // Set a fixed width
       >
-        <div className="sticky top-0 z-10 bg-popover px-1 py-2">
+        <div className="sticky top-0 z-10 bg-popover p-2">
           <div className="flex items-center rounded">
             <TextSearchIcon color="hsl(var(--primary))" size={15} />
             <Input

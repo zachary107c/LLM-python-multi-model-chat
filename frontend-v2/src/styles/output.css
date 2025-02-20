@@ -1682,10 +1682,6 @@ body {
   height: 100svh;
 }
 
-.h-48 {
-  height: 12rem;
-}
-
 .max-h-96 {
   max-height: 24rem;
 }
@@ -1862,10 +1858,6 @@ body {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-6 {
-  width: 1.5rem;
 }
 
 .min-w-0 {
@@ -2281,11 +2273,6 @@ body {
 .rounded-t-md {
   border-top-left-radius: calc(var(--radius) - 2px);
   border-top-right-radius: calc(var(--radius) - 2px);
-}
-
-.rounded-t-lg {
-  border-top-left-radius: var(--radius);
-  border-top-right-radius: var(--radius);
 }
 
 .rounded-tl-sm {
@@ -3014,10 +3001,6 @@ body {
 
 .outline {
   outline-style: solid;
-}
-
-.outline-primary {
-  outline-color: hsl(var(--primary));
 }
 
 .ring-0 {
