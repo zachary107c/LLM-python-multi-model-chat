@@ -69,7 +69,7 @@ const GenerateNewMessageButton: React.FC<{
         : null;
 
       const payload = {
-        model: assistantMessage.model?.id,
+        model: assistantMessage.model?.model,
         provider: assistantMessage.model?.provider,
         conversation: assistantMessage.conversation,
         messages: [
