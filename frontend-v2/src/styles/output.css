@@ -2685,6 +2685,10 @@ body {
   padding-left: 0.625rem;
 }
 
+.pl-3 {
+  padding-left: 0.75rem;
+}
+
 .pl-4 {
   padding-left: 1rem;
 }

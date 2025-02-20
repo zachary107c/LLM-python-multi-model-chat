@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { UndoDeleteAssistantMessageButton } from "./undo-delete-assistant-message.button";
 import { Avatar } from "@/components/ui/avatar";
 import { SiOllama, SiOpenai, SiAnthropic } from "react-icons/si";
+import { MoonLoader } from "react-spinners";
 
 function localizeUTCDates(text: string) {
   const utcDatePattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z/g;

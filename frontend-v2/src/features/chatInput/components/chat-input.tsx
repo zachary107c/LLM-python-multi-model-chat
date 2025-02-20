@@ -11,6 +11,7 @@ import { BaseModelEntity } from "@/types/api";
 import { RocketIcon, LightbulbIcon, LightbulbOffIcon } from "lucide-react";
 import { ModelSelect } from "@/features/model/components/model-select";
 import { FileUpload } from "./file-upload";
+import { PulseLoader } from "react-spinners";
 
 interface Props {
   onSendMessage: (message: string, useTools: boolean) => void;
@@ -100,7 +101,8 @@ export function ChatInput({
   }, []);
 
   return (
-    <div className="chat-input mb-2 flex flex-col w-full">
+    <div className="chat-input mb-2 flex flex-col w-full gap-2">
+      {isLoading && <div className="absolute pl-3 pt-1 flex items-center justify-start gap-1 bg-transparent"><span className="text-xs text-muted-foreground italic">{selectedModel?.name} thinking</span><PulseLoader color="hsl(var(--primary))" size={3}/></div>}
       <form onSubmit={handleSendMessage} className="flex justify-between">
         <Card className="w-full p-2 bg-sidebar shadow-none rounded-lg">
           <div className={`flex justify-between items-center h-full`}>
@@ -112,6 +114,7 @@ export function ChatInput({
                 placeholder="Type your message here"
                 onKeyDown={handleKeyDown}
                 style={{ height: `${textAreaHeight}px` }}
+                disabled={isLoading}
               />
               <div className="flex justify-between items-center gap-2">
                 <div className="flex items-center gap-2">
