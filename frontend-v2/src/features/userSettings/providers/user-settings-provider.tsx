@@ -68,9 +68,6 @@ import React, {
     useEffect(() => {
       if (fetchedSettings) {
         setUserSettingsData(fetchedSettings);
-        const theme = fetchedSettings.settings.theme || "light";
-        applyTheme(theme);
-        localStorage.setItem("theme", theme);
       }
     }, [fetchedSettings]);
   

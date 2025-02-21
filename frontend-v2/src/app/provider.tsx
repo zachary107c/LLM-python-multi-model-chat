@@ -6,6 +6,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { UserSettingsProvider } from "@/features/userSettings/providers/user-settings-provider";
 import { MainErrorFallback } from "@/components/errors/main";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthLoader } from "@/lib/auth";
@@ -38,17 +39,19 @@ export const AppProvider = ({ children }: AppProviderProps) => {
             <SidebarProvider>
               <TooltipProvider>
                 <QueryClientProvider client={queryClient}>
-                  {import.meta.env.DEV && <ReactQueryDevtools />}
-                  <Toaster />
-                  <AuthLoader
-                    renderLoading={() => (
-                      <div className="flex h-screen w-screen items-center justify-center">
-                        <HashLoader size={200} />
-                      </div>
-                    )}
-                  >
-                    {children}
-                  </AuthLoader>
+                  <UserSettingsProvider>
+                    {import.meta.env.DEV && <ReactQueryDevtools />}
+                    <Toaster />
+                    <AuthLoader
+                      renderLoading={() => (
+                        <div className="flex h-screen w-screen items-center justify-center">
+                          <HashLoader size={200} />
+                        </div>
+                      )}
+                    >
+                      {children}
+                    </AuthLoader>
+                  </UserSettingsProvider>
                 </QueryClientProvider>
               </TooltipProvider>
             </SidebarProvider>

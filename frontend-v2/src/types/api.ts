@@ -1,3 +1,5 @@
+import * as z from "zod";
+
 export type BaseEntity = {
     id: string;
     created_at: string;
@@ -183,4 +185,4 @@ export type Suggestions = {
 export type Provider = {
   id: number;
   name: string;
-}
+};

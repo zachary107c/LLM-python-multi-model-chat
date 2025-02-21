@@ -73,14 +73,14 @@ class ApiClient {
     if (!response.ok) {
       let errorMessage = 'Network response was not ok';
       let errorData: any = {};
-  
+
       try {
         errorData = await response.json();
         errorMessage = errorData.message || errorData.detail || errorMessage;
       } catch (e) {
         errorMessage = response.statusText || errorMessage;
       }
-  
+
       // Handle Unauthorized Access (401)
       if (response.status === 401) {
         console.log("401 status received, redirecting to login.");
@@ -126,16 +126,16 @@ class ApiClient {
     try {
       console.log('POST Request Data:', data);
       console.log('Making POST request to:', endpoint, 'with data:', data);
-  
+
       // Determine if the data is FormData
       const isFormData = data instanceof FormData;
-  
+
       // Don't set Content-Type for FormData, let the browser handle it
       const headers = this.getHeaders(config);
       if (isFormData) {
         headers.delete('Content-Type');
       }
-  
+
       const response = await fetch(this.getFullURL(endpoint), {
         method: 'POST',
         headers: headers,
@@ -143,21 +143,21 @@ class ApiClient {
         // Don't stringify if it's FormData
         body: isFormData ? data : JSON.stringify(data),
       });
-  
+
       console.log('POST Response:', response);
-  
+
       await this.handleResponse(response);
-  
+
       if (config.headers?.Accept === 'text/event-stream') {
         return response.body as unknown as T;
       }
-  
+
       // Handle empty responses (like from logout endpoint)
       const contentLength = response.headers.get('content-length');
       if (contentLength === '0' || response.status === 204) {
         return null as T;
       }
-  
+
       try {
         return await response.json();
       } catch (error) {
@@ -173,27 +173,96 @@ class ApiClient {
     }
   }
 
-  async put<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await fetch(this.getFullURL(endpoint), {
-      method: 'PUT',
-      headers: authRequestHeaders(),
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
+  async put<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
+    try {
+      console.log('PUT Request Data:', data);
+      console.log('Making PUT request to:', endpoint, 'with data:', data);
 
-    await this.handleResponse(response);
-    return response.json();
+      // Determine if the data is FormData
+      const isFormData = data instanceof FormData;
+
+      // Don't set Content-Type for FormData, let the browser handle it
+      const headers = this.getHeaders(config);
+      if (isFormData) {
+        headers.delete('Content-Type');
+      }
+
+      const response = await fetch(this.getFullURL(endpoint), {
+        method: 'PUT',
+        headers: headers,
+        credentials: 'include',
+        body: isFormData ? data : JSON.stringify(data),
+      });
+
+      console.log('PUT Response:', response);
+
+      await this.handleResponse(response);
+
+      // Handle empty responses
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0' || response.status === 204) {
+        return null as T;
+      }
+
+      try {
+        return await response.json();
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          // If response is empty or not JSON, return null
+          return null as T;
+        }
+        throw error;
+      }
+    } catch (error) {
+      console.error('API Client Error:', error);
+      throw error;
+    }
   }
 
-  async patch<T>(endpoint: string, data?: unknown): Promise<T> {
-    const response = await fetch(this.getFullURL(endpoint), {
-      method: 'PATCH',
-      headers: authRequestHeaders(),
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
-    await this.handleResponse(response);
-    return response.json();
+  async patch<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
+    try {
+      console.log('PATCH Request Data:', data);
+      console.log('Making PATCH request to:', endpoint, 'with data:', data);
+
+      // Determine if the data is FormData
+      const isFormData = data instanceof FormData;
+
+      // Don't set Content-Type for FormData, let the browser handle it
+      const headers = this.getHeaders(config);
+      if (isFormData) {
+        headers.delete('Content-Type');
+      }
+
+      const response = await fetch(this.getFullURL(endpoint), {
+        method: 'PATCH',
+        headers: headers,
+        credentials: 'include',
+        body: isFormData ? data : JSON.stringify(data),
+      });
+
+      console.log('PATCH Response:', response);
+
+      await this.handleResponse(response);
+
+      // Handle empty responses
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0' || response.status === 204) {
+        return null as T;
+      }
+
+      try {
+        return await response.json();
+      } catch (error) {
+        if (error instanceof SyntaxError) {
+          // If response is empty or not JSON, return null
+          return null as T;
+        }
+        throw error;
+      }
+    } catch (error) {
+      console.error('API Client Error:', error);
+      throw error;
+    }
   }
 
   async delete<T>(endpoint: string, data?: unknown): Promise<T> {

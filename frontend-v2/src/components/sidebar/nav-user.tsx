@@ -21,6 +21,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "../theme/components/theme-toggle";
 import { User } from "@/types/api";
+import { Button } from "../ui/button";
+import { useConversationId } from "@/features/conversation/contexts/conversationContext";
 
 export function NavUser({ user }: { user: User | undefined | null }) {
   const { isMobile } = useSidebar();
@@ -30,10 +32,11 @@ export function NavUser({ user }: { user: User | undefined | null }) {
   const logout = useLogout();
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
+  const { conversationId, setConversationId } = useConversationId();
 
   const handleLogout = async () => {
     try {
-      navigate("logged-out", { replace: true});
+      navigate("logged-out", { replace: true });
       await logout.mutateAsync(undefined);
     } catch (error) {
       console.error("Logout failed:", error);
@@ -67,7 +70,14 @@ export function NavUser({ user }: { user: User | undefined | null }) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+              <Button
+                className="flex items-center gap-2 px-1 py-1.5 text-left text-sm"
+                variant="ghost"
+                onClick={() =>{ 
+                  setConversationId("");
+                  navigate('/profile');
+                }}
+              >
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
                     src={user?.profile?.image}
@@ -81,7 +91,7 @@ export function NavUser({ user }: { user: User | undefined | null }) {
                   </span>
                   <span className="truncate text-xs">{user?.email}</span>
                 </div>
-              </div>
+              </Button>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

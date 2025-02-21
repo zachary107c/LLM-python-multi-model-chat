@@ -1,8 +1,9 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ImageUploadButton } from "@/features/imageUpload/components/image-upload-button";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCallback, useEffect } from "react";
+import type { ClipboardEvent as ReactClipboardEvent } from "react";
 
 interface FileUploadProps {
   imageName: string | null;
@@ -21,7 +22,6 @@ export function FileUpload({
 }: FileUploadProps) {
   const { toast } = useToast();
 
-
   const handleFileValidation = (file: File | null) => {
     if (!file) {
       onFileChange(null);
@@ -29,13 +29,27 @@ export function FileUpload({
     }
 
     if (file.size > 30 * 1024 * 1024) {
-      toast({title: "Image Too Large", description: "Image must be less than 30MB", variant: "destructive"});
+      toast({
+        title: "Image Too Large",
+        description: "Image must be less than 30MB",
+        variant: "destructive",
+      });
       return;
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/heic",
+    ];
     if (!allowedTypes.includes(file.type)) {
-      toast({title: "Invalid image file type", description: "File must be an image (JPG, PNG, WebP, HEIC) or GIF", variant: "destructive"});
+      toast({
+        title: "Invalid image file type",
+        description: "File must be an image (JPG, PNG, WebP, HEIC) or GIF",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -46,10 +60,35 @@ export function FileUpload({
     reader.readAsArrayBuffer(file);
   };
 
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (const item of items) {
+        if (item.type.startsWith("image/")) {
+          const file = item.getAsFile();
+          if (file) {
+            e.preventDefault();
+            handleFileValidation(file);
+            break;
+          }
+        }
+      }
+    };
+
+    document.addEventListener("paste", handlePaste);
+
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, []);
+
   return (
-    <>
+    <div className="relative h-8">
+      {" "}
       {imageName ? null : (
-        <div>
+        <div className="absolute top-0 left-0">
           <ImageUploadButton
             fileName={imageName}
             onFileChange={handleFileValidation}
@@ -58,25 +97,27 @@ export function FileUpload({
           />
         </div>
       )}
-      {imageName && (
-        <div>
-          <Badge variant="outline" className="px-1 py-0">
-            <div className="w-full flex justify-between items-center gap-1">
-              <span className="text-xs">
-                {imageName}
-              </span>
+      {imageName && previewUrl && (
+        <div className="absolute top-0 left-0 group">
+          <div className="w-8 h-8 rounded overflow-hidden">
+            <img
+              src={previewUrl}
+              alt={imageName}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Button
                 size="sm"
                 variant="ghostNoHover"
                 onClick={handleOuterClear}
-                className="p-0 w-2"
+                className="p-0"
               >
-                <X size={6}className="p-0 m-0"/>
+                <X size={12} className="text-white" />
               </Button>
             </div>
-          </Badge>
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

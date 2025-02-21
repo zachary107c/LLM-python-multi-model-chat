@@ -18,6 +18,8 @@ interface ModelSelectProps {
   models: BaseModelEntity[] | undefined;
   modelsLoading: boolean;
   onModelChange: (model: BaseModelEntity) => void;
+  className?: string;
+  variant?: "default" | "secondary"
 }
 
 type ProviderType = "ollama" | "openai" | "anthropic";
@@ -27,6 +29,8 @@ export function ModelSelect({
   models,
   modelsLoading,
   onModelChange,
+  className,
+  variant
 }: ModelSelectProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -53,6 +57,7 @@ export function ModelSelect({
   function mapProvider(provider: string) {
     if (provider === "ollama") return "Ollama";
     if (provider === "openai") return "OpenAI";
+    if (provider === "anthropic") return "Anthropic";
     return provider.charAt(0).toUpperCase() + provider.slice(1);
   }
 
@@ -66,9 +71,9 @@ export function ModelSelect({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="default"
+          variant={variant || "default"}
           size="sm"
-          className="flex justify-between pr-1"
+          className={`flex justify-between pr-1 ${className || ''}`}
         >
           {modelsLoading ? (
             <Skeleton className="w-[60px]" />

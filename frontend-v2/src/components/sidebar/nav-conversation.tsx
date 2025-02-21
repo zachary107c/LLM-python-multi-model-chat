@@ -1,4 +1,9 @@
-import { MessageSquarePlus, MessageSquare, ChevronRight } from "lucide-react";
+import {
+  MessageSquarePlus,
+  MessageSquare,
+  ChevronRight,
+  UserIcon,
+} from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -12,6 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
 
 import { ConversationHistory } from "@/features/conversation/components/conversation-history";
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
@@ -21,6 +27,7 @@ export function NavConversation() {
   const { open } = useSidebar();
   const { conversationId, setConversationId } = useConversationId();
   const createConversation = createConversationMutation();
+  const navigate = useNavigate();
 
   async function createNewConversation() {
     try {
@@ -39,9 +46,13 @@ export function NavConversation() {
   return (
     <SidebarGroup>
       <SidebarMenu>
-        <Button variant="default" onClick={async () => await createNewConversation()}>
-          {open && 'New Conversation' } <MessageSquarePlus />
+        <Button
+          variant="default"
+          onClick={async () => await createNewConversation()}
+        >
+          {open && "New Conversation"} <MessageSquarePlus />
         </Button>
+
         <Collapsible
           key="conversation-list"
           asChild

@@ -1,7 +1,7 @@
 import { configureAuth } from "react-query-auth";
 import { Navigate } from "react-router-dom";
 import { z } from "zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AuthResponse, RegisterAuthResponse, User } from "@/types/api";
 import { api } from "./api-client";
 
@@ -77,6 +77,24 @@ const authConfig = {
       console.error("Logout failed:", error);
     }
   },
+};
+
+export const useUpdateUserSettingsMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      data,
+    }: {
+      data: FormData;
+    }): Promise<User> => {
+      console.log(data);
+      return api.patch(`/user/`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["authenticated-user"] });
+    },
+  });
 };
 
 export const { useUser, useLogin, useLogout, useRegister, AuthLoader } =

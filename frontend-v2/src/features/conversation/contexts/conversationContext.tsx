@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 type ConversationContextType = {
   conversationId: string;
@@ -10,6 +10,8 @@ const ConversationContext = createContext<ConversationContextType | undefined>(u
 
 export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
   const [conversationId, setConversationId] = useState<string>(searchParams.get('c') || '');
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const handleSetConversationId = (id: string) => {
     setConversationId(id);
     setSearchParams({ c: id });
+    navigate(`/chat?c=${id}`);
   };
 
   return (
