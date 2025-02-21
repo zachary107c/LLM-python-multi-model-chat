@@ -18,15 +18,19 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme
   colorTheme: ColorTheme,
+  avatarOverlay: boolean,
   setTheme: (theme: Theme) => void,
   setColorTheme: (colorTheme: ColorTheme) => void
+  setAvatarOverlay: (overlay: boolean) => void
 }
 
 const initialState: ThemeProviderState = {
   theme: "system",
   colorTheme: "default",
+  avatarOverlay: true,
   setTheme: () => null,
   setColorTheme: () => null,
+  setAvatarOverlay: () => null,
 }
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
@@ -37,6 +41,7 @@ export function ThemeProvider({
   defaultColorTheme = "default",
   storageKey = "vite-ui-theme",
   colorStorageKey = "vite-ui-color-theme",
+
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
@@ -44,6 +49,10 @@ export function ThemeProvider({
   )
   const [colorTheme, setColorTheme] = useState<ColorTheme>(() => 
     (localStorage.getItem(colorStorageKey) as ColorTheme) || defaultColorTheme
+  );
+
+  const [avatarOverlay, setAvatarOverlay] = useState<boolean>(
+    () => localStorage.getItem("vite-ui-avatar-overlay") !== "false"
   );
 
   useEffect(() => {
@@ -62,6 +71,7 @@ export function ThemeProvider({
   const value = {
     theme,
     colorTheme,
+    avatarOverlay,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
@@ -69,6 +79,10 @@ export function ThemeProvider({
     setColorTheme: (colorTheme: ColorTheme) => {
       localStorage.setItem(colorStorageKey, colorTheme);
       setColorTheme(colorTheme);
+    },
+    setAvatarOverlay: (overlay: boolean) => {
+      localStorage.setItem("avatar-overlay", overlay.toString());
+      setAvatarOverlay(overlay);
     }
   }
 

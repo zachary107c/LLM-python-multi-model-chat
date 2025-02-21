@@ -1,4 +1,4 @@
-import { Moon, Sun, Laptop } from "lucide-react";
+import { Moon, Sun, Laptop, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,11 +7,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useTheme, Theme, ColorTheme } from "@/components/theme/theme-provider";
 
 interface ThemeToggleProps {
@@ -29,7 +24,7 @@ export function ThemeToggle({
   variant = "dropdown",
   onThemeSelect,
 }: ThemeToggleProps) {
-  const { setTheme, theme, setColorTheme, colorTheme } = useTheme();
+  const { setTheme, theme, setColorTheme, colorTheme, avatarOverlay, setAvatarOverlay } = useTheme();
 
   const handleThemeSelect = (newTheme: Theme, event: React.MouseEvent) => {
     event?.stopPropagation();
@@ -50,7 +45,7 @@ export function ThemeToggle({
     { key: "green", className: "bg-colorscheme-green", name: "Green" },
     { key: "blue", className: "bg-colorscheme-blue", name: "Blue" },
     { key: "yellow", className: "bg-colorscheme-yellow", name: "Yellow" },
-    { key: "violet", className: "bg-colorscheme-violet", name: "Violet"},
+    { key: "violet", className: "bg-colorscheme-violet", name: "Violet" },
   ];
 
   if (variant === "buttons") {
@@ -139,6 +134,17 @@ export function ThemeToggle({
             </Button>
           ))}
         </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => {
+            setAvatarOverlay(!avatarOverlay);
+            if (onThemeSelect) setTimeout(onThemeSelect, 0);
+          }}
+        >
+          <Image className="mr-2 h-4 w-4" />
+          Avatar Color Overlay
+          <div className="ml-auto">{avatarOverlay ? "On" : "Off"}</div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

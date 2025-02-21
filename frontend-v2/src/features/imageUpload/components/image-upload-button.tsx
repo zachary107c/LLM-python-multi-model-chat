@@ -63,7 +63,7 @@ export function ImageUploadButton({
   }, [fileName]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex justify-center items-center gap-2">
       <input
         type="file"
         ref={fileInputRef}
@@ -72,7 +72,7 @@ export function ImageUploadButton({
         className="hidden"
         aria-label="Upload image"
       />
-      <div className="flex">
+      <div className="flex items-center justify-center">
         {showPreview && previewUrl && (
           <Avatar className="h-8 w-8 rounded-lg">
             <AvatarImage src={previewUrl} alt="image" />
@@ -85,6 +85,7 @@ export function ImageUploadButton({
           onClick={handleUploadClick}
           aria-label="Upload image"
           type="button"
+          className="flex items-center justify-center w-8 h-8 p-1"
         >
           <Image size={15} strokeWidth={1.5} />
         </Button>

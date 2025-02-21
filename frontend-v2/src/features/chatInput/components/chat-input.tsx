@@ -102,7 +102,14 @@ export function ChatInput({
 
   return (
     <div className="chat-input mb-2 flex flex-col w-full gap-2">
-      {isLoading && <div className="absolute pl-3 pt-1 flex items-center justify-start gap-1 bg-transparent"><span className="text-xs text-muted-foreground italic">{selectedModel?.name} thinking</span><PulseLoader color="hsl(var(--primary))" size={3}/></div>}
+      {isLoading && (
+        <div className="absolute pl-3 pt-1 flex items-center justify-start gap-1 bg-transparent">
+          <span className="text-xs text-muted-foreground italic">
+            {selectedModel?.name} thinking
+          </span>
+          <PulseLoader color="hsl(var(--primary))" size={3} />
+        </div>
+      )}
       <form onSubmit={handleSendMessage} className="flex justify-between">
         <Card className="w-full p-2 bg-sidebar shadow-none rounded-lg">
           <div className={`flex justify-between items-center h-full`}>
@@ -117,7 +124,7 @@ export function ChatInput({
                 disabled={isLoading}
               />
               <div className="flex justify-between items-center gap-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <ModelSelect
                     selectedModel={selectedModel}
                     models={models}
@@ -128,25 +135,33 @@ export function ChatInput({
                     <TooltipTrigger
                       asChild
                       onClick={handleUseToolsToggled}
-                      className="hover:cursor-pointer"
                     >
-                      {useTools ? (
-                        <LightbulbIcon size={15} />
-                      ) : (
-                        <LightbulbOffIcon size={15} />
-                      )}
+                      <div className="hover:cursor-pointer p-2 flex justify-center items-center">
+                        {useTools ? (
+                          <LightbulbIcon size={15} />
+                        ) : (
+                          <LightbulbOffIcon size={15} />
+                        )}
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       {useTools ? <p>Disable Tools</p> : <p>Enable Tools</p>}
                     </TooltipContent>
                   </Tooltip>
-                  <FileUpload
-                    imageName={imageName}
-                    onFileChange={handleFileChange}
-                    onClear={handleClear}
-                    handleOuterClear={handleClear}
-                    previewUrl={previewUrl}
-                  />
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <FileUpload
+                        imageName={imageName}
+                        onFileChange={handleFileChange}
+                        onClear={handleClear}
+                        handleOuterClear={handleClear}
+                        previewUrl={previewUrl}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Upload Image</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <Button type="submit" variant="default" size="sm">
                   <span className="text-sm">Submit</span>

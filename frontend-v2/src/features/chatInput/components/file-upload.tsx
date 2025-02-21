@@ -2,8 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ImageUploadButton } from "@/features/imageUpload/components/image-upload-button";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useCallback, useEffect } from "react";
-import type { ClipboardEvent as ReactClipboardEvent } from "react";
+import { useEffect } from "react";
 
 interface FileUploadProps {
   imageName: string | null;
@@ -88,7 +87,7 @@ export function FileUpload({
     <div className="relative h-8">
       {" "}
       {imageName ? null : (
-        <div className="absolute top-0 left-0">
+        <div className="absolute top-0 left-0 flex items-center justify-center">
           <ImageUploadButton
             fileName={imageName}
             onFileChange={handleFileValidation}
@@ -110,7 +109,7 @@ export function FileUpload({
                 size="sm"
                 variant="ghostNoHover"
                 onClick={handleOuterClear}
-                className="p-0"
+                className="p-0 flex items-center justify-center"
               >
                 <X size={12} className="text-white" />
               </Button>

@@ -49,7 +49,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           }`}
         >
           {open && <span className="text-xl font-medium italic">bruh.</span>}
-          <SidebarTrigger />
+          <SidebarTrigger variant="ghostNoHover" />
         </div>
       </div>
       {/* Sidebar Content */}

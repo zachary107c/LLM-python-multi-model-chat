@@ -23,6 +23,7 @@ import { ThemeToggle } from "../theme/components/theme-toggle";
 import { User } from "@/types/api";
 import { Button } from "../ui/button";
 import { useConversationId } from "@/features/conversation/contexts/conversationContext";
+import { useTheme } from "../theme/theme-provider";
 
 export function NavUser({ user }: { user: User | undefined | null }) {
   const { isMobile } = useSidebar();
@@ -33,7 +34,7 @@ export function NavUser({ user }: { user: User | undefined | null }) {
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
   const { conversationId, setConversationId } = useConversationId();
-
+  const { avatarOverlay } = useTheme();
   const handleLogout = async () => {
     try {
       navigate("logged-out", { replace: true });
@@ -41,6 +42,26 @@ export function NavUser({ user }: { user: User | undefined | null }) {
     } catch (error) {
       console.error("Logout failed:", error);
     }
+  };
+
+  const avatarOverlayStyles: React.CSSProperties = {
+    position: "relative",
+    width: "32px", // h-8 equals 32px
+    height: "32px", // w-8 equals 32px
+    borderRadius: "inherit",
+    overflow: "hidden",
+    flexShrink: 0, // Prevent the avatar from shrinking
+  };
+
+  const overlayStyles: React.CSSProperties = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "hsl(var(--primary))",
+    mixBlendMode: "overlay",
+    opacity: 0.5,
   };
 
   return (
@@ -52,8 +73,16 @@ export function NavUser({ user }: { user: User | undefined | null }) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border border-foreground/10"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user?.profile?.image} alt={user?.username} />
+              <Avatar
+                className="h-8 w-8 rounded-lg"
+                style={avatarOverlay ? avatarOverlayStyles : undefined}
+              >
+                <AvatarImage
+                  src={user?.profile?.image}
+                  alt={user?.username}
+                  className={avatarOverlay ? "grayscale" : ""}
+                />
+                {avatarOverlay && <div style={overlayStyles}></div>}
                 <AvatarFallback className="rounded-lg">BS</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -73,9 +102,9 @@ export function NavUser({ user }: { user: User | undefined | null }) {
               <Button
                 className="flex items-center gap-2 px-1 py-1.5 text-left text-sm"
                 variant="ghost"
-                onClick={() =>{ 
+                onClick={() => {
                   setConversationId("");
-                  navigate('/profile');
+                  navigate("/profile");
                 }}
               >
                 <Avatar className="h-8 w-8 rounded-lg">
