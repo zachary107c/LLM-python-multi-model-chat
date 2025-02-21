@@ -6,7 +6,6 @@ import { HelmetProvider } from "react-helmet-async";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { UserSettingsProvider } from "@/features/userSettings/providers/user-settings-provider";
 import { MainErrorFallback } from "@/components/errors/main";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthLoader } from "@/lib/auth";
@@ -39,7 +38,6 @@ export const AppProvider = ({ children }: AppProviderProps) => {
             <SidebarProvider>
               <TooltipProvider>
                 <QueryClientProvider client={queryClient}>
-                  <UserSettingsProvider>
                     {import.meta.env.DEV && <ReactQueryDevtools />}
                     <Toaster />
                     <AuthLoader
@@ -51,7 +49,6 @@ export const AppProvider = ({ children }: AppProviderProps) => {
                     >
                       {children}
                     </AuthLoader>
-                  </UserSettingsProvider>
                 </QueryClientProvider>
               </TooltipProvider>
             </SidebarProvider>
