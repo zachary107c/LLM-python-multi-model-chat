@@ -2,6 +2,7 @@ import os
 import json
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from datetime import datetime, timezone as dt_timezone
 
 class Command(BaseCommand):
     help = "Populate Model table with models from Ollama"
@@ -15,7 +16,7 @@ class Command(BaseCommand):
             data = json.load(file)
 
         # Get the current time in UTC
-        now = timezone.now().astimezone(timezone.utc)
+        now = datetime.now(dt_timezone.utc)
 
         # Update each entry with current timestamps in UTC
         for entry in data:

@@ -7,8 +7,8 @@
             "description": "A tool to get the current weather information for a single location.",
             "script": "import python_weather\n\nasync def get_weather_information(single_location: str) -> str:\n    \"\"\"Get the current weather of the specified single location.\n\n    Args:\n        location (str): The single location to get the current weather for.\n\n    Returns:\n        str: A string containg various metrics about the current weather for that single location.\n    \"\"\"\n    async with python_weather.Client(unit=python_weather.IMPERIAL) as client:\n        # Get the weather for the location\n        weather = await client.get(single_location)\n        output = \"\"\n        output += f\"Datetime: {weather.datetime}\"\n        output += f\"Description: {weather.description}\"\n        output += f\"Feels Like: {weather.feels_like}\"\n        output += f\"Humidity: {weather.humidity}\"\n        output += f\"Kind: {weather.kind}\"\n        output += f\"Precipitation: {weather.precipitation}\"\n        output += f\"Temperature: {weather.temperature}\"\n        output += f\"Ultraviolet: {weather.ultraviolet}\"\n        output += f\"Visibility: {weather.visibility}\"\n        output += f\"Wind Direction: {weather.wind_direction}\"\n        output += f\"Wind Speed: {weather.wind_speed}\"\n        return output",
             "user": 1,
-            "created_at": "2025-01-20T16:00:21.753646",
-            "updated_at": "2025-01-20T16:00:21.753646"
+            "created_at": "2025-02-22T08:52:06.752739+00:00",
+            "updated_at": "2025-02-22T08:52:06.752739+00:00"
         }
     },
     {
@@ -19,8 +19,8 @@
             "description": "Get the square root of a number.",
             "script": "import math\n\nasync def square_root(number: str | int) -> str:\n    \"\"\"\n    Get the square root of a number.\n\n    Args:\n        number (str | int): The number to get the square root of.\n\n    Returns:\n        str: The square root of the number formatted to four decimal places.\n    \"\"\"\n    try:\n        if isinstance(number, str):\n            number = int(number)\n        return f\"{math.sqrt(number):.4f}\"\n    except ValueError:\n        return \"Invalid number format.\"\n    except TypeError:\n        return \"Input must be a string or an integer.\"\n    except Exception as e:\n        return f\"An error occurred: {str(e)}\"\n",
             "user": 1,
-            "created_at": "2025-01-20T16:00:21.753646",
-            "updated_at": "2025-01-20T16:00:21.753646"
+            "created_at": "2025-02-22T08:52:06.752739+00:00",
+            "updated_at": "2025-02-22T08:52:06.752739+00:00"
         }
     }
 ]
