@@ -37,7 +37,8 @@ RUN python manage.py collectstatic --noinput && \
     python manage.py populate_anthropic_models && \
     python manage.py update_fixtures && \
     python manage.py createsuperuser --noinput && \
-    python manage.py loaddata tools_fixture.json
+    python manage.py loaddata tools_fixture.json && \
+    python manage.py save_tools
 
 # Set final permissions
 RUN chown -R bsllmwebuibackend:bsllmwebuibackend /app && \
