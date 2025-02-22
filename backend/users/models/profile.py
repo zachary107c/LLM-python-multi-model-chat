@@ -8,7 +8,7 @@ class Profile(models.Model):
         User, related_name="userprofile", on_delete=models.CASCADE
     )
     image = models.ImageField(
-        default="profile_pics/default/default.jpg", upload_to="profile_pics/"
+        default="profile_pics/default/default.png", upload_to="profile_pics/"
     )
     bio = models.TextField(null=True, blank=True)
 
