@@ -1,34 +1,49 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 type ConversationContextType = {
   conversationId: string;
   setConversationId: (id: string) => void;
 };
 
-const ConversationContext = createContext<ConversationContextType | undefined>(undefined);
+const ConversationContext = createContext<ConversationContextType | undefined>(
+  undefined
+);
 
-export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  
-  const [conversationId, setConversationId] = useState<string>(searchParams.get('c') || '');
+
+  const [conversationId, setConversationId] = useState<string>(
+    searchParams.get("c") || ""
+  );
 
   useEffect(() => {
-    const id = searchParams.get('c');
+    const id = searchParams.get("c");
     if (id) {
       setConversationId(id);
     }
   }, [searchParams]);
 
   const handleSetConversationId = (id: string) => {
-    setConversationId(id);
-    setSearchParams({ c: id });
-    navigate(`/chat?c=${id}`);
+    if (id !== "") {
+      setConversationId(id);
+      setSearchParams({ c: id });
+      navigate(`/chat?c=${id}`);
+    } else {
+      setConversationId("");
+      setSearchParams({});
+      navigate("/chat");
+
+    }
   };
 
   return (
-    <ConversationContext.Provider value={{ conversationId, setConversationId: handleSetConversationId }}>
+    <ConversationContext.Provider
+      value={{ conversationId, setConversationId: handleSetConversationId }}
+    >
       {children}
     </ConversationContext.Provider>
   );
@@ -37,7 +52,9 @@ export const ConversationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 export const useConversationId = () => {
   const context = useContext(ConversationContext);
   if (!context) {
-    throw new Error('useConversationId must be used within a ConversationProvider');
+    throw new Error(
+      "useConversationId must be used within a ConversationProvider"
+    );
   }
   return context;
 };

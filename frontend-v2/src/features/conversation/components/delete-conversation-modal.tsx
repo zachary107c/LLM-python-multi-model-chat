@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useSearchParams } from "react-router-dom";
 import { deleteConversationMutation } from "../api/delete-conversation";
 import { Trash2 } from "lucide-react";
+import { useConversationId } from "../contexts/conversationContext";
 
 interface DeleteConversationModalProps {
   conversationId: string;
@@ -19,7 +20,7 @@ interface DeleteConversationModalProps {
 export function DeleteConversationModal({
   conversationId,
 }: DeleteConversationModalProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const {conversationId: activeConversationId, setConversationId} = useConversationId();
   const deleteMutation = deleteConversationMutation();
 
   const handleDelete = async () => {
@@ -27,8 +28,8 @@ export function DeleteConversationModal({
       await deleteMutation.mutateAsync({
         data: { conversationId: conversationId },
       });
-      if (searchParams.get("c") === conversationId) {
-        setSearchParams({});
+      if (conversationId === activeConversationId) {
+        setConversationId("");
       }
     } catch (e) {
       console.log(e);
