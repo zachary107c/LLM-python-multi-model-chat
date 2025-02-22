@@ -1,7 +1,7 @@
 import os
 import json
-import datetime
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 class Command(BaseCommand):
     help = "Populate Model table with models from Ollama"
@@ -14,10 +14,13 @@ class Command(BaseCommand):
         ) as file:
             data = json.load(file)
 
-        # Update each entry with current timestamps
+        # Get the current time in UTC
+        now = timezone.now().astimezone(timezone.utc)
+
+        # Update each entry with current timestamps in UTC
         for entry in data:
-            entry["fields"]["created_at"] = datetime.datetime.now().isoformat()
-            entry["fields"]["updated_at"] = datetime.datetime.now().isoformat()
+            entry["fields"]["created_at"] = now.isoformat()
+            entry["fields"]["updated_at"] = now.isoformat()
 
         # Save the updated fixture
         with open(
