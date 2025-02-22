@@ -18,11 +18,9 @@ import {
   AssistantMessage,
   BaseModelEntity,
   Message,
-  Suggestion,
 } from "@/types/api";
 import { Welcome } from "@/features/suggestions/components/welcome";
 import { WelcomeLoading } from "@/features/suggestions/components/welcome-loading";
-import { useGetSuggestionsQuery } from "../../suggestions/api/get-three-suggestions";
 import { useSearchParams } from "react-router-dom";
 import { useUser } from "@/lib/auth";
 import { useConversationId } from "@/features/conversation/contexts/conversationContext";
@@ -35,16 +33,12 @@ export function ChatArea() {
   const [model, setModel] = useState<BaseModelEntity | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [imageData, setImageData] = useState<File | null>(null);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [_, setSearchParams] = useSearchParams();
   const userSettings = useUser();
   const { conversationId, setConversationId } = useConversationId();
 
   const updateMutation = updateConversationMutation();
   const createMutation = createConversationMutation();
-
-  const { data: suggestionsData, isLoading: suggestionsLoading } =
-    useGetSuggestionsQuery(3);
   const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
   const {
     data,
@@ -114,17 +108,6 @@ export function ChatArea() {
       setModel(preferredModel ? preferredModel : models[0]);
     }
   }, [models, model]);
-
-  useEffect(() => {
-    if (
-      suggestionsData &&
-      suggestionsData.suggestions &&
-      suggestionsData.suggestions.length > 0 &&
-      !suggestionsLoading
-    ) {
-      setSuggestions(suggestionsData.suggestions);
-    }
-  }, [suggestionsData]);
 
   useEffect(() => {
     if (conversationId) {
@@ -274,7 +257,7 @@ export function ChatArea() {
             source: {
               type: "base64",
               media_type: image_data.type,
-              data: image_data.base64
+              data: image_data.base64,
             },
           };
           payload.messages[0].content = [text_part, image_part];
@@ -470,17 +453,9 @@ export function ChatArea() {
           </div>
         )}
         <div className="h-full w-full pt-4 overflow-y-scroll no-scrollbar">
-          {(!messages || messages.length == 0) &&
-            suggestionsLoading &&
-            !conversationLoading && <WelcomeLoading />}
-          {(!messages || messages.length == 0) &&
-            !suggestionsLoading &&
-            !conversationLoading && (
-              <Welcome
-                suggestions={suggestions}
-                handleMessageSend={handleSendMessage}
-              />
-            )}
+          {((!messages || messages.length == 0) && !conversationLoading) && (
+            <Welcome handleMessageSend={handleSendMessage} />
+          )}
           {messages.map((message) => {
             if (isUserMessage(message)) {
               return (
@@ -512,7 +487,9 @@ export function ChatArea() {
           modelsLoading={modelsLoading}
         />
         <div className="w-full flex justify-center items-center">
-          <span className="text-muted-foreground text-xs italic">AI can make mistakes. Check important information.</span>
+          <span className="text-muted-foreground text-xs italic">
+            AI can make mistakes. Check important information.
+          </span>
         </div>
       </div>
     </div>

@@ -130,12 +130,11 @@ export function ChatInput({
                     models={models}
                     modelsLoading={modelsLoading}
                     onModelChange={handleModelChange}
+                    variant="secondary"
+                    className="bg-accent-2 hover:bg-primary/50"
                   />
                   <Tooltip>
-                    <TooltipTrigger
-                      asChild
-                      onClick={handleUseToolsToggled}
-                    >
+                    <TooltipTrigger asChild onClick={handleUseToolsToggled}>
                       <div className="hover:cursor-pointer p-2 flex justify-center items-center">
                         {useTools ? (
                           <LightbulbIcon size={15} />
@@ -149,7 +148,7 @@ export function ChatInput({
                     </TooltipContent>
                   </Tooltip>
                   <Tooltip>
-                    <TooltipTrigger>
+                    <TooltipTrigger asChild>
                       <FileUpload
                         imageName={imageName}
                         onFileChange={handleFileChange}

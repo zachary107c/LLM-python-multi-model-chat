@@ -152,6 +152,7 @@ export function ProfileRoute() {
       <Card className="p-4 w-[60vw]">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           <div className="space-y-4">
+            <Label htmlFor="profile_image">Profile Picture</Label>
             <div className="relative w-24">
               <div
                 onClick={handleAvatarClick}

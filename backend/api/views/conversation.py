@@ -9,6 +9,7 @@ from ..serializers.conversation_detail_serializer import ConversationDetailSeria
 
 from ..models.conversation import Conversation
 
+
 class ConversationListCreateView(ListCreateAPIView):
     queryset = None
     serializer_class = ConversationSerializer

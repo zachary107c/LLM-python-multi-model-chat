@@ -5,7 +5,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarTrigger,
-
 } from "@/components/ui/sidebar";
 import { NavConversation } from "@/components/sidebar/nav-conversation";
 import { NavUser, NavUserSkeleton } from "@/components/sidebar/nav-user";
@@ -14,7 +13,6 @@ import { useUser } from "@/lib/auth";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar();
   const { data: user, isLoading: userLoading } = useUser();
-
 
   return (
     <Sidebar

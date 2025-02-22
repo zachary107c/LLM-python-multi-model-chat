@@ -35,12 +35,12 @@ export function LikeMessageButton({
   return (
     <Button
       variant="ghostNoHover"
-      className="m-0 p-0"
+      className="m-0 p-0 [&_svg]:size-3"
       size={"icon"}
       onClick={handleLikedMessage}
       aria-label={liked ? "Unlike" : "Like"}
     >
-      {liked ? <HeartIcon className="fill-red-500"/> : <HeartIcon />}
+      {liked ? <HeartIcon className="fill-red-500" /> : <HeartIcon />}
     </Button>
   );
 }

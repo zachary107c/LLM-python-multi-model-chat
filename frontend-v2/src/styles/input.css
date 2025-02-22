@@ -1007,6 +1007,20 @@
   transition: background-clip 0.3s ease, color 0.3s ease;
 }
 
+.title.mask-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(
+    -45deg,
+    hsl(var(--secondary)) 0%,
+    hsl(var(--primary)) 50%,
+    hsl(var(--secondary)) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-flow-2 8s ease-in-out infinite;
+}
+
 .suggestion-border:hover .mask-text {
   background-clip: text;
   -webkit-background-clip: text;
@@ -1026,4 +1040,20 @@
   to {
     background-position: -150% 150%;
   }
+}
+
+@keyframes gradient-flow-2 {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.markdown p + p {
+  margin-top: 16px; /* Adjust this value to your desired gap */
 }

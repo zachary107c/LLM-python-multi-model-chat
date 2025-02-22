@@ -47,8 +47,9 @@ export function NavConversation() {
     <SidebarGroup>
       <SidebarMenu>
         <Button
-          variant="default"
+          variant="secondary"
           onClick={async () => await createNewConversation()}
+          className="bg-accent-2 hover:bg-primary/50 transition-colors duration-200"
         >
           {open && "New Conversation"} <MessageSquarePlus />
         </Button>

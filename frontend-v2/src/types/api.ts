@@ -128,10 +128,14 @@ export type UserMessage = Entity<{
     content: string;
   }
   
+  export type Arguments = {
+    [key: string]: any;
+  };
+  
   export type UsedTool = {
     name: string;
-    arguments: any;
-  }
+    arguments: Arguments;
+  };
   
   export type AssistantMessage = Entity<{
     conversation: string;

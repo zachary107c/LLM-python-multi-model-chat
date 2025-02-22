@@ -30,7 +30,7 @@ export function DeleteMessageModal({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghostNoHover" className="m-0 p-0">
+        <Button variant="ghostNoHover" className="m-0 p-0 [&_svg]:size-3">
           <Trash2Icon />
         </Button>
       </AlertDialogTrigger>
@@ -46,7 +46,10 @@ export function DeleteMessageModal({
               Cancel
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction asChild className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90">
+          <AlertDialogAction
+            asChild
+            className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
+          >
             <Button size="sm" onClick={handleDelete}>
               Delete Message
             </Button>

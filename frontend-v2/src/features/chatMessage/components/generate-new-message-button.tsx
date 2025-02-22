@@ -183,7 +183,7 @@ const GenerateNewMessageButton: React.FC<{
     <Button
       onClick={handleClick}
       variant="ghostNoHover"
-      className="m-0 p-0"
+      className="m-0 p-0 [&_svg]:size-3"
       disabled={assistantMessage.generated_by.is_deleted}
     >
       <div className={isLoading ? "rotate" : ""}>

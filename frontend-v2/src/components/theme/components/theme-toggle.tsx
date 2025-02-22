@@ -24,7 +24,14 @@ export function ThemeToggle({
   variant = "dropdown",
   onThemeSelect,
 }: ThemeToggleProps) {
-  const { setTheme, theme, setColorTheme, colorTheme, avatarOverlay, setAvatarOverlay } = useTheme();
+  const {
+    setTheme,
+    theme,
+    setColorTheme,
+    colorTheme,
+    avatarOverlay,
+    setAvatarOverlay,
+  } = useTheme();
 
   const handleThemeSelect = (newTheme: Theme, event: React.MouseEvent) => {
     event?.stopPropagation();

@@ -1581,6 +1581,16 @@ body {
   aspect-ratio: 16 / 9;
 }
 
+.\!size-3 {
+  width: 0.75rem !important;
+  height: 0.75rem !important;
+}
+
+.size-3 {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
 .size-4 {
   width: 1rem;
   height: 1rem;
@@ -1628,10 +1638,6 @@ body {
 
 .h-5 {
   height: 1.25rem;
-}
-
-.h-6 {
-  height: 1.5rem;
 }
 
 .h-7 {
@@ -2518,6 +2524,15 @@ body {
   background-color: hsl(var(--primary) / 0.2);
 }
 
+.bg-primary\/80 {
+  background-color: hsl(var(--primary) / 0.8);
+}
+
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity, 1));
+}
+
 .bg-secondary {
   background-color: hsl(var(--secondary));
 }
@@ -2788,6 +2803,11 @@ body {
   line-height: 2.25rem;
 }
 
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
 .text-\[0\.8rem\] {
   font-size: 0.8rem;
 }
@@ -2877,6 +2897,10 @@ body {
 
 .text-card-foreground {
   color: hsl(var(--card-foreground));
+}
+
+.text-chart-2 {
+  color: hsl(var(--chart-2));
 }
 
 .text-current {
@@ -3514,6 +3538,20 @@ body {
   transition: background-clip 0.3s ease, color 0.3s ease, -webkit-background-clip 0.3s ease;
 }
 
+.title.mask-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(
+    -45deg,
+    hsl(var(--secondary)) 0%,
+    hsl(var(--primary)) 50%,
+    hsl(var(--secondary)) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-flow-2 8s ease-in-out infinite;
+}
+
 .suggestion-border:hover .mask-text {
   background-clip: text;
   -webkit-background-clip: text;
@@ -3534,6 +3572,25 @@ body {
   to {
     background-position: -150% 150%;
   }
+}
+
+@keyframes gradient-flow-2 {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.markdown p + p {
+  margin-top: 16px;
+  /* Adjust this value to your desired gap */
 }
 
 .file\:border-0::file-selector-button {
@@ -3650,6 +3707,10 @@ body {
 
 .hover\:bg-primary:hover {
   background-color: hsl(var(--primary));
+}
+
+.hover\:bg-primary\/50:hover {
+  background-color: hsl(var(--primary) / 0.5);
 }
 
 .hover\:bg-primary\/90:hover {
@@ -5041,6 +5102,11 @@ body {
 
 .\[\&_svg\]\:pointer-events-none svg {
   pointer-events: none;
+}
+
+.\[\&_svg\]\:size-3 svg {
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 .\[\&_svg\]\:size-4 svg {
