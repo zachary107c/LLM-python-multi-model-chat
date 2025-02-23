@@ -8,7 +8,7 @@ export const useGetSuggestionsQuery = (count: number) => {
     queryFn: async (): Promise<Suggestions | null> => {
       return api.post("/suggestions/", {
         provider: "ollama",
-        model: "llama3.2:latest",
+        model: "llama3.1:latest",
         count: count,
       });
     },
