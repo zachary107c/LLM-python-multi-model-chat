@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BaseModelEntity } from "@/types/api";
-import { ChevronsUpDown, TextSearchIcon, BotIcon } from "lucide-react";
+import { ChevronsUpDown, BotIcon, SearchIcon } from "lucide-react";
 import { SiOllama, SiOpenai, SiAnthropic } from "react-icons/si";
 
 interface ModelSelectProps {
@@ -95,7 +95,7 @@ export function ModelSelect({
       >
         <div className="sticky top-0 z-10 bg-popover p-2">
           <div className="flex items-center rounded">
-            <TextSearchIcon color="hsl(var(--primary))" size={15} />
+            <SearchIcon color="hsl(var(--muted-foreground))" size={15} />
             <Input
               type="text"
               className="w-full px-2 py-1 focus-visible:ring-0 focus-visible:outline-none border-none text-xs shadow-none"
