@@ -2,7 +2,18 @@
 
 _Inspired by [nulzo - Ollama WebUI](https://github.com/nulzo/Ollama-WebUI)_
 
-![image](https://github.com/user-attachments/assets/4d5b996d-2053-4aa3-8f1a-74d8d0aa38cd)
+### Landing Page
+![image](https://github.com/user-attachments/assets/eaffa769-362c-431d-9cd9-6f04c87c926b)
+
+### Utilize Custom Tools and Analyze Images
+![image](https://github.com/user-attachments/assets/4a71253a-a91d-4b3c-898d-ba4b3d1e2237)
+
+### Custom Defined Tools
+![image](https://github.com/user-attachments/assets/cd1ae9c6-cdb7-4c88-94f5-8890632d1597)
+![image](https://github.com/user-attachments/assets/435ea0d2-6a26-4504-9947-efd3f61c3519)
+
+### Profile
+![image](https://github.com/user-attachments/assets/d85299a3-956b-4071-a703-2128f0dcf5f7)
 
 ## Description
 
@@ -100,15 +111,3 @@ The frontend React application will communicate with the Django backend via API 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-
-![image](https://github.com/user-attachments/assets/68c50af3-77a6-41ce-a389-af6cbd8f97d3)
-
-![image](https://github.com/user-attachments/assets/18aa8bca-23d5-4899-8356-8b9060547914)
-
-![image](https://github.com/user-attachments/assets/f74ad883-3a17-4294-bf46-9d86a52549e7)
-
-![image](https://github.com/user-attachments/assets/e3e987e6-4b18-4580-b809-05635a6bdbb2)
-
-![image](https://github.com/user-attachments/assets/e4253f96-827a-4c34-be9e-7887083f8b7a)
-
