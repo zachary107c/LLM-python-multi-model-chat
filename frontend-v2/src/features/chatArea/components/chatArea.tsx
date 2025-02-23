@@ -31,7 +31,9 @@ import {
 } from "@/types/api";
 
 export function ChatArea() {
-  const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>([]);
+  const [messages, setMessages] = useState<(UserMessage | AssistantMessage)[]>(
+    []
+  );
   const [model, setModel] = useState<BaseModelEntity | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [imageData, setImageData] = useState<File | null>(null);
@@ -42,7 +44,11 @@ export function ChatArea() {
   const updateMutation = updateConversationMutation();
   const createMutation = createConversationMutation();
   const { data: models, isLoading: modelsLoading } = useGetModelsQuery();
-  const { data, error, isLoading: conversationLoading } = useGetConversationQuery({ conversationId });
+  const {
+    data,
+    error,
+    isLoading: conversationLoading,
+  } = useGetConversationQuery({ conversationId });
 
   const ref = useScrollToEnd(messages);
   const queryClient = useQueryClient();
@@ -68,7 +74,10 @@ export function ChatArea() {
   useEffect(() => {
     if (models && models.length > 0 && !model) {
       const preferredModel = models.find(
-        (m) => m.name === (userSettings.data?.settings.preferred_model?.name || "llama3.1:latest")
+        (m) =>
+          m.name ===
+          (userSettings.data?.settings.preferred_model?.name ||
+            "llama3.1:latest")
       );
       setModel(preferredModel || models[0]);
     }
@@ -76,7 +85,9 @@ export function ChatArea() {
 
   useEffect(() => {
     if (conversationId) {
-      queryClient.invalidateQueries({ queryKey: ["conversation", conversationId] });
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", conversationId],
+      });
     }
   }, [conversationId]);
 
@@ -92,18 +103,25 @@ export function ChatArea() {
     }
   }, [error]);
 
-  const isUserMessage = (message: Message): message is UserMessage => message.type === "user";
-  const isAssistantMessage = (message: Message): message is AssistantMessage => message.type === "assistant";
+  const isUserMessage = (message: Message): message is UserMessage =>
+    message.type === "user";
+  const isAssistantMessage = (message: Message): message is AssistantMessage =>
+    message.type === "assistant";
 
   const handleCreateNewConversation = async (firstMessage: string) => {
     const response = await createMutation.mutateAsync({
-      data: { previousConversationId: conversationId || undefined, data: { title: firstMessage } },
+      data: {
+        previousConversationId: conversationId || undefined,
+        data: { title: firstMessage },
+      },
     });
     setConversationId(response.id);
     return response.id;
   };
 
-  const toDataURL = async (url: string | null): Promise<{ base64: string; type: string } | null> => {
+  const toDataURL = async (
+    url: string | null
+  ): Promise<{ base64: string; type: string } | null> => {
     if (!url) return null;
 
     const response = await fetch(url);
@@ -115,7 +133,9 @@ export function ChatArea() {
         const base64Data = reader.result as string;
         const [header, base64String] = base64Data.split(",");
         const typeMatch = header.match(/:(.*?);/);
-        typeMatch ? resolve({ base64: base64String, type: typeMatch[1] }) : reject(new Error("Failed to extract MIME type"));
+        typeMatch
+          ? resolve({ base64: base64String, type: typeMatch[1] })
+          : reject(new Error("Failed to extract MIME type"));
       };
       reader.onerror = reject;
       reader.readAsDataURL(blob);
@@ -157,7 +177,12 @@ export function ChatArea() {
       provider: model?.provider,
       conversation: currentChatId,
       useTools,
-      messages: [{ role: "user", content: message, ...(image_data && { images: [image_data.base64] }) }],
+      messages: [
+        {
+          role: "user",
+          ...getImagePayloadForProvider( model?.provider, image_data, message)
+        },
+      ],
     };
 
     try {
@@ -168,16 +193,74 @@ export function ChatArea() {
       }
     } catch (error) {
       console.error(error);
-      toast({ title: "Chat Error", description: `Failed to Chat with the AI: ${error}`, variant: "destructive" });
+      toast({
+        title: "Chat Error",
+        description: `Failed to Chat with the AI: ${error}`,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleStreamResponse = async (payload: any, newUserMessage: UserMessage, currentChatId: string) => {
+  const getImagePayloadForProvider = (
+    provider: string | undefined,
+    image_data: { base64: string; type: string } | null,
+    message: string
+  ): Record<string, any> => {
+    if (image_data === null) {
+      return {
+        content: message
+      };
+    }
+    switch (provider) {
+      case "ollama":
+        return {
+          images: [image_data.base64],
+          content: message,
+        };
+      case "openai":
+        return {
+          content: [
+            { type: "text", text: message },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:${image_data.type};base64,${image_data.base64}`,
+              },
+            },
+          ],
+        };
+      case "anthropic":
+        return {
+          content: [
+            { type: "text", text: message },
+            {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: image_data.type,
+                data: image_data.base64,
+              },
+            },
+          ],
+        };
+      default:
+        return {}; // No additional payload for providers without image support
+    }
+  };
+
+  const handleStreamResponse = async (
+    payload: any,
+    newUserMessage: UserMessage,
+    currentChatId: string
+  ) => {
     const response = await fetch(`${env.BACKEND_API_URL}chat/stream/`, {
       method: "POST",
-      headers: { Authorization: `Token ${localStorage.getItem("token")}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Token ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(payload),
       credentials: "include",
     });
@@ -189,7 +272,7 @@ export function ChatArea() {
 
     const reader = response.body?.getReader();
     while (true) {
-      const { done, value } = await reader?.read() || {};
+      const { done, value } = (await reader?.read()) || {};
       if (done) break;
 
       const decoded = new TextDecoder().decode(value);
@@ -211,7 +294,14 @@ export function ChatArea() {
                 content_variations: [{ id: -1, content: accumulatedContent }],
                 generated_by: newUserMessage,
                 conversation: currentChatId,
-                model: model || { id: -1, name: "", model: "", liked: false, provider: "", color: "gray" },
+                model: model || {
+                  id: -1,
+                  name: "",
+                  model: "",
+                  liked: false,
+                  provider: "",
+                  color: "gray",
+                },
                 provider: model?.provider || "",
                 liked: false,
                 type: "assistant",
@@ -246,11 +336,22 @@ export function ChatArea() {
       },
     });
 
-    const finalAssistantMessage: AssistantMessage = { ...assistantPostData, type: "assistant" };
-    setMessages((messages) => (messages[messages.length - 1]?.id === "temp" ? [...messages.slice(0, -1), finalAssistantMessage] : [...messages, finalAssistantMessage]));
+    const finalAssistantMessage: AssistantMessage = {
+      ...assistantPostData,
+      type: "assistant",
+    };
+    setMessages((messages) =>
+      messages[messages.length - 1]?.id === "temp"
+        ? [...messages.slice(0, -1), finalAssistantMessage]
+        : [...messages, finalAssistantMessage]
+    );
   };
 
-  const handleDirectResponse = async (payload: any, newUserMessage: UserMessage, currentChatId: string) => {
+  const handleDirectResponse = async (
+    payload: any,
+    newUserMessage: UserMessage,
+    currentChatId: string
+  ) => {
     const response = await api.post("/chat/", payload);
     const assistantPostData = await createAssistantMessage({
       data: {
@@ -263,7 +364,10 @@ export function ChatArea() {
       },
     });
 
-    const newAssistantMessage: AssistantMessage = { ...assistantPostData, type: "assistant" };
+    const newAssistantMessage: AssistantMessage = {
+      ...assistantPostData,
+      type: "assistant",
+    };
     setMessages((messages) => [...messages, newAssistantMessage]);
   };
 
@@ -276,12 +380,20 @@ export function ChatArea() {
           </div>
         )}
         <div className="h-full w-full pt-4 overflow-y-scroll no-scrollbar">
-          {!messages?.length && !conversationLoading && <Welcome handleMessageSend={handleSendMessage} />}
+          {!messages?.length && !conversationLoading && (
+            <Welcome handleMessageSend={handleSendMessage} />
+          )}
           {messages.map((message) =>
             isUserMessage(message) ? (
-              <UserChatMessage key={`user-${message.id}`} userMessageData={message} />
+              <UserChatMessage
+                key={`user-${message.id}`}
+                userMessageData={message}
+              />
             ) : isAssistantMessage(message) ? (
-              <AssistantChatMessage key={`assistant-${message.id}`} assistantMessageData={message} />
+              <AssistantChatMessage
+                key={`assistant-${message.id}`}
+                assistantMessageData={message}
+              />
             ) : null
           )}
           <div ref={ref} />
@@ -296,7 +408,9 @@ export function ChatArea() {
           modelsLoading={modelsLoading}
         />
         <div className="w-full flex justify-center items-center">
-          <span className="text-muted-foreground text-xs italic">AI can make mistakes. Check important information.</span>
+          <span className="text-muted-foreground text-xs italic">
+            AI can make mistakes. Check important information.
+          </span>
         </div>
       </div>
     </div>

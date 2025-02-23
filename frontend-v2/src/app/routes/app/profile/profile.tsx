@@ -17,8 +17,8 @@ import { ImageIcon } from "lucide-react";
 
 const formSchema = z.object({
   username: z.string().min(3).max(50),
-  first_name: z.string().min(1).max(50),
-  last_name: z.string().min(1).max(50),
+  first_name: z.string().max(50).optional(),
+  last_name: z.string().max(50).optional(),
   email: z.string().email(),
   use_message_history: z.boolean(),
   stream_responses: z.boolean(),

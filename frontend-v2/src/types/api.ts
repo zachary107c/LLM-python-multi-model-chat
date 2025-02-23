@@ -190,3 +190,12 @@ export type Provider = {
   id: number;
   name: string;
 };
+
+export type Tool = Entity<{
+  updated_at: string;
+  name: string;
+  description: string;
+  script: string;
+  user: string;
+}>;
+

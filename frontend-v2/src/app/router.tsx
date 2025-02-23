@@ -62,6 +62,13 @@ export const createAppRouter = (_queryClient: QueryClient) =>
             return { Component: ProfileRoute };
           },
         },
+        {
+          path: "tools",
+          lazy: async () => {
+            const { ToolsRoute } = await import("@/app/routes/app/tools");
+            return { Component: ToolsRoute };
+          },
+        },
       ],
     },
     {

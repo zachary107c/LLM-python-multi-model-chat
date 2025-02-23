@@ -5,14 +5,37 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarTrigger,
+  SidebarGroup,
 } from "@/components/ui/sidebar";
+import { Button } from "../ui/button";
 import { NavConversation } from "@/components/sidebar/nav-conversation";
 import { NavUser, NavUserSkeleton } from "@/components/sidebar/nav-user";
+import { NavTools } from "./nav-tools";
 import { useUser } from "@/lib/auth";
+import { useConversationId } from "@/features/conversation/contexts/conversationContext";
+import { createConversationMutation } from "@/features/conversation/api/create-conversation";
+import { MessageSquarePlusIcon } from "lucide-react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar();
   const { data: user, isLoading: userLoading } = useUser();
+
+  const { conversationId, setConversationId } = useConversationId();
+  const createConversation = createConversationMutation();
+
+  async function createNewConversation() {
+    try {
+      var response = await createConversation.mutateAsync({
+        data: {
+          previousConversationId: conversationId || undefined,
+          data: { title: "New Conversation" },
+        },
+      });
+      setConversationId(response.id);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <Sidebar
@@ -52,7 +75,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </div>
       {/* Sidebar Content */}
       <SidebarContent className="no-scrollbar">
-        <NavConversation />
+        <SidebarGroup>
+          <div className="flex justify-start items-center w-full pb-2">
+            <Button
+              variant="secondary"
+              onClick={async () => await createNewConversation()}
+              className="bg-accent-2 hover:bg-primary/50 transition-colors duration-200 w-full"
+            >
+              {open && "New Conversation"} <MessageSquarePlusIcon />
+            </Button>
+          </div>
+          <NavTools />
+          <NavConversation />
+        </SidebarGroup>
       </SidebarContent>
 
       {/* Sidebar Footer */}
