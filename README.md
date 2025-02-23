@@ -15,6 +15,10 @@ _Inspired by [nulzo - Ollama WebUI](https://github.com/nulzo/Ollama-WebUI)_
 ### Profile
 ![image](https://github.com/user-attachments/assets/d85299a3-956b-4071-a703-2128f0dcf5f7)
 
+### Auth
+![image](https://github.com/user-attachments/assets/ff7362d9-dec5-41a8-af9a-54c3361fad63)
+![image](https://github.com/user-attachments/assets/b1b93702-50b4-4704-acc2-c96da9dcbe1f)
+
 ## Description
 
 BS-LLM-WebUI is a web application with a frontend built using React and Vite, and a backend powered by Django with a Poetry-managed virtual environment.
