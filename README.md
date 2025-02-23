@@ -2,9 +2,22 @@
 
 _Inspired by [nulzo - Ollama WebUI](https://github.com/nulzo/Ollama-WebUI)_
 
-![image](https://github.com/user-attachments/assets/08bce57d-75d9-4a41-81dc-babaa85c386f)
+### Landing Page
+![image](https://github.com/user-attachments/assets/eaffa769-362c-431d-9cd9-6f04c87c926b)
 
-![image](https://github.com/user-attachments/assets/2ce45a75-7838-4aad-934e-541132ce2c61)
+### Utilize Custom Tools and Analyze Images
+![image](https://github.com/user-attachments/assets/4a71253a-a91d-4b3c-898d-ba4b3d1e2237)
+
+### Custom Defined Tools
+![image](https://github.com/user-attachments/assets/cd1ae9c6-cdb7-4c88-94f5-8890632d1597)
+![image](https://github.com/user-attachments/assets/435ea0d2-6a26-4504-9947-efd3f61c3519)
+
+### Profile
+![image](https://github.com/user-attachments/assets/d85299a3-956b-4071-a703-2128f0dcf5f7)
+
+### Auth
+![image](https://github.com/user-attachments/assets/ff7362d9-dec5-41a8-af9a-54c3361fad63)
+![image](https://github.com/user-attachments/assets/b1b93702-50b4-4704-acc2-c96da9dcbe1f)
 
 ## Description
 

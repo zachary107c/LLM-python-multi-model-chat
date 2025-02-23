@@ -3,7 +3,7 @@ import json
 import random
 import requests
 from django.core.management.base import BaseCommand
-from api.models import Model
+from api.models.model import Model
 
 COLORS = ["gray", "gold", "bronze", "brown", "yellow", "amber", "orange", "tomato", "red", "ruby", "crimson", "pink", "plum", "purple", "violet", "iris", "indigo", "blue", "cyan", "teal", "jade", "green", "grass", "lime", "mint", "sky"]
 
@@ -37,7 +37,6 @@ class Command(BaseCommand):
         for model_data in data.get("models", []):
             name = model_data.get("name")
             model = model_data.get("model")
-
             if name and model:
                 obj, created = Model.objects.update_or_create(
                     name=name,

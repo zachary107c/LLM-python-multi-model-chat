@@ -1,6 +1,12 @@
 import os
 from django.contrib import admin
-from .models import Conversation, UserMessage, AssistantMessage, Model, ContentVariation, Tool
+
+from .models.model import Model
+from .models.tool import Tool
+from .models.content_variation import ContentVariation
+from .models.user_message import UserMessage
+from .models.assistant_message import AssistantMessage
+from .models.conversation import Conversation
 
 class ToolAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
