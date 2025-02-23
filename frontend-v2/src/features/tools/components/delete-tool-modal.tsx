@@ -35,7 +35,6 @@ export function DeleteToolModal({
       <AlertDialogTrigger>
         <Button variant="destructive" className="flex-1 mx-2">
           <Trash2 size={15} />
-          Delete Tool
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

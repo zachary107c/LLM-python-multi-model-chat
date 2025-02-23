@@ -91,7 +91,6 @@ export function ToolsArea() {
               New Tool
             </Button>
           </div>
-          {/* Add a wrapper for scrollable area */}
           <div className="overflow-y-auto h-[100vh]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredTools.map((tool) => (
@@ -122,14 +121,12 @@ export function ToolsArea() {
                       <Edit className="w-4 h-4 mr-2" />
                       Edit
                     </Button>
-                    <DeleteToolModal toolId={tool.id} />{" "}
-                    {/* Add the delete modal */}
+                    <DeleteToolModal toolId={tool.id} />
                   </CardFooter>
                 </Card>
               ))}
             </div>
-          </div>{" "}
-          {/* End wrapper */}
+          </div>
         </>
       )}
     </div>
