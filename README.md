@@ -2,9 +2,11 @@
 
 _Inspired by [nulzo - Ollama WebUI](https://github.com/nulzo/Ollama-WebUI)_
 
-![image](https://github.com/user-attachments/assets/08bce57d-75d9-4a41-81dc-babaa85c386f)
+![image](https://github.com/user-attachments/assets/4d5b996d-2053-4aa3-8f1a-74d8d0aa38cd)
 
-![image](https://github.com/user-attachments/assets/2ce45a75-7838-4aad-934e-541132ce2c61)
+![image](https://github.com/user-attachments/assets/68c50af3-77a6-41ce-a389-af6cbd8f97d3)
+
+![image](https://github.com/user-attachments/assets/18aa8bca-23d5-4899-8356-8b9060547914)
 
 ## Description
 
