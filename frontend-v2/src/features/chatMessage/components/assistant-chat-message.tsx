@@ -16,7 +16,7 @@ import GenerateNewMessageButton from "./generate-new-message-button";
 import { Button } from "@/components/ui/button";
 import { UndoDeleteAssistantMessageButton } from "./undo-delete-assistant-message.button";
 import { Avatar } from "@/components/ui/avatar";
-import { SiOllama, SiOpenai, SiAnthropic } from "react-icons/si";
+import { SiOllama, SiOpenai, SiAnthropic, SiGooglegemini } from "react-icons/si";
 import {
   Tooltip,
   TooltipContent,
@@ -99,6 +99,7 @@ export function AssistantChatMessage({
     ollama: <SiOllama color="hsl(var(--primary-foreground))" />,
     openai: <SiOpenai color="hsl(var(--primary-foreground))" />,
     anthropic: <SiAnthropic color="hsl(var(--primary-foreground))" />,
+    google: <SiGooglegemini color="hsl(var(--primary-foreground))" />,
   };
 
   type ProviderType = "ollama" | "openai" | "anthropic";
@@ -108,7 +109,7 @@ export function AssistantChatMessage({
       <Avatar className="rounded-md h-8 w-8 bg-primary flex justify-center items-center">
         {PROVIDER_ICONS[
           assistantMessageData.model.provider as ProviderType
-        ] || <BotIcon color="hsl(var(--primary-foreground))" />}
+        ] || <BotIcon color="hsl(var(--primary-foreground))" size={17} />}
       </Avatar>
       <div className="flex flex-col">
         <div>
@@ -136,7 +137,7 @@ export function AssistantChatMessage({
             </Badge>
           </div>
           <Card className="w-full bg-transparent shadow-none border-none text-sm">
-            <MarkdownRenderer content={localizeUTCDates(displayContent)} padParagraph={true} />
+            <MarkdownRenderer content={localizeUTCDates(displayContent)} />
           </Card>
         </div>
         <div className="flex justify-start">

@@ -12,6 +12,16 @@ class BaseLLMService(ABC):
         **kwargs,
     ) -> Dict:
         pass
+    
+    def chat_stream(
+        self,
+        model: str,
+        messages: List[Dict[str, str]],
+        use_tools: bool = False,
+        user_tools: List[str] | None = None,
+        **kwargs,
+    ) -> Dict:
+        pass
 
     @abstractmethod
     def get_models(self) -> Dict:

@@ -13,3 +13,6 @@ AZURE_OPENAI_VERSION=""
 
 # Anthropic Settings
 ANTHROPIC_API_KEY=""
+
+# Google Gemini Settings
+GEMINI_API_KEY=""

@@ -3,6 +3,7 @@ from .ollama_service import OllamaService
 from .openai_service import OpenAIService
 from .azure_openai_service import AzureOpenAIService
 from .anthropic_service import AnthropicService
+from .google_ai_service import GoogleAIService
 
 class LLMServiceFactory:
     @staticmethod
@@ -15,5 +16,7 @@ class LLMServiceFactory:
             return AzureOpenAIService()
         elif provider == "anthropic":
             return AnthropicService()
+        elif provider == "google":
+            return GoogleAIService()
         else:
             return None

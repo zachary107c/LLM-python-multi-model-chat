@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "knip": "knip"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.5",
     "@radix-ui/react-aspect-ratio": "^1.1.1",
@@ -73,10 +75,12 @@
     "rehype-highlight": "^7.0.2",
     "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",
+    "remark-directive": "^3.0.1",
     "remark-math": "^6.0.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "unist-builder": "^4.0.0",
     "url-join": "^5.0.0",
     "vaul": "^1.1.2",
     "zod": "^3.24.1"
@@ -84,7 +88,7 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@tanstack/eslint-plugin-query": "^5.66.0",
-    "@types/node": "^22.13.0",
+    "@types/node": "^22.13.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@types/react-katex": "^3.0.4",
@@ -95,6 +99,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "knip": "^5.44.5",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.6.2",

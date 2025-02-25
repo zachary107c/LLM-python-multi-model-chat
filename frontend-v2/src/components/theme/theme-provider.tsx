@@ -36,6 +36,7 @@ type ThemeProviderState = {
   theme: Theme;
   colorTheme: ColorTheme;
   avatarOverlay: boolean;
+  systemOverride: Theme;
   setTheme: (theme: Theme) => void;
   setColorTheme: (colorTheme: ColorTheme) => void;
   setAvatarOverlay: (overlay: boolean) => void;
@@ -45,6 +46,7 @@ const initialState: ThemeProviderState = {
   theme: "system",
   colorTheme: "default",
   avatarOverlay: true,
+  systemOverride: "light",
   setTheme: () => null,
   setColorTheme: () => null,
   setAvatarOverlay: () => null,
@@ -62,17 +64,11 @@ export function ThemeProvider({
 
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
-  const [colorTheme, setColorTheme] = useState<ColorTheme>(
-    () =>
-      (localStorage.getItem(colorStorageKey) as ColorTheme) || defaultColorTheme
-  );
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme);
+  const [colorTheme, setColorTheme] = useState<ColorTheme>(() => (localStorage.getItem(colorStorageKey) as ColorTheme) || defaultColorTheme);
+  const [avatarOverlay, setAvatarOverlay] = useState<boolean>(() => localStorage.getItem(avatarOverlayStorageKey) !== "false");
+  const [systemOverride, setSystemOverride] = useState<Theme>("light");
 
-  const [avatarOverlay, setAvatarOverlay] = useState<boolean>(
-    () => localStorage.getItem(avatarOverlayStorageKey) !== "false"
-  );
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -85,6 +81,7 @@ export function ThemeProvider({
       .matches
       ? "dark"
       : "light";
+    setSystemOverride(systemTheme);
     const appliedTheme = theme === "system" ? systemTheme : theme;
 
     root.classList.add(appliedTheme);
@@ -97,6 +94,7 @@ export function ThemeProvider({
     theme,
     colorTheme,
     avatarOverlay,
+    systemOverride,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);

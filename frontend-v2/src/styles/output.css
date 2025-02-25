@@ -3014,11 +3014,6 @@ body {
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 
-.text-zinc-400 {
-  --tw-text-opacity: 1;
-  color: rgb(161 161 170 / var(--tw-text-opacity, 1));
-}
-
 .underline {
   text-decoration-line: underline;
 }
@@ -3128,11 +3123,6 @@ body {
 
 .ring-offset-background {
   --tw-ring-offset-color: hsl(var(--background));
-}
-
-.blur {
-  --tw-blur: blur(8px);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
 .grayscale {

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import { cn } from "@/lib/utils";
 import "katex/dist/katex.min.css";
+import ThinkBlock from "./think-block"; // Adjust the import based on your project structure
 
 interface MarkdownStyles {
   container?: string;
@@ -40,7 +42,6 @@ interface MarkdownStyles {
 interface MarkdownRendererProps {
   content: string;
   className?: string;
-  padParagraph?: boolean;
   styles?: MarkdownStyles;
 }
 
@@ -80,9 +81,35 @@ const defaultStyles: MarkdownStyles = {
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   content,
   className,
-  padParagraph = false,
   styles = {},
 }) => {
+  const [isThinking, setIsThinking] = useState(false);
+  const [thinkContent, setThinkContent] = useState("");
+
+  // Extract and strip <think> blocks
+  useEffect(() => {
+    const thinkStart = content.indexOf("<think>");
+    const thinkEnd = content.indexOf("</think>");
+
+    if (thinkStart !== -1) {
+      setIsThinking(true);
+
+      // Extract content between <think> and </think> (if </think> exists)
+      if (thinkEnd !== -1) {
+        setThinkContent(content.slice(thinkStart + 7, thinkEnd).trim());
+      } else {
+        // If </think> hasn't been reached yet, extract everything after <think>
+        setThinkContent(content.slice(thinkStart + 7).trim());
+      }
+    } else {
+      setIsThinking(false);
+      setThinkContent("");
+    }
+  }, [content]);
+
+  // Remove <think> blocks from the main content
+  const strippedContent = content.replace(/<think>[\s\S]*?<\/think>/, "");
+
   const mergedStyles = {
     ...defaultStyles,
     ...styles,
@@ -102,8 +129,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
     >
       <div className={cn(mergedStyles.container)}>
         <div className="flex flex-col gap-2">
+          {/* Render the ThinkBlock if there's think content */}
+          {isThinking && (
+            <ThinkBlock isStreaming={!content.includes("</think>")}>
+              {thinkContent}
+            </ThinkBlock>
+          )}
+
+          {/* Render the rest of the content (without <think> blocks) */}
           <ReactMarkdown
-            // remarkPlugins={[remarkMath]}
             rehypePlugins={[
               rehypeKatex,
               [rehypeHighlight, { ignoreMissing: true }],
@@ -176,7 +210,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               p: ({ children }) => <p className="break-words">{children}</p>,
             }}
           >
-            {content}
+            {strippedContent}
           </ReactMarkdown>
         </div>
       </div>

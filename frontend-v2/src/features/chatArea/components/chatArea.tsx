@@ -177,12 +177,7 @@ export function ChatArea() {
       provider: model?.provider,
       conversation: currentChatId,
       useTools,
-      messages: [
-        {
-          role: "user",
-          ...getImagePayloadForProvider( model?.provider, image_data, message)
-        },
-      ],
+      messages: getMessagesForProvider(model?.provider, image_data, message),
     };
 
     try {
@@ -209,9 +204,15 @@ export function ChatArea() {
     message: string
   ): Record<string, any> => {
     if (image_data === null) {
-      return {
-        content: message
-      };
+      if (provider !== "google") {
+        return {
+          content: message,
+        };
+      } else {
+        return {
+          parts: [{ text: message }],
+        };
+      }
     }
     switch (provider) {
       case "ollama":
@@ -245,9 +246,34 @@ export function ChatArea() {
             },
           ],
         };
+      case "google":
+        return {
+          parts: [
+            { text: message },
+            {
+              inline_data: {
+                mime_type: image_data.type,
+                data: image_data.base64,
+              },
+            },
+          ],
+        };
       default:
         return {}; // No additional payload for providers without image support
     }
+  };
+
+  const getMessagesForProvider = (
+    provider: string | undefined,
+    image_data: { base64: string; type: string } | null,
+    message: string
+  ): Record<string, any> | Array<string> => {
+    return [
+      {
+        role: "user",
+        ...getImagePayloadForProvider(provider, image_data, message),
+      },
+    ];
   };
 
   const handleStreamResponse = async (

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BaseModelEntity } from "@/types/api";
 import { ChevronsUpDown, BotIcon, SearchIcon } from "lucide-react";
-import { SiOllama, SiOpenai, SiAnthropic } from "react-icons/si";
+import { SiOllama, SiOpenai, SiAnthropic, SiGooglegemini } from "react-icons/si";
 
 interface ModelSelectProps {
   selectedModel: BaseModelEntity | null;
@@ -58,6 +58,7 @@ export function ModelSelect({
     if (provider === "ollama") return "Ollama";
     if (provider === "openai") return "OpenAI";
     if (provider === "anthropic") return "Anthropic";
+    if (provider === "google") return "Google";
     return provider.charAt(0).toUpperCase() + provider.slice(1);
   }
 
@@ -65,6 +66,7 @@ export function ModelSelect({
     ollama: <SiOllama />,
     openai: <SiOpenai />,
     anthropic: <SiAnthropic />,
+    google: <SiGooglegemini />
   };
 
   return (
@@ -80,7 +82,7 @@ export function ModelSelect({
           ) : (
             <div className="flex items-center justify-between gap-2">
               {PROVIDER_ICONS[selectedModel?.provider as ProviderType] || (
-                <BotIcon />
+                <BotIcon size={5}/>
               )}
               {selectedModel?.name || "Select a model"}
             </div>
@@ -120,7 +122,7 @@ export function ModelSelect({
                       variant="secondary"
                       className="rounded-md text-primary"
                     >
-                      {PROVIDER_ICONS[provider as ProviderType] || <BotIcon />}
+                      {PROVIDER_ICONS[provider as ProviderType] || <BotIcon size={12}/>}
                     </Badge>
                     <span className="text-left text-sm font-normal truncate ml-2">
                       {model.name}

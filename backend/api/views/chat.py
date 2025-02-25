@@ -15,6 +15,9 @@ from ..services.llm_service_factory import LLMServiceFactory
 
 from users.models.settings import Settings
 
+from google import genai
+from google.genai import types as GoogleGenAITypes
+
 
 class ChatAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -149,14 +152,14 @@ class StreamChatAPIView(APIView):
                         old_messages[idx] = {
                             "role": role,
                             "content": old_messages[idx]["content"],
-                        }
+                        } if provider != "google" else {"role": role, "parts": [{"text": old_messages[idx]["content"]}]}
                     elif role == "assistant":
                         old_messages[idx] = {
                             "role": role,
                             "content": old_messages[idx]["content_variations"][-1][
                                 "content"
                             ],
-                        }
+                        } if provider != "google" else {"role": role, "parts": [{"text": old_messages[idx]["content_variations"][-1]["content"]}]}
                 messages = old_messages + messages
 
             self.llm_service = LLMServiceFactory.get_service(provider)
