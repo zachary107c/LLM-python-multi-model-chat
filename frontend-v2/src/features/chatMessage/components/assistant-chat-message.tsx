@@ -16,7 +16,12 @@ import GenerateNewMessageButton from "./generate-new-message-button";
 import { Button } from "@/components/ui/button";
 import { UndoDeleteAssistantMessageButton } from "./undo-delete-assistant-message.button";
 import { Avatar } from "@/components/ui/avatar";
-import { SiOllama, SiOpenai, SiAnthropic, SiGooglegemini } from "react-icons/si";
+import {
+  SiOllama,
+  SiOpenai,
+  SiAnthropic,
+  SiGooglegemini,
+} from "react-icons/si";
 import {
   Tooltip,
   TooltipContent,
@@ -201,7 +206,7 @@ export function AssistantChatMessage({
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent
-                      side="bottom"
+                      side="top"
                       className="flex flex-col justify-center items-start gap-2 border bg-background"
                     >
                       <span className="text-foreground text-md font-bold">
@@ -213,24 +218,35 @@ export function AssistantChatMessage({
                           key={index}
                           className="flex flex-col justify-center items-start p-1 text-foreground gap-2"
                         >
-                          {Object.entries(tool.arguments).map(
-                            ([key, value], argIndex) => (
-                              <div
-                                key={argIndex}
-                                className="w-full flex justify-between items-center"
-                              >
-                                <pre>
-                                  <span className="text-primary">
-                                    {tool.name}
-                                  </span>
-                                  ({key}=
-                                  <span className="text-chart-2">
-                                    "{value}"
-                                  </span>
-                                  )
-                                </pre>
-                              </div>
+                          {Object.entries(tool.arguments).length > 0 ? (
+                            Object.entries(tool.arguments).map(
+                              ([key, value], argIndex) => (
+                                <div
+                                  key={argIndex}
+                                  className="w-full flex justify-between items-center"
+                                >
+                                  <pre>
+                                    <span className="text-primary">
+                                      {tool.name}
+                                    </span>
+                                    ({key}=
+                                    <span className="text-chart-2">
+                                      "{value}"
+                                    </span>
+                                    )
+                                  </pre>
+                                </div>
+                              )
                             )
+                          ) : (
+                            <div className="w-full flex justify-between items-center">
+                              <pre>
+                                <span className="text-primary">
+                                  {tool.name}
+                                </span>
+                                ()
+                              </pre>
+                            </div>
                           )}
                         </div>
                       ))}

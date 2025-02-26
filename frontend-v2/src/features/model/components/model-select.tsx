@@ -50,6 +50,7 @@ export function ModelSelect({
   }, {});
 
   const handleNewModel = (model: BaseModelEntity) => {
+    console.log("Model Selected: ", model, model.name);
     onModelChange(model);
     setSearchQuery("");
   };
@@ -115,7 +116,7 @@ export function ModelSelect({
                 {models.map((model) => (
                   <DropdownMenuItem
                     onClick={() => handleNewModel(model)}
-                    key={model.id}
+                    key={model.name}
                     className="hover:bg-accent-2 flex"
                   >
                     <Badge

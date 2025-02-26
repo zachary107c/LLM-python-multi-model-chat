@@ -43,7 +43,7 @@ class GoogleAIService(BaseLLMService):
             return {"error": "GoogleAI Service is not initialized. Please set the GEMINI_API_KEY."}
 
         try:
-            response: types.GenerateContentResponse = self.client.models.generate_content(model=model, contents=messages, **kwargs)
+            response: types.GenerateContentResponse = self.client.models.generate_content(model=model, contents=[self.map_payload_to_provider(message) for message in messages], **kwargs)
             return response.model_dump_json()
         except Exception as e:
             self.logger.error(f"Google AI API request failed: {e}")
@@ -69,7 +69,7 @@ class GoogleAIService(BaseLLMService):
             return
 
         try:
-            response = self.client.models.generate_content_stream(model=model, contents=messages)
+            response = self.client.models.generate_content_stream(model=model, contents=[self.map_payload_to_provider(message) for message in messages])
             for chunk in response:
                 if chunk is not None and chunk.text is not None:
                     yield {
@@ -104,3 +104,21 @@ class GoogleAIService(BaseLLMService):
         except Exception as e:
             self.logger.error(f"Failed to retrieve model details: {e}")
             return {"error": str(e)}
+    
+    def map_payload_to_provider(self, message):
+        mapped_message = {
+            "role": message.get("role", "user"),
+            "parts": [{"text": message.get("content", "")}]
+        }
+        
+        if images := message.get("images", []):
+            for image in images:
+                mapped_message["parts"].append({
+                    "inline_data": {
+                        "mime_type": image.get("type", ""),
+                        "data": image.get("data", "")
+                    }
+                })
+
+        return mapped_message
+    

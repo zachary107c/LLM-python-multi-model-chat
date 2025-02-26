@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { HashLoader } from "react-spinners";
-
 import { api } from "@/lib/api-client";
 import { env } from "@/config/env";
 import { useUser } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import useScrollToEnd from "../hooks/use-scroll-to-end";
-
 import { ChatInput } from "@/features/chatInput/components/chat-input";
 import { createUserMessage } from "@/features/chatMessage/api/create-user-message";
 import { createAssistantMessage } from "@/features/chatMessage/api/create-assistant-message";
@@ -17,11 +15,9 @@ import { useGetConversationQuery } from "@/features/conversation/api/get-convers
 import { createConversationMutation } from "@/features/conversation/api/create-conversation";
 import { useGetModelsQuery } from "@/features/model/api/get-models";
 import { useConversationId } from "@/features/conversation/contexts/conversationContext";
-
 import { UserChatMessage } from "@/features/chatMessage/components/user-chat-message";
 import { AssistantChatMessage } from "@/features/chatMessage/components/assistant-chat-message";
 import { Welcome } from "@/features/suggestions/components/welcome";
-import { WelcomeLoading } from "@/features/suggestions/components/welcome-loading";
 
 import {
   UserMessage,
@@ -173,11 +169,22 @@ export function ChatArea() {
 
     const image_data = await toDataURL(userPostData.image);
     const payload = {
+      conversation: conversationId,
       model: model?.model,
       provider: model?.provider,
-      conversation: currentChatId,
-      useTools,
-      messages: getMessagesForProvider(model?.provider, image_data, message),
+      use_tools: useTools,
+      message: {
+        content: message,
+        role: "user",
+        images: image_data
+          ? [
+              {
+                type: image_data?.type,
+                data: image_data?.base64,
+              },
+            ]
+          : [],
+      },
     };
 
     try {
@@ -196,84 +203,6 @@ export function ChatArea() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getImagePayloadForProvider = (
-    provider: string | undefined,
-    image_data: { base64: string; type: string } | null,
-    message: string
-  ): Record<string, any> => {
-    if (image_data === null) {
-      if (provider !== "google") {
-        return {
-          content: message,
-        };
-      } else {
-        return {
-          parts: [{ text: message }],
-        };
-      }
-    }
-    switch (provider) {
-      case "ollama":
-        return {
-          images: [image_data.base64],
-          content: message,
-        };
-      case "openai":
-        return {
-          content: [
-            { type: "text", text: message },
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:${image_data.type};base64,${image_data.base64}`,
-              },
-            },
-          ],
-        };
-      case "anthropic":
-        return {
-          content: [
-            { type: "text", text: message },
-            {
-              type: "image",
-              source: {
-                type: "base64",
-                media_type: image_data.type,
-                data: image_data.base64,
-              },
-            },
-          ],
-        };
-      case "google":
-        return {
-          parts: [
-            { text: message },
-            {
-              inline_data: {
-                mime_type: image_data.type,
-                data: image_data.base64,
-              },
-            },
-          ],
-        };
-      default:
-        return {}; // No additional payload for providers without image support
-    }
-  };
-
-  const getMessagesForProvider = (
-    provider: string | undefined,
-    image_data: { base64: string; type: string } | null,
-    message: string
-  ): Record<string, any> | Array<string> => {
-    return [
-      {
-        role: "user",
-        ...getImagePayloadForProvider(provider, image_data, message),
-      },
-    ];
   };
 
   const handleStreamResponse = async (

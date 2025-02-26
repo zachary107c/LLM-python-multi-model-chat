@@ -82,7 +82,7 @@ class OllamaService(BaseLLMService):
                 if tools:
                     response = self.client.chat(
                         model=model,
-                        messages=messages,
+                        messages=[self.map_payload_to_provider(message) for message in messages],
                         stream=False,
                         tools=tools.values(),
                     )
@@ -99,7 +99,7 @@ class OllamaService(BaseLLMService):
                         
             response = self.client.chat(
                 model=model,
-                messages=messages,
+                messages=[self.map_payload_to_provider(message) for message in messages],
                 stream=False,
             ).model_dump()
             response["tools_used"] = called_tools
@@ -145,7 +145,7 @@ class OllamaService(BaseLLMService):
                 if tools:
                     response = self.client.chat(
                         model=model,
-                        messages=messages,
+                        messages=[self.map_payload_to_provider(message) for message in messages],
                         stream=False,
                         tools=tools.values(),
                     )
@@ -160,7 +160,7 @@ class OllamaService(BaseLLMService):
                             "content": f"Utilize the following information from a tool call you just performed to answer the user's question. Don't reference the fact that you used a tool.\n\nDATA:\n{data}",
                         })
 
-            for response in self.client.chat(model=model, messages=messages, stream=True):
+            for response in self.client.chat(model=model, messages=[self.map_payload_to_provider(message) for message in messages], stream=True):
                 response = response.model_dump()
                 response["tools_used"] = called_tools
                 yield response
@@ -202,3 +202,14 @@ class OllamaService(BaseLLMService):
             return model_info
         except (RequestError, ResponseError) as e:
             return {"error": str(e)}
+    
+    def map_payload_to_provider(self, message):
+        mapped_message = {
+            "role": message.get("role", "user"),
+            "content": message.get("content", "")
+        }
+
+        if images := message.get("images", []):
+            mapped_message["images"] = [image["base64"] for image in images]
+
+        return mapped_message

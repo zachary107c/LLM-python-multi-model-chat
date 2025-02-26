@@ -50,7 +50,7 @@ class AnthropicService(BaseLLMService):
             from anthropic.types.completion import Completion
 
             response: Completion = self.client.messages.create(
-                model=model, messages=messages, max_tokens=4096
+                model=model, messages=[self.map_payload_to_provider(message) for message in messages], max_tokens=4096
             )
             response_json = response.model_dump()
             response_json["message"] = {"content": response_json["content"][0]["text"]}
@@ -80,7 +80,7 @@ class AnthropicService(BaseLLMService):
 
         try:
             with self.client.messages.stream(
-                model=model, messages=messages, max_tokens=4096
+                model=model, messages=[self.map_payload_to_provider(message) for message in messages], max_tokens=4096
             ) as stream:
                 for text in stream.text_stream:
                     if text is not None:
@@ -102,7 +102,7 @@ class AnthropicService(BaseLLMService):
             }
 
         model_list = self.client.models.list()
-        return []
+        return model_list
 
     def get_model(self) -> Dict:
         if not self.client:
@@ -111,4 +111,23 @@ class AnthropicService(BaseLLMService):
             }
 
         return {}
+
+    def map_payload_to_provider(self, message):
+        mapped_message = {
+            "role": message.get("role", "user"),
+            "content": [{"type": "text", "text": message.get("content", "")}]
+        }
+        
+        if images := message.get("images", []):
+            for image in images:
+                mapped_message["content"].append({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": image.get("type", ""),
+                        "data": image.get("base64", "")
+                    }
+                })
+                
+        return mapped_message
 

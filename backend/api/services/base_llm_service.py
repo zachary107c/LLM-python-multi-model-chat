@@ -30,3 +30,7 @@ class BaseLLMService(ABC):
     @abstractmethod
     def get_model(self) -> Dict:
         pass
+    
+    @abstractmethod
+    def map_payload_to_provider(self, message):
+        pass

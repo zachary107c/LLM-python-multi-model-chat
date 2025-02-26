@@ -75,12 +75,6 @@ class AzureOpenAIService(BaseLLMService):
             self.logger.error(f"Azure OpenAI API request failed: {e}")
             return {"error": str(e)}
 
-    def get_models(self) -> Dict:
-        return []
-
-    def get_model(self) -> Dict:
-        return {}
-
     def chat_stream(self, model: str, messages: List[Dict[str, str]], **kwargs):
         """
         Sends a chat completion request to the Azure OpenAI API with streaming enabled.
@@ -116,3 +110,11 @@ class AzureOpenAIService(BaseLLMService):
             self.logger.error(f"Azure OpenAI API streaming request failed: {e}")
             yield {"error": str(e)}
 
+    def get_models(self) -> Dict:
+        return []
+
+    def get_model(self) -> Dict:
+        return {}
+    
+    def map_payload_to_provider(self, message):
+        pass
