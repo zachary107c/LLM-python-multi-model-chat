@@ -141,7 +141,7 @@ export function AssistantChatMessage({
               </span>
             </Badge>
           </div>
-          <Card className="w-full bg-transparent shadow-none border-none text-sm">
+          <Card className="w-full bg-transparent shadow-none border-none text-sm overflow-hidden">
             <MarkdownRenderer content={localizeUTCDates(displayContent)} />
           </Card>
         </div>

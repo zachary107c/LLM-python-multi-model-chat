@@ -49,9 +49,9 @@ const defaultStyles: MarkdownStyles = {
   container:
     "font-erm prose dark:prose-invert max-w-none overflow-x-auto break-words",
   headings: {
-    h1: "text-3xl font-bold mt-8 mb-4 break-words",
-    h2: "text-2xl font-bold mt-6 mb-4 break-words",
-    h3: "text-xl font-bold mt-4 mb-2 break-words",
+    h1: "text-3xl font-bold mt-8 mb-4 break-words text-primary",
+    h2: "text-2xl font-bold mt-6 mb-4 break-words text-primary/80",
+    h3: "text-xl font-bold mt-4 mb-2 break-words text-primary/50",
   },
   lists: {
     ul: "list-disc ml-6 mb-4",
@@ -73,8 +73,8 @@ const defaultStyles: MarkdownStyles = {
     inline: "overflow-x-auto",
   },
   code: {
-    block: "rounded-lg p-4 bg-secondary overflow-x-auto whitespace-pre",
-    inline: "bg-secondary rounded px-1 whitespace-nowrap",
+    block: "rounded-lg p-4 bg-secondary max-h-60 overflow-auto whitespace-pre",
+    inline: "bg-secondary rounded px-1 whitespace-normal break-words",
   },
 };
 
