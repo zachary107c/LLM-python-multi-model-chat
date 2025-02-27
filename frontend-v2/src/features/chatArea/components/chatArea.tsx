@@ -150,7 +150,7 @@ export function ChatArea() {
     }
 
     const userPostData = await createUserMessage({
-      data: { conversation: currentChatId, content: message, image: imageData },
+      data: { conversation: currentChatId, content: message, image: imageData, use_tools: useTools },
     });
 
     if (messages.length === 0) {

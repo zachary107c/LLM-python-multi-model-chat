@@ -121,6 +121,7 @@ export type UserMessage = Entity<{
     is_deleted: boolean;
     deleted_at: string;
     recoverable: string;
+    use_tools: boolean;
   }>;
   
   export type ContentVariation = {

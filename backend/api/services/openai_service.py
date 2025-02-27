@@ -127,7 +127,7 @@ class OpenAIService(BaseLLMService):
         }
         
         mapped_message["content"].extend(
-            {"type": "image_url", "image_url": {"url": f"data:{image['type']};base64,{image['base64']}"}}
+            {"type": "image_url", "image_url": {"url": f"data:{image['type']};base64,{image['data']}"}}
             for image in message.get("images", [])
         )
 

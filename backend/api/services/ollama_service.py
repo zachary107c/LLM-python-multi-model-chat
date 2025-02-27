@@ -210,6 +210,6 @@ class OllamaService(BaseLLMService):
         }
 
         if images := message.get("images", []):
-            mapped_message["images"] = [image["base64"] for image in images]
+            mapped_message["images"] = [image["data"] for image in images]
 
         return mapped_message

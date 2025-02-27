@@ -68,46 +68,26 @@ const GenerateNewMessageButton: React.FC<{
         ? await toDataURL(assistantMessage.generated_by.image)
         : null;
 
+      console.log(image_data);
+      
       const payload = {
+        conversation: conversationId,
         model: assistantMessage.model?.model,
         provider: assistantMessage.model?.provider,
-        conversation: assistantMessage.conversation,
-        messages: [
-          {
-            role: "user",
-            content: "",
-          } as { role: string; content: string | any[]; images?: string[] },
-        ],
+        use_tools: assistantMessage.generated_by.use_tools,
+        message: {
+          content: assistantMessage.generated_by.content,
+          role: "user",
+          images: image_data
+            ? [
+                {
+                  type: image_data?.type,
+                  data: image_data?.base64,
+                },
+              ]
+            : [],
+        },
       };
-
-      if (image_data) {
-        if (assistantMessage.model?.provider === "ollama") {
-          payload.messages[0]["images"] = [image_data.base64];
-          payload.messages[0].content = assistantMessage.generated_by.content;
-        } else if (assistantMessage.model?.provider === "openai") {
-          let text_part = { type: "text", text: assistantMessage.generated_by.content };
-          let image_part = {
-            type: "image_url",
-            image_url: {
-              url: `data:${image_data.type};base64,${image_data.base64}`,
-            },
-          };
-          payload.messages[0].content = [text_part, image_part];
-        } else if (assistantMessage.model?.provider === "anthropic") {
-          let text_part = { type: "text", text: assistantMessage.generated_by.content };
-          let image_part = {
-            type: "image",
-            source: {
-              type: "base64",
-              media_type: image_data.type,
-              data: image_data.base64
-            },
-          };
-          payload.messages[0].content = [text_part, image_part];
-        }
-      } else {
-        payload.messages[0].content = assistantMessage.generated_by.content;
-      }
 
       if (userSettings.data?.settings?.stream_responses) {
         const response = await fetch(`${env.BACKEND_API_URL}chat/stream/`, {

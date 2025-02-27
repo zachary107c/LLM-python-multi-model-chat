@@ -5,7 +5,7 @@ const useScrollToEnd = (messages: (UserMessage | AssistantMessage)[]) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: "smooth" });
+    ref.current?.scrollIntoView({ behavior: "instant" });
   }, [messages]);
 
   return ref;

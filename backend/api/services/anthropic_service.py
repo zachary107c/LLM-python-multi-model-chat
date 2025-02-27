@@ -125,7 +125,7 @@ class AnthropicService(BaseLLMService):
                     "source": {
                         "type": "base64",
                         "media_type": image.get("type", ""),
-                        "data": image.get("base64", "")
+                        "data": image.get("data", "")
                     }
                 })
                 
