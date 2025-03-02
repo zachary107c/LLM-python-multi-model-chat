@@ -5,8 +5,9 @@ import { UserMessage } from "@/types/api";
 import { ImageExpandModal } from "./image-expander-modal";
 import MarkdownRenderer from "@/features/markdown/components/markdown";
 import { UndoDeleteUserMessageButton } from "./undo-delete-user-message-button";
+import { memo } from "react";
 
-export function UserChatMessage({
+const UserChatMessage = memo(function UserChatMessage({
   userMessageData,
 }: {
   userMessageData: UserMessage;
@@ -72,4 +73,6 @@ export function UserChatMessage({
       )}
     </div>
   );
-}
+});
+
+export default UserChatMessage;

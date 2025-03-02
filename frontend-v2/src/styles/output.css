@@ -1712,6 +1712,10 @@ body {
   height: 100svh;
 }
 
+.max-h-60 {
+  max-height: 15rem;
+}
+
 .max-h-96 {
   max-height: 24rem;
 }
@@ -1730,10 +1734,6 @@ body {
 
 .max-h-screen {
   max-height: 100vh;
-}
-
-.max-h-60 {
-  max-height: 15rem;
 }
 
 .min-h-0 {
@@ -2995,6 +2995,14 @@ body {
   color: hsl(var(--primary-foreground));
 }
 
+.text-primary\/50 {
+  color: hsl(var(--primary) / 0.5);
+}
+
+.text-primary\/80 {
+  color: hsl(var(--primary) / 0.8);
+}
+
 .text-purple-600 {
   --tw-text-opacity: 1;
   color: rgb(147 51 234 / var(--tw-text-opacity, 1));
@@ -3020,14 +3028,6 @@ body {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-.text-primary\/50 {
-  color: hsl(var(--primary) / 0.5);
-}
-
-.text-primary\/80 {
-  color: hsl(var(--primary) / 0.8);
 }
 
 .underline {

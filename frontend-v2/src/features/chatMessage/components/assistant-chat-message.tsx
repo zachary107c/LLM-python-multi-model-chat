@@ -28,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
+import { memo } from "react";
 
 function localizeUTCDates(text: string) {
   const utcDatePattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z/g;
@@ -44,7 +45,7 @@ function localizeUTCDates(text: string) {
   });
 }
 
-export function AssistantChatMessage({
+const AssistantChatMessage = memo(function AssistantChatMessage({
   assistantMessageData,
 }: {
   assistantMessageData: AssistantMessage;
@@ -259,4 +260,6 @@ export function AssistantChatMessage({
       </div>
     </div>
   );
-}
+});
+
+export default AssistantChatMessage;
