@@ -127,6 +127,14 @@ You can then access the site at http://localhost:5173 (or the ip of the device o
 ![image](https://github.com/user-attachments/assets/ff7362d9-dec5-41a8-af9a-54c3361fad63)
 ![image](https://github.com/user-attachments/assets/b1b93702-50b4-4704-acc2-c96da9dcbe1f)
 
+### Themes
+![image](https://github.com/user-attachments/assets/17ccf50c-3ea5-46c9-9d4c-4d2c47880055)
+![image](https://github.com/user-attachments/assets/86ebf58b-b3b4-4fa5-ba63-9e72cda5064c)
+![image](https://github.com/user-attachments/assets/a66702fc-e151-4ed0-9d32-0d9b43590661)
+
+
+
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
