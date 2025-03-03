@@ -1,7 +1,5 @@
-import { useToast } from '@/hooks/use-toast';
 import { env } from '@/config/env';
 import urlJoin from 'url-join';
-import { userInfo } from 'os';
 
 type RequestConfig = {
   headers?: Record<string, string>;

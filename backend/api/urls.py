@@ -8,6 +8,7 @@ from .views.model import ModelListCreateView, ModelDetailWithInfoView, ModelsPop
 from .views.chat import ChatAPIView, StreamChatAPIView
 from .views.three_suggestions import ThreeSuggestionsAPIView
 from .views.tool import ToolsListCreateView, ToolsDetailView
+from .views.magic_title import MagicTitleAPIView
 
 
 urlpatterns = [
@@ -25,5 +26,6 @@ urlpatterns = [
     path("chat/stream/", StreamChatAPIView.as_view(), name="chat-stream"),
     path("suggestions/", ThreeSuggestionsAPIView.as_view(), name="suggestions"),
     path("tools/", ToolsListCreateView.as_view(), name="tools"),
-    path("tools/<str:pk>/", ToolsDetailView.as_view(), name="tools-detail")
+    path("tools/<str:pk>/", ToolsDetailView.as_view(), name="tools-detail"),
+    path("magic", MagicTitleAPIView.as_view(), name="magic-title")
 ]

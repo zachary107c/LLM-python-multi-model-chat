@@ -15,7 +15,7 @@ const MessageList = memo(function MessageList({ messages }: MessageListProps) {
   return (
     <div className="message-list">
       {messages.map((message) => (
-        <div key={message.id}>
+        <div key={`message-${message.type}-${message.id}`}>
           {message.type === "user" ? (
             <UserChatMessage userMessageData={message as UserMessage} />
           ) : (
