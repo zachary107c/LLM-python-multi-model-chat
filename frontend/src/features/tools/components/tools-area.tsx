@@ -24,7 +24,7 @@ export function ToolsArea() {
   const { toolId, setToolId } = useToolId();
 
   if (toolsLoading || tools === undefined) {
-    return <div>Loading Tools . . .</div>;
+    return (<div>Loading Tools . . .</div>);
   }
 
   const filteredTools = tools.filter(
@@ -35,7 +35,7 @@ export function ToolsArea() {
 
   const handleNewTool = async () => {
     try {
-      var response = await createMutation.mutateAsync();
+      const response = await createMutation.mutateAsync();
       setToolId(response.id);
     } catch (e) {
       console.log(e);
