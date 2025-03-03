@@ -34,7 +34,7 @@ services:
   nginx:
     container_name: bruh-nginx
     build:
-      context: .
+      context: ./nginx
       dockerfile: Dockerfile
     ports:
       - "8008:8008"
