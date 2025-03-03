@@ -57,7 +57,7 @@ class MagicTitleAPIView(APIView):
         ), many=True).data
         for message in assistant_messages:
             message["type"] = "assistant"
-            
+
         user_messages = UserMessageSerializer( UserMessage.objects.filter(conversation__id=conversation), many=True).data
         for message in user_messages:
             message["type"] = "user"
@@ -95,7 +95,7 @@ class MagicTitleAPIView(APIView):
             model=model,
             messages=[
                 {
-                    "role": "assistant", 
+                    "role": "assistant",
                     "content": PROMPTS.get("title")
                 },
                 {

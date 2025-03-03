@@ -44,8 +44,10 @@ BS-LLM-WebUI is a web application with a frontend built using React and Vite, an
 ## Quickstart using Docker
 
 ```sh
-docker compose up --build
+docker compose up --build -d
 ```
+
+Then the app will be accessible on http://127.0.0.1:8008 (or the ip of the device running the app on your local network)
 
 ## Frontend Setup (React with Vite)
 
@@ -61,10 +63,11 @@ cd frontend
 npm install
 ```
 
-### 3. Start the Development Server
+### 3. Start the Development Server & Tailwind watch
 
 ```sh
-npm run dev
+make run
+make tailw
 ```
 
 This will start the Vite development server, and you should be able to access the frontend at `http://localhost:5173` by default.
@@ -95,7 +98,12 @@ poetry run python manage.py migrate
 poetry run python manage.py createsuperuser
 ```
 
-### 5. Start the Django Development Server
+### 5. Populate the Models table
+```sh
+poetry run python manage.py populate_models
+```
+
+### 6. Start the Django Development Server
 
 ```sh
 poetry run python manage.py runserver
@@ -111,6 +119,8 @@ To run the application, start both the frontend and backend servers as described
 2. Start the Django development server in the backend directory.
 
 The frontend React application will communicate with the Django backend via API calls.
+
+You can then access the site at http://localhost:5173 (or the ip of the device on the local network)
 
 ## License
 
