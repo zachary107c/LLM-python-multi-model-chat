@@ -29,28 +29,28 @@ BS-LLM-WebUI is a web application with a frontend built using React and Vite, an
 - _Check to ensure each folder (frontend, backend, nginx) have their .env files created. Look at the sample.env files for examples._
 
 ### Frontend Environment Variables
-- **VITE_APP_BACKEND_API_URL**: The url the frontend will use to access the backend.
+- `VITE_APP_BACKEND_API_URL`: The url the frontend will use to access the backend.
   - If locally, `http://127.0.0.1:8000/api/v1/`
   - If with docker compose, `/api/v1/`
 
 ### Backend Environment Variables
-- **ALLOWED_HOSTS**: The allowed hosts lists for django.
-- **OLLAMA_ENDPOINT**: The endpoint to access Ollama running locally.
-- **OPENAI_API_KEY**: API Key to interact with OpenAI apis.
-- **ANTHROPIC_API_KEY**: API Key to interact with Anthropic apis.
-- **GEMINI_API_KEY**: API Key to interact with Google AI apis.
-- **AZURE_OPENAI_ENDPOINT**: Endpoint for Azure Open AI resource.
-- **AZURE_OPENAI_API_KEY**: API Key for Azure Open AI resource.
-- **AZURE_OPENAI_VERSION**: API Version of Azure Open AI resource.
+- `ALLOWED_HOSTS`: The allowed hosts lists for django.
+- `OLLAMA_ENDPOINT`: The endpoint to access Ollama running locally.
+- `OPENAI_API_KEY`: API Key to interact with OpenAI apis.
+- `ANTHROPIC_API_KEY`: API Key to interact with Anthropic apis.
+- `GEMINI_API_KEY`: API Key to interact with Google AI apis.
+- `AZURE_OPENAI_ENDPOINT`: Endpoint for Azure Open AI resource.
+- `AZURE_OPENAI_API_KEY`: API Key for Azure Open AI resource.
+- `AZURE_OPENAI_VERSION`: API Version of Azure Open AI resource.
 
 _Azure Open AI is not fully supported yet_
 
 ### Root Environment Variables
-- **DJANGO_SUPERUSER_USERNAME**: Username of the Django super user.
-- **DJANGO_SUPERUSER_PASSWORD**: Password of the Django super user.
-- **DJANGO_SUPERUSER_EMAIL**: Email of the Django super user.
-- **OLLAMA_ENDPOINT**: The endpoint to access Ollama running locally.
-- **VITE_APP_BACKEND_API_URL**: The url the frontend will use to access the backend.
+- `DJANGO_SUPERUSER_USERNAME`: Username of the Django super user.
+- `DJANGO_SUPERUSER_PASSWORD`: Password of the Django super user.
+- `DJANGO_SUPERUSER_EMAIL`: Email of the Django super user.
+- `OLLAMA_ENDPOINT`: The endpoint to access Ollama running locally.
+- `VITE_APP_BACKEND_API_URL`: The url the frontend will use to access the backend.
   - If locally, `http://127.0.0.1:8000/api/v1/`
   - If with docker compose, `/api/v1/`
 
