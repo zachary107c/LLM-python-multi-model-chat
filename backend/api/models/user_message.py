@@ -15,6 +15,7 @@ class UserMessage(models.Model):
     )
     is_deleted = models.BooleanField(default=False)
     deleted_at = models.DateTimeField(null=True, blank=True)
+    use_tools = models.BooleanField(default=False)
 
     def soft_delete(self):
         self.is_deleted = True

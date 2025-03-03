@@ -50,7 +50,7 @@ class OpenAIService(BaseLLMService):
             from openai.types.chat import ChatCompletion
 
             response: ChatCompletion = self.client.chat.completions.create(
-                model=model, messages=messages
+                model=model, messages=[self.map_payload_to_provider(message) for message in messages]
             )
 
             response_json = response.model_dump()
@@ -84,7 +84,7 @@ class OpenAIService(BaseLLMService):
 
         try:
             stream = self.client.chat.completions.create(
-                model=model, messages=messages, stream=True
+                model=model, messages=[self.map_payload_to_provider(message) for message in messages], stream=True
             )
 
             for chunk in stream:
@@ -120,3 +120,15 @@ class OpenAIService(BaseLLMService):
 
         return {}
 
+    def map_payload_to_provider(self, message):
+        mapped_message = {
+            "role": message.get("role", "user"),
+            "content": [{"type": "text", "text": message.get("content", "")}]
+        }
+        
+        mapped_message["content"].extend(
+            {"type": "image_url", "image_url": {"url": f"data:{image['type']};base64,{image['data']}"}}
+            for image in message.get("images", [])
+        )
+
+        return mapped_message

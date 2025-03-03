@@ -1,8 +1,6 @@
 import { useGetConversationQuery } from "@/features/conversation/api/get-conversation";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
-import Cookies from "js-cookie";
-
 
 export const useConversationalTitleGenerator = (conversationId: string) => {
   const {
@@ -52,11 +50,9 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
         ],
       };
 
-      const summaryResponse = await api.post('/chat/', summaryPayload, {
-        headers: { Authorization: `Token ${Cookies.get("token")}` },
-      });
+      const summaryResponse = await api.post('/chat/', summaryPayload);
 
-      const summary = summaryResponse.message.content.replace(/"/g, "");
+      const summary = (summaryResponse as any).message.content.replace(/"/g, "");
 
       const payload = {
         model: "gpt-4o-mini",
@@ -71,11 +67,9 @@ export const useConversationalTitleGenerator = (conversationId: string) => {
         ],
       };
 
-      const response = await api.post('/chat/', payload, {
-        headers: { Authorization: `Token ${Cookies.get("token")}` },
-      });
+      const response = await api.post('/chat/', payload);
 
-      return response.message.content.replace(/"/g, "");
+      return (response as any).message.content.replace(/"/g, "");
     } catch (err) {
       setError("Failed to generate a title.");
       console.error(err);

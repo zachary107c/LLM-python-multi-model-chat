@@ -1,12 +1,13 @@
-import { Flex, Card, Text } from "@radix-ui/themes";
+import { Card } from "@/components/ui/card";
 import { deleteUserMessageMutation } from "@/features/chatMessage/api/delete-user-message";
 import { DeleteMessageModal } from "./delete-message-modal";
 import { UserMessage } from "@/types/api";
 import { ImageExpandModal } from "./image-expander-modal";
 import MarkdownRenderer from "@/features/markdown/components/markdown";
 import { UndoDeleteUserMessageButton } from "./undo-delete-user-message-button";
+import { memo } from "react";
 
-export function UserChatMessage({
+const UserChatMessage = memo(function UserChatMessage({
   userMessageData,
 }: {
   userMessageData: UserMessage;
@@ -31,42 +32,47 @@ export function UserChatMessage({
 
   return (
     <div className="mb-2">
-      <div className="flex justify-end">
-        <Card className="w-fit flex flex-col">
-          {userMessageData.image
-            ? ImageExpandModal({ imagePath: userMessageData.image })
-            : null}
+      <div className="flex flex-col items-end">
+        {userMessageData.image
+          ? ImageExpandModal({ imagePath: userMessageData.image })
+          : null}
+        <Card className="w-fit flex flex-col p-2 bg-secondary shadow-none rounded-md">
           <div>
             <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
-              <Text size="2">
+              <span className="text-sm text-left w-fit">
                 <MarkdownRenderer
-                  markdown={localizeUTCDates(userMessageData.content)}
+                  content={localizeUTCDates(userMessageData.content)}
                 />
-              </Text>
+              </span>
             </div>
           </div>
         </Card>
       </div>
       {userMessageData.is_deleted ? (
-        userMessageData.recoverable ?
-        <div className="flex justify-end">
-          <Flex gap="0" align="center">
-            <UndoDeleteUserMessageButton
-              messageId={userMessageData.id}
-              conversationId={userMessageData.conversation}
-            />
-          </Flex>
-        </div> : <></>
+        userMessageData.recoverable ? (
+          <div className="flex justify-end">
+            <div className="flex gap-0 align-middle">
+              <UndoDeleteUserMessageButton
+                messageId={userMessageData.id}
+                conversationId={userMessageData.conversation}
+              />
+            </div>
+          </div>
+        ) : (
+          <></>
+        )
       ) : (
         <div className="flex justify-end">
-          <Flex gap="0" align="center">
+          <div className="flex gap-0 align-middle">
             <DeleteMessageModal
               messageId={userMessageData.id}
               deleteMutation={deleteMutation}
             />
-          </Flex>
+          </div>
         </div>
       )}
     </div>
   );
-}
+});
+
+export default UserChatMessage;

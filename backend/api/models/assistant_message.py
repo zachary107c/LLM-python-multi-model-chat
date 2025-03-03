@@ -14,7 +14,7 @@ class AssistantMessage(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     content_variations = models.ManyToManyField(ContentVariation)
     generated_by = models.ForeignKey(UserMessage, on_delete=models.DO_NOTHING)
-    model = models.ForeignKey(Model, on_delete=models.DO_NOTHING)
+    model = models.ForeignKey(Model, on_delete=models.SET_NULL, null=True)
     provider = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     liked = models.BooleanField(default=False)

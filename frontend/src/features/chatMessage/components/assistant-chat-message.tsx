@@ -1,21 +1,36 @@
 import { useState, useEffect } from "react";
-import { Flex, Card, Text, Badge } from "@radix-ui/themes";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
-  SlashIcon,
+  BotIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
-} from "@radix-ui/react-icons";
+  InfoIcon,
+} from "lucide-react";
 import { deleteAssistantMessageMutation } from "@/features/chatMessage/api/delete-assistant-message";
 import { LikeMessageButton } from "./like-message-button";
 import { DeleteMessageModal } from "./delete-message-modal";
 import { AssistantMessage } from "@/types/api";
 import MarkdownRenderer from "@/features/markdown/components/markdown";
 import GenerateNewMessageButton from "./generate-new-message-button";
-import { Button as LocalButton } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { UndoDeleteAssistantMessageButton } from "./undo-delete-assistant-message.button";
+import { Avatar } from "@/components/ui/avatar";
+import {
+  SiOllama,
+  SiOpenai,
+  SiAnthropic,
+  SiGooglegemini,
+} from "react-icons/si";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
+import { memo } from "react";
 
 function localizeUTCDates(text: string) {
-  // Regular expression to match ISO 8601 UTC datetime format
   const utcDatePattern = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z/g;
 
   return text.replace(utcDatePattern, (match) => {
@@ -26,12 +41,11 @@ function localizeUTCDates(text: string) {
       day: "numeric",
       hour: "numeric",
       minute: "numeric",
-      // second: "numeric",
     });
   });
 }
 
-export function AssistantChatMessage({
+const AssistantChatMessage = memo(function AssistantChatMessage({
   assistantMessageData,
 }: {
   assistantMessageData: AssistantMessage;
@@ -53,8 +67,7 @@ export function AssistantChatMessage({
   };
 
   const handleRegenerate = () => {
-    setStreamingContent(""); // Start with empty content for streaming
-    // Don't create a new variation here - wait for the streaming to complete
+    setStreamingContent("");
   };
 
   const handleStreamComplete = (finalContent: string) => {
@@ -63,7 +76,6 @@ export function AssistantChatMessage({
     setCurrentVariationIndex((prev) => prev + 1);
   };
 
-  // Reset when content variations change from the server
   useEffect(() => {
     setVariations(assistantMessageData.content_variations);
     setCurrentVariationIndex(
@@ -84,117 +96,170 @@ export function AssistantChatMessage({
     );
   };
 
-  // Show either streaming content or current variation
   const displayContent =
     streamingContent !== null
       ? streamingContent
       : variations[currentVariationIndex]?.content;
 
+  const PROVIDER_ICONS: Record<string, JSX.Element> = {
+    ollama: <SiOllama color="hsl(var(--primary-foreground))" />,
+    openai: <SiOpenai color="hsl(var(--primary-foreground))" />,
+    anthropic: <SiAnthropic color="hsl(var(--primary-foreground))" />,
+    google: <SiGooglegemini color="hsl(var(--primary-foreground))" />,
+  };
+
+  type ProviderType = "ollama" | "openai" | "anthropic";
+
   return (
-    <div className="mb-2">
-      <div>
+    <div className="flex items-start gap-2 mb-2">
+      <Avatar className="rounded-md h-8 w-8 bg-primary flex justify-center items-center">
+        {PROVIDER_ICONS[
+          assistantMessageData.model.provider as ProviderType
+        ] || <BotIcon color="hsl(var(--primary-foreground))" size={17} />}
+      </Avatar>
+      <div className="flex flex-col">
         <div>
-          <div className="mb-1 flex justify-start items-center">
-            <div className="flex items-center">
-              <Text
-                color={assistantMessageData.model.color}
-                className="ml-1"
-                size="1"
-              >
-                {assistantMessageData.model.name}
-              </Text>
-              <Text>
-                <SlashIcon />
-              </Text>
-              <Text weight="light" size="1">
+          <div className="mb-1 flex items-center gap-2">
+            <span className="text-sm text-primary font-bold">
+              {assistantMessageData.model.name}
+            </span>
+            <Badge
+              className="p-1 m-0 text-primary text-xs min-h-0 h-5 flex justify-between items-center gap-1"
+              variant="secondary"
+            >
+              <span className="text-xs">
+                @
                 {new Date(assistantMessageData.created_at).toLocaleDateString(
                   "en-US",
                   {
                     year: "numeric",
-                    month: "long",
+                    month: "short",
                     day: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
-                    // second: "2-digit",
                   }
                 )}
-              </Text>
-            </div>
+              </span>
+            </Badge>
           </div>
-          <div className="flex justify-start">
-            {displayContent ? (
-              <Card className="w-fit flex flex-col">
-                <div>
-                  <div className="overflow-y-scroll overflow-x-scroll no-scrollbar">
-                    <Text size="2">
-                      <MarkdownRenderer
-                        markdown={localizeUTCDates(displayContent) || ""}
-                      />
-                    </Text>
-                  </div>
+          <Card className="w-full bg-transparent shadow-none border-none text-sm overflow-hidden rounded-none">
+            <MarkdownRenderer content={localizeUTCDates(displayContent)} />
+          </Card>
+        </div>
+        <div className="flex justify-start">
+          {assistantMessageData.is_deleted ? (
+            assistantMessageData.recoverable ? (
+              <div className="flex justify-end">
+                <div className="flex gap-0 align-middle">
+                  <UndoDeleteAssistantMessageButton
+                    messageId={assistantMessageData.id}
+                    conversationId={assistantMessageData.conversation}
+                  />
                 </div>
-              </Card>
+              </div>
             ) : (
               <></>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="flex justify-start">
-        {assistantMessageData.is_deleted ? (
-          assistantMessageData.recoverable ? (
-            <div className="flex justify-end">
-              <Flex gap="0" align="center">
-                <UndoDeleteAssistantMessageButton
-                  messageId={assistantMessageData.id}
-                  conversationId={assistantMessageData.conversation}
-                />
-              </Flex>
-            </div>
+            )
           ) : (
-            <></>
-          )
-        ) : (
-          <Flex gap="0" align="center">
-            <DeleteMessageModal
-              messageId={assistantMessageData.id}
-              deleteMutation={deleteMutation}
-            />
-            <LikeMessageButton
-              messageId={assistantMessageData.id}
-              isLiked={assistantMessageData.liked}
-              conversationId={assistantMessageData.conversation}
-            />
-            <GenerateNewMessageButton
-              assistantMessage={assistantMessageData}
-              conversationId={assistantMessageData.conversation}
-              onUpdateContent={handleUpdateContent}
-              onRegenerate={handleRegenerate}
-              onStreamComplete={handleStreamComplete}
-            />
+            <div className="flex gap-2 items-center">
+              <DeleteMessageModal
+                messageId={assistantMessageData.id}
+                deleteMutation={deleteMutation}
+              />
+              <LikeMessageButton
+                messageId={assistantMessageData.id}
+                isLiked={assistantMessageData.liked}
+                conversationId={assistantMessageData.conversation}
+              />
+              <GenerateNewMessageButton
+                assistantMessage={assistantMessageData}
+                conversationId={assistantMessageData.conversation}
+                onUpdateContent={handleUpdateContent}
+                onRegenerate={handleRegenerate}
+                onStreamComplete={handleStreamComplete}
+              />
 
-            {/* Only show arrows if there are more than one variation and not streaming */}
-            {variations.length > 1 && streamingContent === null && (
-              <div className="flex justify-end text-center items-center">
-                <LocalButton onClick={handlePrevious} variant="ghost-no-hover">
-                  <ChevronLeftIcon />
-                </LocalButton>
-                <Text size="1" weight="light">
-                  {currentVariationIndex + 1}
-                </Text>
-                <LocalButton onClick={handleNext} variant="ghost-no-hover">
-                  <ChevronRightIcon />
-                </LocalButton>
-              </div>
-            )}
-            {assistantMessageData.tools_used &&
-              assistantMessageData.tools_used?.length > 0 &&
-              assistantMessageData.tools_used.map((tool, index) => (
-                <Badge key={tool.name + index} variant="surface" radius="full" className="ml-2">{tool.name}</Badge>
-              ))}
-          </Flex>
-        )}
+              {variations.length > 1 && streamingContent === null && (
+                <div className="flex justify-end text-center items-center">
+                  <Button onClick={handlePrevious} variant="ghostNoHover">
+                    <ChevronLeftIcon className="!size-3" />
+                  </Button>
+                  <span className="text-xs font-light">
+                    {currentVariationIndex + 1}
+                  </span>
+                  <Button onClick={handleNext} variant="ghostNoHover">
+                    <ChevronRightIcon className="size-3" />
+                  </Button>
+                </div>
+              )}
+
+              {assistantMessageData.tools_used &&
+                assistantMessageData.tools_used.length > 0 && (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Badge
+                        key={`assistant-tools-${assistantMessageData.id}`}
+                        className="p-2 m-0 text-primary text-xs min-h-0 h-5 flex justify-between items-center gap-1"
+                        variant="secondary"
+                      >
+                        <InfoIcon size={12} />
+                        Tools Used
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      className="flex flex-col justify-center items-start gap-2 border bg-background"
+                    >
+                      <span className="text-foreground text-md font-bold">
+                        Function Calls
+                      </span>
+                      <Separator className="bg-primary/80" />
+                      {assistantMessageData.tools_used.map((tool, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-col justify-center items-start p-1 text-foreground gap-2"
+                        >
+                          {Object.entries(tool.arguments).length > 0 ? (
+                            Object.entries(tool.arguments).map(
+                              ([key, value], argIndex) => (
+                                <div
+                                  key={argIndex}
+                                  className="w-full flex justify-between items-center"
+                                >
+                                  <pre>
+                                    <span className="text-primary">
+                                      {tool.name}
+                                    </span>
+                                    ({key}=
+                                    <span className="text-chart-2">
+                                      "{value}"
+                                    </span>
+                                    )
+                                  </pre>
+                                </div>
+                              )
+                            )
+                          ) : (
+                            <div className="w-full flex justify-between items-center">
+                              <pre>
+                                <span className="text-primary">
+                                  {tool.name}
+                                </span>
+                                ()
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
-}
+});
+
+export default AssistantChatMessage;

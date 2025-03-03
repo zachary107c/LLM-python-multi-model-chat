@@ -1,11 +1,17 @@
-import { Text, Button, Card, Switch } from "@radix-ui/themes";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useState, useCallback, useEffect } from "react";
 import { BaseModelEntity } from "@/types/api";
-import { Button as LocalButton } from "@/components/ui/button";
-import { Rocket, Folder } from "lucide-react";
+import { RocketIcon, LightbulbIcon, LightbulbOffIcon } from "lucide-react";
 import { ModelSelect } from "@/features/model/components/model-select";
 import { FileUpload } from "./file-upload";
+import { PulseLoader } from "react-spinners";
 
 interface Props {
   onSendMessage: (message: string, useTools: boolean) => void;
@@ -51,7 +57,7 @@ export function ChatInput({
 
   const handleKeyDown = (event: any) => {
     if (event.shiftKey && event.key === "Enter") {
-      setTextAreaHeight(Math.min(textAreaHeight + 24, 240)); // Limit expansion to 240px
+      setTextAreaHeight(Math.min(textAreaHeight + 24, 240));
     } else if (event.key === "Enter") {
       event.preventDefault();
       onSendMessage(newMessage, useTools);
@@ -77,16 +83,13 @@ export function ChatInput({
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        // const base64Data = reader.result as string;
-        // Create blob URL for preview
         const blobUrl = URL.createObjectURL(file);
         setPreviewUrl(blobUrl);
-        // Store the original file for upload
         setImageData(file);
         setImageName(file.name);
         onImageDataChange(file);
       };
-      reader.readAsDataURL(file); // Changed from readAsArrayBuffer
+      reader.readAsDataURL(file);
     }
   }, []);
 
@@ -98,70 +101,70 @@ export function ChatInput({
   }, []);
 
   return (
-    <div
-      className={`chat-input mb-4 flex flex-col w-full ${isLoading ? "chat-input-border" : ""
-        }`}
-    >
+    <div className="chat-input mb-2 flex flex-col w-full gap-2">
+      {isLoading && (
+        <div className="absolute pl-3 pt-1 flex items-center justify-start gap-1 bg-transparent">
+          <span className="text-xs text-muted-foreground italic">
+            {selectedModel?.name} thinking
+          </span>
+          <PulseLoader color="hsl(var(--primary))" size={3} />
+        </div>
+      )}
       <form onSubmit={handleSendMessage} className="flex justify-between">
-        <Card
-          className={`w-full`}
-          style={
-            {
-              "--base-card-padding-top": "var(--space-1)",
-              "--base-card-padding-bottom": "var(--space-1)",
-              "--base-card-padding-left": "var(--space-2)",
-              "--base-card-padding-right": "var(--space-2)",
-            } as any
-          }
-          size="1"
-          variant="classic"
-        >
+        <Card className="w-full p-2 bg-sidebar shadow-none rounded-lg">
           <div className={`flex justify-between items-center h-full`}>
             <div className="flex flex-col w-full">
               <Textarea
-                className="outline-none border-none w-full py-3 px-1 rounded-l resize-none h-[48px] no-scrollbar"
+                className="outline-none border-none w-full py-3 px-1 resize-none no-scrollbar focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 focus-visible:ring-offset-0 shadow-none min-h-[48px]"
                 onChange={(event) => setNewMessage(event.target.value)}
                 value={newMessage}
                 placeholder="Type your message here"
                 onKeyDown={handleKeyDown}
                 style={{ height: `${textAreaHeight}px` }}
+                disabled={isLoading}
               />
-              <div className="flex justify-between items-center">
-                <div className="mr-2">
-                  <div className="flex items-center">
-                    <ModelSelect
-                      selectedModel={selectedModel}
-                      models={models}
-                      modelsLoading={modelsLoading}
-                      onModelChange={handleModelChange}
-                    />
-                    <div className="ml-2 flex items-center">
-                      <Text size="1" color="gray" className="mr-1">
-                        Use Tools
-                      </Text>
-                      <Switch
-                        checked={useTools}
-                        onCheckedChange={handleUseToolsToggled}
-                        size="1"
+              <div className="flex justify-between items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <ModelSelect
+                    selectedModel={selectedModel}
+                    models={models}
+                    modelsLoading={modelsLoading}
+                    onModelChange={handleModelChange}
+                    variant="secondary"
+                    className="bg-accent-2 hover:bg-primary/50"
+                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild onClick={handleUseToolsToggled}>
+                      <div className="hover:cursor-pointer p-2 flex justify-center items-center">
+                        {useTools ? (
+                          <LightbulbIcon size={15} />
+                        ) : (
+                          <LightbulbOffIcon size={15} />
+                        )}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {useTools ? <p>Disable Tools</p> : <p>Enable Tools</p>}
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <FileUpload
+                        imageName={imageName}
+                        onFileChange={handleFileChange}
+                        onClear={handleClear}
+                        handleOuterClear={handleClear}
+                        previewUrl={previewUrl}
                       />
-                    </div>
-                    <div className="ml-2">
-                      <LocalButton variant="ghost-no-hover" className="m-1 p-0">
-                        <Folder size={15} strokeWidth={1.5} />
-                      </LocalButton>
-                    </div>
-                    <FileUpload
-                      imageName={imageName}
-                      onFileChange={handleFileChange}
-                      onClear={handleClear}
-                      handleOuterClear={handleClear}
-                      previewUrl={previewUrl}
-                    />
-                  </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Upload Image</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
-                <Button type="submit" size="1" variant="surface" color="green">
-                  <Text size="1">Submit</Text>
-                  <Rocket size={15} />
+                <Button type="submit" variant="default" size="sm">
+                  <span className="text-sm">Submit</span>
+                  <RocketIcon size={15} />
                 </Button>
               </div>
             </div>

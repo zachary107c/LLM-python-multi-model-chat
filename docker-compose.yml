@@ -24,7 +24,7 @@ services:
   frontend:
     container_name: bruh-frontend
     build:
-      context: ./frontend-v2
+      context: ./frontend
       dockerfile: Dockerfile
     environment:
       - VITE_APP_BACKEND_API_URL=${VITE_APP_BACKEND_API_URL}
