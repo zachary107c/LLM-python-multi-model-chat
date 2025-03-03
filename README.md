@@ -22,9 +22,9 @@ BS-LLM-WebUI is a web application with a frontend built using React and Vite, an
 
 ## Prerequisites
 
-- **Node.js**: Make sure you have Node.js installed to manage frontend dependencies.
-- **Python**: Ensure that Python 3.11+ is installed for running the Django backend.
-- **Poetry**: Make sure you have Poetry installed to manage Python dependencies.
+- **[Node.js](https://nodejs.org/en/download)**: Make sure you have Node.js installed to manage frontend dependencies.
+- **[Python](https://www.python.org/downloads/)**: Ensure that Python 3.11+ is installed for running the Django backend.
+- **[Poetry](https://python-poetry.org/docs/)**: Make sure you have Poetry installed to manage Python dependencies.
 - **[Ollama](https://ollama.com/)**: Ensure you have Ollama installed on your machine, or a machine on your local network.
 
 ## Quickstart using Docker
