@@ -3654,7 +3654,8 @@ body {
   /* Adjust this value to your desired gap */
 }
 
-.monaco-editor, .overflow-guard
+.monaco-editor,
+.overflow-guard,
 .monaco-editor-background,
 .monaco-editor .inputarea.ime-input {
   border-radius: 0.5rem !important;
