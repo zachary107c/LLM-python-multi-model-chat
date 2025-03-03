@@ -36,6 +36,7 @@ BS-LLM-WebUI is a web application with a frontend built using React and Vite, an
 ### Backend Environment Variables
 - `ALLOWED_HOSTS`: The allowed hosts lists for django.
 - `OLLAMA_ENDPOINT`: The endpoint to access Ollama running locally.
+  - If you are using docker on the same system that is running Ollama, you may need to use `http://host.docker.internal:11434`. Otherwise, it can be the IP address of the device hosting Ollama on your local network.
 - `OPENAI_API_KEY`: API Key to interact with OpenAI apis.
 - `ANTHROPIC_API_KEY`: API Key to interact with Anthropic apis.
 - `GEMINI_API_KEY`: API Key to interact with Google AI apis.
@@ -50,6 +51,7 @@ _Azure Open AI is not fully supported yet_
 - `DJANGO_SUPERUSER_PASSWORD`: Password of the Django super user.
 - `DJANGO_SUPERUSER_EMAIL`: Email of the Django super user.
 - `OLLAMA_ENDPOINT`: The endpoint to access Ollama running locally.
+  - If you are using docker on the same system that is running Ollama, you may need to use `http://host.docker.internal:11434`. Otherwise, it can be the IP address of the device hosting Ollama on your local network.
 - `VITE_APP_BACKEND_API_URL`: The url the frontend will use to access the backend.
   - If locally, `http://127.0.0.1:8000/api/v1/`
   - If with docker compose, `/api/v1/`
