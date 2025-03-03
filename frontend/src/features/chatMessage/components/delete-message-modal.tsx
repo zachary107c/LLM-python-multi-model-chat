@@ -1,6 +1,14 @@
-import { AlertDialog, Flex, Button } from "@radix-ui/themes";
-import { Button as LocalButton } from "@/components/ui/button";
-import { TrashIcon } from "@radix-ui/react-icons";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Trash2Icon } from "lucide-react";
 
 interface DeleteMessageModalProps {
   messageId: string;
@@ -20,31 +28,34 @@ export function DeleteMessageModal({
   };
 
   return (
-    <AlertDialog.Root>
-      <AlertDialog.Trigger>
-        <LocalButton variant={"ghost-no-hover"} className="mx-1 px-1 py-0 my-0">
-          <TrashIcon />
-        </LocalButton>
-      </AlertDialog.Trigger>
-      <AlertDialog.Content size="1">
-        <AlertDialog.Title size="2">Delete Message</AlertDialog.Title>
-        <AlertDialog.Description size="1">
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="ghostNoHover" className="m-0 p-0 [&_svg]:size-3">
+          <Trash2Icon />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogTitle>Delete Message</AlertDialogTitle>
+        <AlertDialogDescription>
           Are you sure? This message will no longer be accessible.
-        </AlertDialog.Description>
+        </AlertDialogDescription>
 
-        <Flex gap="3" mt="4" justify="between">
-          <AlertDialog.Cancel>
-            <Button variant="soft" color="gray" size="1">
+        <div className="flex gap-3 mt-4 justify-between">
+          <AlertDialogCancel asChild>
+            <Button variant="secondary" size="sm">
               Cancel
             </Button>
-          </AlertDialog.Cancel>
-          <AlertDialog.Action>
-            <Button variant="solid" color="red" onClick={handleDelete} size="1">
+          </AlertDialogCancel>
+          <AlertDialogAction
+            asChild
+            className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
+          >
+            <Button size="sm" onClick={handleDelete}>
               Delete Message
             </Button>
-          </AlertDialog.Action>
-        </Flex>
-      </AlertDialog.Content>
-    </AlertDialog.Root>
+          </AlertDialogAction>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

@@ -57,13 +57,10 @@ const EditToolArea: React.FC<EditToolAreaProps> = ({ toolId }) => {
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
     editorRef.current = editor;
     monacoInstanceRef.current = monaco;
-
-    // Apply the initial theme
     updateMonacoTheme();
   };
 
   const updateMonacoTheme = () => {
-    // Use setTimeout to ensure CSS variables have been updated in the DOM
     setTimeout(() => {
       if (monacoInstanceRef.current) {
         const customThemeData = createCustomTheme(theme === "dark");

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { updateConversationMutation } from "../api/update-conversation";
 import { useConversationalTitleGenerator } from "@/features/conversation/hooks/generate-conversation-title";
-import { BarLoader } from "react-spinners";
+import { MoonLoader } from "react-spinners";
 import { WandSparkles } from "lucide-react";
 
 interface MagicTitleModalProps {
@@ -31,19 +31,11 @@ export function MagicTitleButton({ conversationId }: MagicTitleModalProps) {
   return (
     <Button
       variant="ghost"
-      className="p-2 w-full flex justify-start"
+      className="p-2 w-full flex gap-4 justify-start"
       onClick={async () => handleGenerateAiTitle()}
     >
-      {isLoading ? (
-        <div className="w-full">
-          <BarLoader width={"100%"} color="#484848" />
-        </div>
-      ) : (
-        <>
-          <WandSparkles size={15} className="mr-2" />
-          <div className="w-full text-left">Magic Title</div>
-        </>
-      )}
+      { isLoading ? (<MoonLoader size={12} color="hsl(var(--primary))"/>) : (<WandSparkles size={15} />)}
+      <div className="text-left">Magic Title™</div>
     </Button>
   );
 }

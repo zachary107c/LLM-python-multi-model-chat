@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { HeartIcon, HeartFilledIcon } from "@radix-ui/react-icons";
+import { HeartIcon } from "lucide-react";
 import { likeAssistantMessageMutation } from "../api/like-assistant-message";
 
 export function LikeMessageButton({
@@ -34,13 +34,13 @@ export function LikeMessageButton({
 
   return (
     <Button
-      variant={"ghost-no-hover"}
-      className="mx-1 px-1 py-0 my-0"
+      variant="ghostNoHover"
+      className="m-0 p-0 [&_svg]:size-3"
       size={"icon"}
       onClick={handleLikedMessage}
       aria-label={liked ? "Unlike" : "Like"}
     >
-      {liked ? <HeartFilledIcon color="red"/> : <HeartIcon />}
+      {liked ? <HeartIcon className="fill-primary stroke-primary" /> : <HeartIcon />}
     </Button>
   );
 }

@@ -1,8 +1,17 @@
-import { AlertDialog, Flex, Button, Text } from "@radix-ui/themes";
-import { Button as LocalButton } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { useSearchParams } from "react-router-dom";
 import { deleteConversationMutation } from "../api/delete-conversation";
 import { Trash2 } from "lucide-react";
+import { useConversationId } from "../contexts/conversationContext";
 
 interface DeleteConversationModalProps {
   conversationId: string;
@@ -11,7 +20,7 @@ interface DeleteConversationModalProps {
 export function DeleteConversationModal({
   conversationId,
 }: DeleteConversationModalProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const {conversationId: activeConversationId, setConversationId} = useConversationId();
   const deleteMutation = deleteConversationMutation();
 
   const handleDelete = async () => {
@@ -19,8 +28,8 @@ export function DeleteConversationModal({
       await deleteMutation.mutateAsync({
         data: { conversationId: conversationId },
       });
-      if (searchParams.get("conversationId") === conversationId) {
-        setSearchParams({});
+      if (conversationId === activeConversationId) {
+        setConversationId("");
       }
     } catch (e) {
       console.log(e);
@@ -28,31 +37,39 @@ export function DeleteConversationModal({
   };
 
   return (
-    <AlertDialog.Root>
-      <AlertDialog.Trigger>
-        <LocalButton variant="ghost" className="p-2 w-full flex justify-start">
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="ghost"
+          className="p-2 w-full flex justify-start text-destructive hover:text-destructive"
+        >
           <Trash2 size={15} className="mr-2" />
-          <Text color="red" className="text-left">Delete Conversation</Text>
-        </LocalButton>
-      </AlertDialog.Trigger>
-      <AlertDialog.Content size="1">
-        <AlertDialog.Title size="2">Delete Conversation</AlertDialog.Title>
-        <AlertDialog.Description size="1">
+          <span className="text-left">
+            Delete Conversation
+          </span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
+        <AlertDialogDescription>
           Are you sure? This conversation will no longer be accessible.
-        </AlertDialog.Description>
-        <Flex gap="3" mt="4" justify="between">
-          <AlertDialog.Cancel>
-            <Button variant="soft" color="gray" size="1">
+        </AlertDialogDescription>
+        <div className="flex gap-3 mt-4 justify-between">
+          <AlertDialogCancel asChild>
+            <Button variant="secondary" size="sm">
               Cancel
             </Button>
-          </AlertDialog.Cancel>
-          <AlertDialog.Action>
-            <Button variant="solid" color="red" onClick={handleDelete} size="1">
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} asChild>
+            <Button
+              className="bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90"
+              size="sm"
+            >
               Delete Conversation
             </Button>
-          </AlertDialog.Action>
-        </Flex>
-      </AlertDialog.Content>
-    </AlertDialog.Root>
+          </AlertDialogAction>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

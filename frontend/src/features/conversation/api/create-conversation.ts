@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { api } from "@/lib/api-client";
 import { Conversation } from "@/types/api";
-import Cookies from "js-cookie";
 
 export const createConversationInputSchema = z.object({
   previousConversationId: z.string().optional(),
@@ -28,9 +27,7 @@ export const createConversationMutation = () => {
           queryKey: [`conversation`, data.previousConversationId],
         });
       }
-      return api.post(`/conversations/`, data.data, {
-        headers: { Authorization: `Token ${Cookies.get("token")}` },
-      });
+      return api.post(`/conversations/`, data.data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
