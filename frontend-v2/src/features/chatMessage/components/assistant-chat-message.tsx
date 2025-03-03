@@ -142,7 +142,7 @@ const AssistantChatMessage = memo(function AssistantChatMessage({
               </span>
             </Badge>
           </div>
-          <Card className="w-full bg-transparent shadow-none border-none text-sm overflow-hidden">
+          <Card className="w-full bg-transparent shadow-none border-none text-sm overflow-hidden rounded-none">
             <MarkdownRenderer content={localizeUTCDates(displayContent)} />
           </Card>
         </div>

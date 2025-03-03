@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import MonacoEditor from "@monaco-editor/react"; // Import the MonacoEditor component
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import MonacoEditor, { Monaco } from "@monaco-editor/react";
 import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { useToolId } from "../contexts/toolsContext";
 import { updateToolMutation } from "../api/update-tool";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/components/theme/theme-provider";
+import { createCustomTheme } from "../theme/customMonacoTheme";
+import { editor } from "monaco-editor";
 
 interface EditToolAreaProps {
   toolId: string;
@@ -20,8 +22,10 @@ const EditToolArea: React.FC<EditToolAreaProps> = ({ toolId }) => {
   const { toolId: _, setToolId } = useToolId();
   const updateTool = updateToolMutation();
   const { toast } = useToast();
-  const { theme, systemOverride } = useTheme();
-
+  const { theme, colorTheme, systemOverride } = useTheme();
+  const monacoInstanceRef = useRef<Monaco | null>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editableTool) {
@@ -29,22 +33,50 @@ const EditToolArea: React.FC<EditToolAreaProps> = ({ toolId }) => {
         await updateTool.mutateAsync({
           data: { toolId: toolId, updates: editableTool },
         });
-        toast({ title: "Tool Updated", description: "Successfully updated the tool!" });
+        toast({
+          title: "Tool Updated",
+          description: "Successfully updated the tool!",
+        });
       } catch (error) {
         console.error("Error updating tool:", error);
-        toast({ title: "Tool Update Failed", description: "Failed to update the tool: " + error, variant: "destructive" });
+        toast({
+          title: "Tool Update Failed",
+          description: "Failed to update the tool: " + error,
+          variant: "destructive",
+        });
       }
     }
   };
 
-  const determineTheme = (theme: string, systemOverride: string): string => {
-    if (theme === "system") {
-      return systemOverride === "dark" ? "vs-dark" : "vs";
-    }
-    return theme === "dark" ? "vs-dark" : "vs";
+  const handleEditorBeforeMount = (monaco: Monaco) => {
+    monacoInstanceRef.current = monaco;
+    const customThemeData = createCustomTheme(theme === "dark");
+    monaco.editor.defineTheme("customMonacoTheme", customThemeData);
   };
 
-  // Set the initial state of the editable tool when the tool data changes
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
+    editorRef.current = editor;
+    monacoInstanceRef.current = monaco;
+
+    // Apply the initial theme
+    updateMonacoTheme();
+  };
+
+  const updateMonacoTheme = () => {
+    // Use setTimeout to ensure CSS variables have been updated in the DOM
+    setTimeout(() => {
+      if (monacoInstanceRef.current) {
+        const customThemeData = createCustomTheme(theme === "dark");
+        monacoInstanceRef.current.editor.defineTheme("customMonacoTheme", customThemeData);
+        monacoInstanceRef.current.editor.setTheme("customMonacoTheme");
+      }
+    }, 0);
+  };
+
+  useEffect(() => {
+    updateMonacoTheme();
+  }, [theme, colorTheme, systemOverride, updateMonacoTheme]);
+
   useEffect(() => {
     if (tool) {
       setEditableTool(tool);
@@ -57,11 +89,7 @@ const EditToolArea: React.FC<EditToolAreaProps> = ({ toolId }) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Button
-        variant="ghost"
-        onClick={() => setToolId("")}
-        className="mb-4"
-      >
+      <Button variant="ghost" onClick={() => setToolId("")} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Tools
       </Button>
       <h1 className="text-3xl font-bold mb-8">Edit Tool</h1>
@@ -71,7 +99,9 @@ const EditToolArea: React.FC<EditToolAreaProps> = ({ toolId }) => {
           <Input
             id="name"
             value={editableTool.name}
-            onChange={(e) => setEditableTool({ ...editableTool, name: e.target.value })}
+            onChange={(e) =>
+              setEditableTool({ ...editableTool, name: e.target.value })
+            }
             className="mt-1"
           />
         </div>
@@ -80,7 +110,9 @@ const EditToolArea: React.FC<EditToolAreaProps> = ({ toolId }) => {
           <Input
             id="description"
             value={editableTool.description}
-            onChange={(e) => setEditableTool({ ...editableTool, description: e.target.value })}
+            onChange={(e) =>
+              setEditableTool({ ...editableTool, description: e.target.value })
+            }
             className="mt-1"
           />
         </div>
@@ -90,8 +122,19 @@ const EditToolArea: React.FC<EditToolAreaProps> = ({ toolId }) => {
             height="400px"
             language="python"
             value={editableTool.script}
-            onChange={(value: string | undefined) => setEditableTool({ ...editableTool, script: value || ''})}
-            theme={determineTheme(theme, systemOverride)}
+            onChange={(value: string | undefined) =>
+              setEditableTool({ ...editableTool, script: value || "" })
+            }
+            beforeMount={handleEditorBeforeMount}
+            onMount={handleEditorDidMount}
+            options={{
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
+              folding: true,
+              lineNumbers: "on",
+              roundedSelection: true
+            }}
           />
         </div>
         <Button type="submit">Save Changes</Button>

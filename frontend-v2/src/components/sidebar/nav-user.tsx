@@ -74,7 +74,7 @@ export function NavUser({ user }: { user: User | undefined | null }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground border border-foreground/10"
             >
               <Avatar
-                className="h-8 w-8 rounded-lg"
+                className="h-8 w-8 rounded-md"
                 style={avatarOverlay ? avatarOverlayStyles : undefined}
               >
                 <AvatarImage
@@ -83,7 +83,7 @@ export function NavUser({ user }: { user: User | undefined | null }) {
                   className={avatarOverlay ? "grayscale" : ""}
                 />
                 {avatarOverlay && <div style={overlayStyles}></div>}
-                <AvatarFallback className="rounded-lg">BS</AvatarFallback>
+                <AvatarFallback className="rounded-md">BS</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user?.username}</span>
@@ -107,11 +107,13 @@ export function NavUser({ user }: { user: User | undefined | null }) {
                   navigate("/profile");
                 }}
               >
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="h-8 w-8 rounded-md">
                   <AvatarImage
                     src={user?.profile?.image}
                     alt={user?.username}
+                    className={avatarOverlay ? "grayscale" : ""}
                   />
+                  {avatarOverlay && <div style={overlayStyles}></div>}
                   <AvatarFallback className="rounded-lg">BS</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

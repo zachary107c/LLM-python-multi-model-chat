@@ -2323,6 +2323,10 @@ body {
   border-radius: calc(var(--radius) - 2px);
 }
 
+.rounded-none {
+  border-radius: 0px;
+}
+
 .rounded-sm {
   border-radius: calc(var(--radius) - 4px);
 }
@@ -2613,8 +2617,8 @@ body {
   fill: hsl(var(--primary));
 }
 
-.fill-red-500 {
-  fill: #ef4444;
+.stroke-primary {
+  stroke: hsl(var(--primary));
 }
 
 .object-cover {
@@ -3574,9 +3578,9 @@ body {
   bottom: -2px;
   z-index: -1;
   background: linear-gradient(-45deg,
-    hsl(var(--background)) 60%,
-    hsl(var(--primary)) 70%,
-    hsl(var(--background)) 80%);
+      hsl(var(--background)) 60%,
+      hsl(var(--primary)) 70%,
+      hsl(var(--background)) 80%);
   border-radius: inherit;
   background-size: 300% 300%;
   animation: gradient-flow 5s linear infinite;
@@ -3601,12 +3605,10 @@ body {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(
-    -45deg,
-    hsl(var(--secondary)) 0%,
-    hsl(var(--primary)) 50%,
-    hsl(var(--secondary)) 100%
-  );
+  background-image: linear-gradient(-45deg,
+      hsl(var(--secondary)) 0%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--secondary)) 100%);
   background-size: 200% 200%;
   animation: gradient-flow-2 8s ease-in-out infinite;
 }
@@ -3616,9 +3618,9 @@ body {
   -webkit-background-clip: text;
   color: transparent;
   background-image: linear-gradient(-45deg,
-    hsl(var(--background)) 60%,
-    hsl(var(--primary)) 70%,
-    hsl(var(--background)) 80%);
+      hsl(var(--background)) 60%,
+      hsl(var(--primary)) 70%,
+      hsl(var(--background)) 80%);
   background-size: 300% 300%;
   animation: gradient-flow 5s linear infinite;
 }
@@ -3647,9 +3649,15 @@ body {
   }
 }
 
-.markdown p + p {
+.markdown p+p {
   margin-top: 16px;
   /* Adjust this value to your desired gap */
+}
+
+.monaco-editor, .overflow-guard
+.monaco-editor-background,
+.monaco-editor .inputarea.ime-input {
+  border-radius: 0.5rem !important;
 }
 
 .file\:border-0::file-selector-button {

@@ -986,9 +986,9 @@
   bottom: -2px;
   z-index: -1;
   background: linear-gradient(-45deg,
-    hsl(var(--background)) 60%,
-    hsl(var(--primary)) 70%,
-    hsl(var(--background)) 80%);
+      hsl(var(--background)) 60%,
+      hsl(var(--primary)) 70%,
+      hsl(var(--background)) 80%);
   border-radius: inherit;
   background-size: 300% 300%;
   animation: gradient-flow 5s linear infinite;
@@ -1011,12 +1011,10 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(
-    -45deg,
-    hsl(var(--secondary)) 0%,
-    hsl(var(--primary)) 50%,
-    hsl(var(--secondary)) 100%
-  );
+  background-image: linear-gradient(-45deg,
+      hsl(var(--secondary)) 0%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--secondary)) 100%);
   background-size: 200% 200%;
   animation: gradient-flow-2 8s ease-in-out infinite;
 }
@@ -1026,9 +1024,9 @@
   -webkit-background-clip: text;
   color: transparent;
   background-image: linear-gradient(-45deg,
-    hsl(var(--background)) 60%,
-    hsl(var(--primary)) 70%,
-    hsl(var(--background)) 80%);
+      hsl(var(--background)) 60%,
+      hsl(var(--primary)) 70%,
+      hsl(var(--background)) 80%);
   background-size: 300% 300%;
   animation: gradient-flow 5s linear infinite;
 }
@@ -1037,6 +1035,7 @@
   from {
     background-position: 150% 150%;
   }
+
   to {
     background-position: -150% 150%;
   }
@@ -1046,14 +1045,23 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
 }
 
-.markdown p + p {
-  margin-top: 16px; /* Adjust this value to your desired gap */
+.markdown p+p {
+  margin-top: 16px;
+  /* Adjust this value to your desired gap */
+}
+
+.monaco-editor, .overflow-guard
+.monaco-editor-background,
+.monaco-editor .inputarea.ime-input {
+  border-radius: 0.5rem !important;
 }

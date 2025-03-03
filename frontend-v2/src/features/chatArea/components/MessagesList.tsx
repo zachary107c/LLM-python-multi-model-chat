@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { UserMessage, AssistantMessage, Message } from "@/types/api";
+import { UserMessage, AssistantMessage } from "@/types/api";
 import UserChatMessage from "@/features/chatMessage/components/user-chat-message";
 import AssistantChatMessage from "@/features/chatMessage/components/assistant-chat-message";
 import useScrollToEnd from "../hooks/use-scroll-to-end";

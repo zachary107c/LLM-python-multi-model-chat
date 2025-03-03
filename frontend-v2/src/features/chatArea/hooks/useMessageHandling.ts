@@ -201,7 +201,7 @@ export function useMessageHandling({
     }
 
     const userPostData = await createUserMessage({
-      data: { conversation: currentChatId, content: message, image: imageData, use_tools: useTools },
+      data: { conversation: currentChatId, content: message, image: imageData, use_tools: useTools || false },
     });
 
     if (messages.length === 0) {

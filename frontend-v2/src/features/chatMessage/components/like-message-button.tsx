@@ -40,7 +40,7 @@ export function LikeMessageButton({
       onClick={handleLikedMessage}
       aria-label={liked ? "Unlike" : "Like"}
     >
-      {liked ? <HeartIcon className="fill-red-500" /> : <HeartIcon />}
+      {liked ? <HeartIcon className="fill-primary stroke-primary" /> : <HeartIcon />}
     </Button>
   );
 }
