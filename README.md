@@ -1,4 +1,4 @@
-# LLM-integrated-chat project
+# Multi-LLM AI chat project
 
 ## Description
 
