@@ -129,5 +129,7 @@ To run the application, start both the frontend and backend servers as described
 
 The frontend React application will communicate with the Django backend via API calls.
 
+## Author
+Zachary Matsuk
 You can then access the site at http://localhost:5173 (or the ip of the device on the local network)
 
